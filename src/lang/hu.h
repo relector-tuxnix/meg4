@@ -143,7 +143,7 @@
 "hanghullám",
 "zenesáv",
 "betűkészlet",
-"felhasználói memória"
+"felhasználói memória",
 
 "Ismeretlen nyelv",
 "Nincs elég memória",
