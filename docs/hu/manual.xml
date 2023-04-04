@@ -1,0 +1,61 @@
+<!--
+  to be used with gendoc, like this:
+  $ gendoc ../../pages/manuan_en.html manual.xml
+  see https://gitlab.com/bztsrc/gendoc
+-->
+<doc>
+    <titleimg>../img/logo.png MEG-4</titleimg>
+    <title>User's Manual</title>
+    <url>https://bztsrc.gitlab.io/meg4</url>
+    <version>0.0.1</version>
+    <theme>../manual.css</theme>
+    <lang>hu</lang>
+    <rslt>Találatok</rslt>
+    <home>Főoldal</home>
+    <link>Hivatkozás erre a címre</link>
+    <info>FONTOS</info>
+    <hint>TIPP</hint>
+    <note>MEGJEGYZÉS</note>
+    <also>LÁSD MÉG</also>
+    <todo>TEENDŐ</todo>
+    <args>Paraméterek</args>
+    <rval>Visszatérési érték</rval>
+    <warn>FIGYELEM</warn>
+    <prev>Előző</prev>
+    <next>Következő</next>
+    <copy>2023 bzt (bztsrc@gitlab)</copy>
+</doc>
+
+<hello>
+<include welcome.md>
+</hello>
+
+<cap>Alapok</cap>
+<include getstart.md>
+<include formats.md>
+<include userinput.md>
+<include interface.md>
+
+<cap>Szerkesztők</cap>
+<include code.md>
+<include sprite.md>
+<include map.md>
+<include font.md>
+<include sound.md>
+<include music.md>
+<include overlay.md>
+<include visual.md>
+<include debug.md>
+
+<cap>Programozás</cap>
+<include c.md>
+<include bas.md>
+<include asm.md>
+<include lua.md>
+
+<cap>API Referencia</cap>
+<include ../../src/lang/hu.md>
+
+<cap>Függelék</cap>
+<include license.md>
+<include links.md>

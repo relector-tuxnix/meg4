@@ -1,0 +1,46 @@
+GIMP Palette
+Name: default theme
+# R   G   B     Element
+ 68  68  68     background
+170 170 170     foreground
+ 58  58  58     background dark
+ 78  78  78     background light
+170 170 170     menu background
+ 34  34  34     menu foreground
+160 160 160     menu dark border
+180 180 180     menu light border
+100 100 100     menu active dark border
+136 136 136     menu active background
+  0 127   0     selected background
+238 238 238     selected foreground
+ 34  34  34     input box background
+200 200 200     input box foreground
+ 68  68  68     input box dark border
+200 200 200     input box light border
+160 160 160     button background
+ 34  34  34     button foreground
+140 140 140     button dark border
+180 180 180     button light border
+238 238 238     help title foreground
+102 102 238     help link foreground
+200 200 200     help header foreground
+102 238 102     help emphasis foreground (aka. italic)
+238 172 172     help stress foreground (aka. bold)
+102 160 102     help monospace foreground (aka. code)
+102 102 102     help keyboard key foreground
+102 102 102     line numbers background
+ 68  68  68     line numbers foreground
+102  68  68     faulting line's background
+102   0   0     error message background
+140 140   0     error message foreground
+ 76  76  76     highlight background
+ 31 102 102     highlight comment
+ 31 113 153     highlight pseudo
+124 154 124     highlight operator
+  1 100 235     highlight number
+152 104   1     highlight string
+152 124 124     highlight delimiter
+ 96 160  80     highlight type
+206 132  71     highlight keyword
+ 42 146 146     highlight function
+170 170 170     highlight variable

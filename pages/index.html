@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="fantasy console, C">
+    <meta name="author" content="bzt">
+    <title>MEG-4</title>
+    <link href="logo.png" rel="shortcut icon">
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <style>
+body { padding-top: 64px; }
+.card { height: 100%; }
+.headerbg {background: #333 url(images/headerbg.png) center;background-size: cover;}
+.headerbg p {text-shadow: 2px 2px 2px #000;}
+.headerbg h1 {text-shadow: 3px 3px 5px #000;}
+.headerbg div {padding-bottom:5px;}
+.headerbg img { height: 30px; margin-right: 20px;}
+th { background-color:#d6d8db; }
+#tabs, #results { padding-bottom: 25px; }
+#menuchk:checked ~ .navbar-collapse { display:block; }
+#canvas { width:320px; height:200px; }
+@media (min-width:768px){#canvas { width:640px; height:400px; }}
+@media (min-width:1024px){#canvas { width:960px; height:600px; }}
+@media (min-width:1500px){#canvas { width:1280px; height:800px; }}
+.nav-link { cursor:pointer; }
+.nav-link:hover {  border-color: #888; }
+.nav-tabs { border-bottom: 1px solid #888; }
+.nav-tabs li { position: relative; bottom: -1px; }
+.nav-tabs li label { margin-bottom: 0px !important; cursor: inherit; }
+.tabcol { border-bottom: 1px solid #888; }
+.hu, .de, .fr, .es, .ru, .zh, .ja { display: none; }
+div.langs { text-align:center; }
+div.langs a { padding:0px 10px 0px 10px; }
+.row > a { width: 210px; height: 220px; cursor:pointer; margin:10px 10px 10px 10px; }
+#tabs > div.row { min-height: 240px; }
+input[name="tab"], div[rel^="tab"] { display: none; }
+#tab0:checked ~ div div ul li[rel="tab0"],
+#tab1:checked ~ div div ul li[rel="tab1"],
+#tab2:checked ~ div div ul li[rel="tab2"],
+#tab3:checked ~ div div ul li[rel="tab3"],
+#tab4:checked ~ div div ul li[rel="tab4"],
+#tab5:checked ~ div div ul li[rel="tab5"],
+#tab6:checked ~ div div ul li[rel="tab6"],
+#tab7:checked ~ div div ul li[rel="tab7"],
+#tab8:checked ~ div div ul li[rel="tab8"],
+#tab9:checked ~ div div ul li[rel="tab9"] { border-color: #888 #888 #fff; cursor: default; }
+#tab0:checked ~ div div[rel="tab0"],
+#tab1:checked ~ div div[rel="tab1"],
+#tab2:checked ~ div div[rel="tab2"],
+#tab3:checked ~ div div[rel="tab3"],
+#tab4:checked ~ div div[rel="tab4"],
+#tab5:checked ~ div div[rel="tab5"],
+#tab6:checked ~ div div[rel="tab6"],
+#tab7:checked ~ div div[rel="tab7"],
+#tab8:checked ~ div div[rel="tab8"],
+#tab9:checked ~ div div[rel="tab9"] { display: flex; }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="/meg4/"><img src="images/meg4hdr.png" height="30" alt="MEG-4"> MEG-4</a>
+        <input type="checkbox" id="menuchk" style="display:none;"><label for="menuchk" class="navbar-toggler">
+          <span class="navbar-toggler-icon"></span>
+        </label>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/meg4/">
+                <span class="en">Home</span>
+                <span class="hu">Főoldal</span>
+                <span class="de">Hauptseite</span>
+                <span class="fr">Page d'accueil</span>
+                <span class="es">Pagina principal</span>
+                <span class="ru">Главная страница</span>
+                <span class="zh">主页</span>
+                <span class="ja">メインページ</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#spec">
+                <span class="en">Specifications</span>
+                <span class="hu">Specifikáció</span>
+                <span class="de">Spezifikationen</span>
+                <span class="fr">Spécifications</span>
+                <span class="es">Especificaciones</span>
+                <span class="ru">Характеристики</span>
+                <span class="zh">规格</span>
+                <span class="ja">仕様</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#features">
+                <span class="en">Features</span>
+                <span class="hu">Jellemzők</span>
+                <span class="de">Eigenschaften</span>
+                <span class="fr">Fonctionalités</span>
+                <span class="es">Caracteristicas</span>
+                <span class="ru">Функции</span>
+                <span class="zh">特征</span>
+                <span class="ja">特徴</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#floppies">
+                <span class="en">Floppies</span>
+                <span class="hu">Flopik</span>
+                <span class="de">Disketten</span>
+                <span class="fr">Disquettes</span>
+                <span class="es">Disquetes</span>
+                <span class="ru">Дискеты</span>
+                <span class="zh">软盘</span>
+                <span class="ja">フロッピー</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://gitlab.com/bztsrc/meg4/issues">
+                <span class="en">Issues</span>
+                <span class="hu">Hibabejelentő</span>
+                <span class="de">Problembericht</span>
+                <span class="fr">Rapport de problème</span>
+                <span class="es">Informe de problema</span>
+                <span class="ru">Проблемы</span>
+                <span class="zh">问题报告</span>
+                <span class="ja">バグレポート</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div style="display:none;"><img src="images/headerbg.png" alt=""></div>
+    <div class="container" id="content" style="display:block;">
+      <div class="langs">
+          <a href="?en">English</a>
+          <a href="?hu">Magyar</a>
+          <a href="?de">Deutsch</a>
+          <a href="?fr">Français</a>
+          <a href="?es">Español</a>
+          <a href="?ru">Русский</a>
+          <a href="?zh">中文</a>
+          <a href="?ja">日本語</a>
+      </div>
+      <header class="jumbotron my-4 headerbg" id="home">
+        <h1 class="display-3 text-white">
+          <span class="en">Welcome to</span>
+          <span class="hu">Üdvözöl a</span>
+          <span class="de">Wilkommen zu</span>
+          <span class="fr">Bienvenue à</span>
+          <span class="es">Bienvenido a</span>
+          <span class="ru">Привет от</span>
+          <span class="zh">欢迎来到</span>
+          <span class="ja">ようこそ</span>
+          MEG-4!
+        </h1>
+        <p class="lead text-white">
+          <span class="en">MEG-4 (pronouned as "MEGA", <i>ˈmegə</i>) is my take on the virtual fantasy game console genre, similar to PICO-8 and TIC-80, but simpler to use, more featureful, and <i>much more</i> performant.</span>
+          <span class="hu">A MEG-4 (kiejtve "MEGA", <i>ˈmegə</i>) az én virtuális fantázia konzol implementációm, olyan, mint a PICO-8 és TIC-80, de könnyebb használni, többet tud, és <i>sokkal, de sokkal</i> gyorsabb azoknál.</span>
+          <span class="de">MEG-4 (ausgesprochen als "MEGA", <i>ˈmegə</i>) ist meine Interpretation des Genres der virtuellen Fantasy-Spielekonsolen, ähnlich wie PICO-8 und TIC-80, aber einfacher zu verwenden, funktionsreicher und <i>viel leistungsfähiger</i>.</span>
+          <span class="fr">MEG-4 (prononcé comme "MEGA", <i>ˈmegə</i>) est mon point de vue sur le genre de console de jeu de fantasy virtuelle, similaire à PICO-8 et TIC-80, mais plus simple à utiliser, plus fonctionnel et <i>beaucoup plus</i> performant.</span>
+          <span class="es">MEG-4 (pronunciado como "MEGA", <i>ˈmegə</i>) es mi versión del género de consola de juegos de fantasía virtual, similar a PICO-8 y TIC-80, pero más simple de usar, con más funciones y <i>mucho más</i> eficaz.</span>
+          <span class="ru">MEG-4 (произносится как «MEGA», <i>ˈmegə</i>) — это мой взгляд на жанр виртуальной фэнтезийной игровой консоли, похожий на PICO-8 и TIC-80, но более простой в использовании, более функциональный и <i>гораздо более</i> эффективнее.</span>
+          <span class="zh">MEG-4（发音为“MEGA”，<i>ˈmegə</i>）是我对虚拟奇幻游戏机类型的看法，类似于 PICO-8 和 TIC-80，但使用更简单，功能更强大，并且 <i>更多</i>性能。</span>
+          <span class="ja">MEG-4 (「MEGA」と発音、<i>ˈmegə</i>) は、PICO-8 や TIC-80 に似た仮想ファンタジー ゲーム コンソールのジャンルに対する私の解釈ですが、より使いやすく、より機能的で、<i>はるかに</i>パフォーマンスが向上します。</span>
+        </p>
+        <div class="row text-center">
+        <div class="col-lg-6"><a href="https://gitlab.com/bztsrc/meg4/tree/binaries" class="btn btn-primary btn-lg btn-block" target="new" id="dl"><img src="images/download.png" alt="Download">
+          <span class="en">Download</span>
+          <span class="hu">Letöltés</span>
+          <span class="de">Herunterladen</span>
+          <span class="fr">Télécharger</span>
+          <span class="es">Descargar</span>
+          <span class="ru">Скачать</span>
+          <span class="zh">下载</span>
+          <span class="ja">ダウンロード</span>
+        (<span id="dlos">all</span>)</a></div>
+        <div class="col-lg-6"><a href="https://gitlab.com/bztsrc/meg4/" class="btn btn-primary btn-lg btn-block" target="new"><img src="images/gitlab.png" alt="GitLab">
+          <span class="en">Browse the Source</span>
+          <span class="hu">Forrás böngészése</span>
+          <span class="de">Durchsuchen Sie die Quelle</span>
+          <span class="fr">Parcourir la source</span>
+          <span class="es">Examinar la fuente</span>
+          <span class="ru">Просмотрите источник</span>
+          <span class="zh">浏览源</span>
+          <span class="ja">ソースを閲覧する</span>
+        </a></div>
+        </div>
+      </header>
+      <div class="row">
+        <div class="col-lg-12">
+          <span class="en">The download link leads to a binary for your OS. You can find other binaries in the <a href="https://gitlab.com/bztsrc/meg4/tree/binaries" target="new">repository</a>.</span>
+          <span class="hu">A letöltés az oprendszerednek megfelelő binárisra mutat. A többi bináris letölhető a <a href="https://gitlab.com/bztsrc/meg4/tree/binaries" target="new">repó</a>ból.</span>
+          <span class="de">Der Download-Link führt zu einer Binärdatei für Ihr Betriebssystem. Weitere Binärdateien finden Sie im <a href="https://gitlab.com/bztsrc/meg4/tree/binaries" target="new">Repository</a>.</span>
+          <span class="fr">Le lien de téléchargement mène à un binaire pour votre système d'exploitation. Vous pouvez trouver d'autres binaires dans le <a href="https://gitlab.com/bztsrc/meg4/tree/binaries" target="new">dépôt</a>.</span>
+          <span class="es">El enlace de descarga conduce a un binario para su sistema operativo. Puede encontrar otros archivos binarios en el <a href="https://gitlab.com/bztsrc/meg4/tree/binaries" target="new">repositorio</a>.</span>
+          <span class="ru">Ссылка для скачивания ведет к бинарному файлу для вашей ОС. Другие двоичные файлы можно найти в <a href="https://gitlab.com/bztsrc/meg4/tree/binaries" target="new">репозитории</a>.</span>
+          <span class="zh">下载链接指向适用于您的操作系统的二进制文件。 您可以在<a href="https://gitlab.com/bztsrc/meg4/tree/binaries" target="new">存储库</a> 中找到其他二进制文件。</span>
+          <span class="ja">ダウンロード リンクは、お使いの OS のバイナリにつながります。 <a href="https://gitlab.com/bztsrc/meg4/tree/binaries" target="new">リポジトリ</a>で他のバイナリを見つけることができます。</span>
+        </div>
+      </div>
+      <div class="card text-white bg-secondary my-4">
+        <div class="card-body">
+          <p class="text-white text-center m-0">
+            <span class="en">The MEG-4 is Free and Open Source! Licensed under <a href="https://gitlab.com/bztsrc/meg4/blob/main/LICENSE" class="text-white" target="new"><b>GPLv3+</b></a>.</span>
+            <span class="hu">A MEG-4 Szabad és Nyílt Forráskódú! A licensze <a href="https://gitlab.com/bztsrc/meg4/blob/main/LICENSE" class="text-white" target="new"><b>GPLv3+</b></a>.</span>
+            <span class="de">Der MEG-4 ist kostenlos und Open Source! Lizenziert unter <a href="https://gitlab.com/bztsrc/meg4/blob/main/LICENSE" class="text-white" target="new"><b>GPLv3+</b></a>.</span>
+            <span class="fr">Le MEG-4 est gratuit et open source! Sous licence <a href="https://gitlab.com/bztsrc/meg4/blob/main/LICENSE" class="text-white" target="new"><b>GPLv3+</b></a>.</span>
+            <span class="es">¡El MEG-4 es gratuita y de código abierto! Licenciado bajo <a href="https://gitlab.com/bztsrc/meg4/blob/main/LICENSE" class="text-white" target="new"><b>GPLv3+</b></a>.</span>
+            <span class="ru">MEG-4 бесплатен и имеет открытый исходный код! Под лицензией <a href="https://gitlab.com/bztsrc/meg4/blob/main/LICENSE" class="text-white" target="new"><b>GPLv3+</b></a>.</span>
+            <span class="zh">MEG-4 是免费和开源的！根据 <a href="https://gitlab.com/bztsrc/meg4/blob/main/LICENSE" class="text-white" target="new"><b>GPLv3+</b></a>。</span>
+            <span class="ja">MEG-4 は無料でオープンソースです! <a href="https://gitlab.com/bztsrc/meg4/blob/main/LICENSE" class="text-white" target="new"><b>GPLv3+</b></a>。</span>
+          </p>
+        </div>
+      </div>
+
+    <hr id="spec">
+      <div class="row">
+        <div class="col-lg-12">
+          <h2>
+            <span class="en">Specifications</span>
+            <span class="hu">Specifikáció</span>
+            <span class="de">Spezifikationen</span>
+            <span class="fr">Spécifications</span>
+            <span class="es">Especificaciones</span>
+            <span class="ru">Характеристики</span>
+            <span class="zh">规格</span>
+            <span class="ja">仕様</span>
+          </h2>
+          <img src="logo.png" align="left" alt="MEG-4" style="margin-right:10px;">
+          <table class="table-sm table-striped table-bordered">
+            <tr><th>RAM</th><td>
+              <span class="en">Astonishing 576 KiB</span>
+              <span class="hu">Elképesztő 576 KiB</span>
+              <span class="de">Erstaunlich 576 KiB</span>
+              <span class="fr">Étonnant 576 KiB</span>
+              <span class="es">Asombroso 576 KiB</span>
+              <span class="ru">Удивительный 576 KiB</span>
+              <span class="zh">惊人 576 KiB</span>
+              <span class="ja">驚くべき 576 KiB</span>
+            </td></tr>
+            <tr><th>MMIO</th><td>192 KiB</td></tr>
+            <tr><th>
+              <span class="en">Screen</span>
+              <span class="hu">Képernyő</span>
+              <span class="de">Bildschirm</span>
+              <span class="fr">Écran</span>
+              <span class="es">Pantalla</span>
+              <span class="ru">Экран</span>
+              <span class="zh">屏幕</span>
+              <span class="ja">画面</span>
+            </th><td>
+              <span class="en">320 x 200 x 8bpp (the famous DOS resolution)</span>
+              <span class="hu">320 x 200 x 8bpp (a híres DOS-os felbontás)</span>
+              <span class="de">320 x 200 x 8bpp (die berühmte DOS-Auflösung)</span>
+              <span class="fr">320 x 200 x 8bpp (la fameuse résolution DOS)</span>
+              <span class="es">320 x 200 x 8bpp (la famosa resolución de DOS)</span>
+              <span class="ru">320 x 200 x 8bpp (знаменитое разрешение DOS)</span>
+              <span class="zh">320 x 200 x 8bpp（著名的 DOS 分辨率）</span>
+              <span class="ja">320 x 200 x 8bpp (有名な DOS 解像度)</span>
+            </td></tr>
+            <tr><th>
+              <span class="en">Palette</span>
+              <span class="hu">Paletta</span>
+              <span class="de">Palette</span>
+              <span class="fr">Palette</span>
+              <span class="es">Paleta</span>
+              <span class="ru">Палитра</span>
+              <span class="zh">调色板</span>
+              <span class="ja">パレット</span>
+            </th><td>
+              <span class="en">256, 32 bit ARGB</span>
+              <span class="hu">256, 32 bit ARGB</span>
+              <span class="de">256, 32 Bit ARGB</span>
+              <span class="fr">256, 32 bits ARGB</span>
+              <span class="es">256, 32 bits ARGB</span>
+              <span class="ru">256, 32 бит ARGB</span>
+              <span class="zh">256, 32 位，ARGB</span>
+              <span class="ja">256, 32 ビット ARGB</span>
+            </td></tr>
+            <tr><th>
+              <span class="en">Sprites</span>
+              <span class="hu">Szprájtok</span>
+              <span class="de">Sprites</span>
+              <span class="fr">Lutins</span>
+              <span class="es">Duendes</span>
+              <span class="ru">Спрайты</span>
+              <span class="zh">精灵</span>
+              <span class="ja">スプライト</span>
+            </th><td>1024, 8 x 8</td></tr>
+            <tr><th>
+              <span class="en">Map</span>
+              <span class="hu">Térkép</span>
+              <span class="de">Karte</span>
+              <span class="fr">Carte</span>
+              <span class="es">Mapa</span>
+              <span class="ru">карта</span>
+              <span class="zh">地图</span>
+              <span class="ja">地図</span>
+            </th><td>
+              <span class="en">320 x 200 tiles (64 screens)</span>
+              <span class="hu">320 x 200 csempe (64 képernyőnyi)</span>
+              <span class="de">320 x 200 Kacheln (64 Bildschirme)</span>
+              <span class="fr">320 x 200 tuiles (64 écrans)</span>
+              <span class="es">320 x 200 mosaicos (64 pantallas)</span>
+              <span class="ru">320 x 200 плиток (64 экрана)</span>
+              <span class="zh">320 x 200 块（64 个屏幕）</span>
+              <span class="ja">320 x 200 タイル (64 画面)</span>
+            </td></tr>
+            <tr><th>
+              <span class="en">Sound</span>
+              <span class="hu">Hang</span>
+              <span class="de">Audio</span>
+              <span class="fr">Du son</span>
+              <span class="es">Sonido</span>
+              <span class="ru">Звук</span>
+              <span class="zh">声音</span>
+              <span class="ja">音</span>
+            </th><td>
+              <span class="en">8 bit, 44100 Hz, 31 waveforms, 64 sound effects</span>
+              <span class="hu">8 bit, 44100 Hz, 31 hullámminta, 64 hangeffekt</span>
+              <span class="de">8 Bit, 44100 Hz, 31 Wellenformen, 64 Soundeffekte</span>
+              <span class="fr">8 bits, 44100 Hz, 31 formes d'onde, 64 effets sonores</span>
+              <span class="es">8 bits, 44100 Hz, 31 formas de onda, 64 efectos de sonido</span>
+              <span class="ru">8 бит, 44100 Гц, 31 сигнала, 64 звуковых эффектов</span>
+              <span class="zh">8 位，44100 赫兹，31 种波形，64 种音效</span>
+              <span class="ja">8 ビット、44100Hz、31波形、64効果音</span>
+            </td></tr>
+            <tr><th>
+              <span class="en">Music</span>
+              <span class="hu">Zene</span>
+              <span class="de">Musik</span>
+              <span class="fr">Musique</span>
+              <span class="es">Música</span>
+              <span class="ru">Музыка</span>
+              <span class="zh">音乐</span>
+              <span class="ja">音楽</span>
+            </th><td>
+              <span class="en">8 music tracks, each 1024 patterns long</span>
+              <span class="hu">8 zenesáv, egyenként 1024 minta hosszú</span>
+              <span class="de">8 Musiktitel, jeweils 1024 Patterns lang</span>
+              <span class="fr">8 pistes musicales, chacune de 1024 motifs de long</span>
+              <span class="es">8 pistas de música, cada una de 1024 patrones de largo</span>
+              <span class="ru">8 музыкальных дорожек по 1024 паттернов каждая</span>
+              <span class="zh">8 首音乐曲目，每首 1024 种模式</span>
+              <span class="ja">8 つの音楽トラック、各 1024 パターンの長さ</span>
+            </td></tr>
+            <tr><th>
+              <span class="en">Codepage</span>
+              <span class="hu">Kódlap</span>
+              <span class="de">Codepage</span>
+              <span class="fr">Page de code</span>
+              <span class="es">Página de código</span>
+              <span class="ru">Кодовая страница</span>
+              <span class="zh">代码页</span>
+              <span class="ja">コードページ</span>
+            </th><td>
+              <span class="en">UTF-8 encoded UNICODE (BMP only, U+0000 to U+FFFF)</span>
+              <span class="hu">UTF-8 kódolt UNICODE (csak BMP, U+0000-től U+FFFF-ig)</span>
+              <span class="de">UTF-8-codierter UNICODE (nur BMP, U+0000 bis U+FFFF)</span>
+              <span class="fr">UNICODE codé UTF-8 (BMP uniquement, U+0000 à U+FFFF)</span>
+              <span class="es">UNICODE con codificación UTF-8 (solo BMP, U+0000 a U+FFFF)</span>
+              <span class="ru">UNICODE в кодировке UTF-8 (только BMP, от U+0000 до U+FFFF)</span>
+              <span class="zh">UTF-8 编码的 UNICODE（仅限 BMP，U+0000 到 U+FFFF）</span>
+              <span class="ja">UTF-8 エンコードの UNICODE (BMP のみ、U+0000 から U+FFFF)</span>
+            </td></tr>
+          </table>
+          </p>
+        </div>
+      </div>
+
+    <hr id="features">
+      <div class="row">
+        <div class="col-lg-12">
+          <h2>
+            <span class="en">Features</span>
+            <span class="hu">Jellemzők</span>
+            <span class="de">Eigenschaften</span>
+            <span class="fr">Fonctionalités</span>
+            <span class="es">Caracteristicas</span>
+            <span class="ru">Функции</span>
+            <span class="zh">特征</span>
+            <span class="ja">特徴</span>
+          </h2>
+          <ul>
+            <li>
+              <span class="en">Multilingual (although not many writing systems fit into a 8x8 bitmap font). </span>
+              <span class="hu">Többnyelvű (bár nem sok írásrendszer fér bele egy 8x8-as bitmap betűtípusba).</span>
+              <span class="de">Mehrsprachig (obwohl nicht viele Schriftsysteme in eine 8x8-Bitmap-Schriftart passen).</span>
+              <span class="fr">Multilingue (bien que peu de systèmes d'écriture s'intègrent dans une police bitmap 8x8).</span>
+              <span class="es">Multilingüe (aunque no muchos sistemas de escritura caben en una fuente de mapa de bits de 8x8).</span>
+              <span class="ru">Многоязычный (хотя не многие системы письма подходят для растрового шрифта 8x8).</span>
+              <span class="zh">多语言（虽然没有多少书写系统适合 8x8 位图字体）。</span>
+              <span class="ja">多言語 (ただし、8x8 ビットマップ フォントに適合する書記体系は多くありません)。</span>
+            </li>
+            <li>
+              <span class="en">Unlike PICO-8, it is <b>Free and Open Source</b>.</span>
+              <span class="hu">A PICO-8-al ellentétben <b>Szabad és Nyílt Forráskódú</b>.</span>
+              <span class="de">Im Gegensatz zu PICO-8 ist es <b>Freie und Open Source</b>.</span>
+              <span class="fr">Contrairement à PICO-8, il est <b>Gratuit et Open Source</b>.</span>
+              <span class="es">A diferencia de PICO-8, es <b>gratuito y de código abierto</b>.</span>
+              <span class="ru">В отличие от PICO-8, это <b>бесплатный и открытый код</b>.</span>
+              <span class="zh">与 PICO-8 不同，它是<b>免费和开源</b>。</span>
+              <span class="ja">PICO-8 とは異なり、<b>無料でオープン ソース</b>です。</span>
+            </li>
+            <li>
+              <span class="en">Hopefully has an easier to use interface and a better API support than TIC-80.</span>
+              <span class="hu">Remélhetőleg kényelmesebb interfésze van, és jobb API támogatása, mint a TIC-80-nak.</span>
+              <span class="de">Hat hoffentlich eine benutzerfreundlichere Oberfläche und eine bessere API-Unterstützung als TIC-80.</span>
+              <span class="fr">J'espère qu'il a une interface plus facile à utiliser et un meilleur support API que TIC-80.</span>
+              <span class="es">Es de esperar que tenga una interfaz más fácil de usar y un mejor soporte de API que TIC-80.</span>
+              <span class="ru">Надеюсь, у него более простой в использовании интерфейс и лучшая поддержка API, чем у TIC-80.</span>
+              <span class="zh">希望有比 TIC-80 更易于使用的界面和更好的 API 支持。</span>
+              <span class="ja">TIC-80 よりも使いやすいインターフェースと優れた API サポートを期待しています。</span>
+            </li>
+            <li>
+              <span class="en">It can import cartridges of the above consoles, in <i>.p8</i>, <i>.p8.png</i>, <i>.tic</i>, <i>.tic.png</i> formats.</span>
+              <span class="hu">Képes betölteni a fenti konzolok kertridzseit, <i>.p8</i>, <i>.p8.png</i>, <i>.tic</i>, <i>.tic.png</i> formátumokban.</span>
+              <span class="de">Es kann importieren Module der oben genannten Konsolen in <i>.p8</i>, <i>.p8.png</i>, <i>.tic</i>, <i>.tic.png</i> Formate.</span>
+              <span class="fr">Il peut importer des cartouches des consoles ci-dessus, en <i>.p8</i>, <i>.p8.png</i>, <i>.tic</i>, <i>.tic.png</i> formats.</span>
+              <span class="es">Puede importar cartuchos de las consolas anteriores, en <i>.p8</i>, <i>.p8.png</i>, <i>.tic</i>, <i>.tic.png</i> formatos.</span>
+              <span class="ru">Он может импортировать картриджи вышеуказанных консолей в форматах <i>.p8</i>, <i>.p8.png</i>, <i>.tic</i>, <i>.tic.png</i> форматы.</span>
+              <span class="zh">可以导入以上游戏机的卡带，格式为<i>.p8</i>, <i>.p8.png</i>, <i>.tic</i>, <i>.tic.png</i> 格式。</span>
+              <span class="ja">上記のコンソールのカートリッジを でインポートできます。  <i>.p8</i>、<i>.p8.png</i>、<i>.tic</i>、<i>.tic.png</i> フォーマット。</span>
+            </li>
+            <li>
+              <span class="en">Includes built-in editors, but supports importing assets in various formats: <i>.png</i>, <i>.tmx</i>, <i>.mod</i>, <i>.mid</i>, <i>.bdf</i>, <i>.sfd</i>, <i>.psfu</i> etc.</span>
+              <span class="hu">Beépített szerkesztőkkel rendelkezik, de képes különböző formátumból importálni: <i>.png</i>, <i>.tmx</i>, <i>.mod</i>, <i>.mid</i>, <i>.bdf</i>, <i>.sfd</i>, <i>.psfu</i> stb.</span>
+              <span class="de">Enthält integrierte Editoren, unterstützt jedoch den Import von Assets in verschiedenen Formaten: <i>.png</i>, <i>.tmx</i>, <i>.mod</i>, <i>.mid</i>, <i>.bdf</i>, <i>.sfd</i>, <i>.psfu</i> usw.</span>
+              <span class="fr">Inclut des éditeurs intégrés, mais prend en charge l'importation de ressources dans différents formats: <i>.png</i>, <i>.tmx</i>, <i>.mod</i>, <i>.mid</i>, <i>.bdf</i>, <i>.sfd</i>, <i>.psfu</i> etc.</span>
+              <span class="es">Incluye editores integrados, pero admite la importación de activos en varios formatos: <i>.png</i>, <i>.tmx</i>, <i>.mod</i>, <i>.mid</i>, <i>.bdf</i>, <i>.sfd</i>, <i>.psfu</i>, etc.</span>
+              <span class="ru">Включает встроенные редакторы, но поддерживает импорт ресурсов в различных форматах: <i>.png</i>, <i>.tmx</i>, <i>.mod</i>, <i>.mid</i>, <i>.bdf</i>, <i>.sfd</i>, <i>.psfu</i> и т. д.</span>
+              <span class="zh">包括内置编辑器，但支持导入各种格式的资源：<i>.png</i>、<i>.tmx</i>、<i>.mod</i>, <i>.mid</i>, <i>.bdf</i>, <i>.sfd</i>, <i>.psfu</i> 等。</span>
+              <span class="ja">組み込みのエディターが含まれていますが、さまざまな形式のアセットのインポートをサポートしています: <i>.png</i>、<i>.tmx</i>、<i>.mod</i>, <i>.mid</i>, <i>.bdf</i>, <i>.sfd</i>, <i>.psfu</i> など。</span>
+            </li>
+            <li>
+              <span class="en">Can import / export the entire project in <i>.zip</i> format.</span>
+              <span class="hu">Képes a komplett projektet kimenteni / betölteni <i>.zip</i> formátumban.</span>
+              <span class="de">Kann das gesamte Projekt im <i>.zip</i>-Format importieren / exportieren.</span>
+              <span class="fr">Peut importer / exporter l'intégralité du projet au format <i>.zip</i>.</span>
+              <span class="es">Puede importar / exportar todo el proyecto en formato <i>.zip</i>.</span>
+              <span class="ru">Можно импортировать / экспортировать весь проект в формате <i>.zip</i>.</span>
+              <span class="zh">可以导入/导出<i>.zip</i> 格式的整个项目。</span>
+              <span class="ja">プロジェクト全体を <i>.zip</i> 形式でインポート/エクスポートできます。</span>
+            </li>
+            <li>
+              <span class="en">More featureful than the competition, for example supports turtle graphics and 3D maze too.</span>
+              <span class="hu">Sokkal többet tud, mint a versenytársak, például támogatja a teknőc-grafikát és a 3D-s útvesztőt.</span>
+              <span class="de">Funktionaler als die Konkurrenz, unterstützt zum Beispiel auch Schildkrötengrafiken und 3D-Labyrinth.</span>
+              <span class="fr">Plus fonctionnel que la concurrence, par exemple, prend également en charge les graphiques de tortues y laberinto 3D.</span>
+              <span class="es">Más funciones que la competencia, por ejemplo, también admite gráficos de tortugas e labirinto 3D.</span>
+              <span class="ru">Более функциональный, чем у конкурентов, например, поддерживает графику черепах и 3D лабиринт.</span>
+              <span class="zh">比竞争对手更有特色，例如也支持海龟图形和 3D 迷宫。</span>
+              <span class="ja">競合他社よりも機能的です、たとえば、タートル グラフィックスや 3D 迷路もサポートしています。</span>
+            </li>
+            <li>
+              <span class="en">Easy to compile, easy to integrate (repo has multiple "platforms", SDL, GLFW, etc.)</span>
+              <span class="hu">Könnyű fordítani, könnyű integrálni (a repóban több "platform" is van, SDL, GLFW, stb.)</span>
+              <span class="de">Einfach zu kompilieren, einfach zu integrieren (Repo hat mehrere "Plattformen", SDL, GLFW usw.)</span>
+              <span class="fr">Facile à compiler, facile à intégrer (le référentiel a plusieurs "plates-formes", SDL, GLFW, etc.)</span>
+              <span class="es">Fácil de compilar, fácil de integrar (el repositorio tiene múltiples "plataformas", SDL, GLFW, etc.)</span>
+              <span class="ru">Легко компилируется, легко интегрируется (репозиторий имеет несколько «платформ», SDL, GLFW и т. д.)</span>
+              <span class="zh">易于编译、易于集成（存储库有多个“平台”、SDL、GLFW 等）</span>
+              <span class="ja">コンパイルと統合が容易 (リポジトリには複数の「プラットフォーム」、SDL、GLFW などがあります)</span>
+            </li>
+            <li>
+              <span class="en">Very <a href="manual_en.html" target="new">well documented</a>.</span>
+              <span class="hu">Nagyon <a href="manual_hu.html" target="new">jól dokumentált</a>.</span>
+              <span class="de">Sehr <a href="manual_en.html" target="new">gut dokumentiert</a>.</span>
+              <span class="fr">Très <a href="manual_en.html" target="new">bien documenté</a>.</span>
+              <span class="es">Muy <a href="manual_en.html" target="new">bien documentado</a>.</span>
+              <span class="ru">Очень <a href="manual_en.html" target="new">хорошо документировано</a>.</span>
+              <span class="zh">非常<a href="manual_en.html" target="new">有据可查</a>。</span>
+              <span class="ja">非常に<a href="manual_en.html" target="new">よく文書化されています</a>。</span>
+            </li>
+            <li>
+              <span class="en"><i>FAST.</i> High performance was one of my main concern.</span>
+              <span class="hu"><i>GYORS.</i> A kiemelkedő sebesség az egyik fő szempont volt.</span>
+              <span class="de"><i>SCHNELL.</i> Hohe Leistung war eines meiner Hauptanliegen.</span>
+              <span class="fr"><i>RAPIDE.</i> La haute performance était l'une de mes principales préoccupations.</span>
+              <span class="es"><i>RÁPIDO.</i> El alto rendimiento era una de mis principales preocupaciones.</span>
+              <span class="ru"><i>БЫСТРО.</i> Высокая производительность была одной из моих главных задач.</span>
+              <span class="zh"><i>速。</i> 高性能是我最关心的问题之一。</span>
+              <span class="ja"><i>速い。</i> 高性能は私の主な関心事の 1 つでした。</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="row" id="wdiv" style="display:none">
+        <div class="col-lg-12">
+          <h2>
+            <span class="en">Try out in your browser</span>
+            <span class="hu">Próbáld ki a böngésződben</span>
+            <span class="de">Probieren Sie es in Ihrem Browser aus</span>
+            <span class="fr">Essayez dans votre navigateur</span>
+            <span class="es">Pruébelo en su navegador</span>
+            <span class="ru">Попробуйте в своем браузере</span>
+            <span class="zh">在浏览器中试用</span>
+            <span class="ja">ブラウザで試してみてください</span>
+          </h2>
+          <center>
+          <canvas id="canvas"></canvas>
+          <p>
+            <span class="en">Drag'n'drop a floppy from below into the screen!</span>
+            <span class="hu">Húzd rá a meghajtóra az alábbi flopik valamelyikét!</span>
+            <span class="de">Ziehen Sie eine Diskette per Drag'n'Drop von unten in den Bildschirm!</span>
+            <span class="fr">Faites glisser et déposez une disquette d'en bas dans l'écran!</span>
+            <span class="es">¡Arrastra y suelta un disquete desde abajo a la pantalla!</span>
+            <span class="ru">Перетащите дискету снизу на экран!</span>
+            <span class="zh">从下方拖放一张软盘到屏幕中！</span>
+            <span class="ja">フロッピーを下から画面にドラッグ＆ドロップ！</span>
+          </p>
+          </center>
+        </div>
+      </div>
+
+    <hr id="floppies">
+      <div>
+        <div class="row">
+          <div class="col-lg-12">
+            <h2>
+              <span class="en">Floppies</span>
+              <span class="hu">Flopik</span>
+              <span class="de">Disketten</span>
+              <span class="fr">Disquettes</span>
+              <span class="es">Disquetes</span>
+              <span class="ru">Дискеты</span>
+              <span class="zh">软盘</span>
+              <span class="ja">フロッピー</span>
+          </div>
+        </div>
+<input type="radio" name="tab" id="tab0" onclick="clrsearch();" value="demo" checked>
+<input type="radio" name="tab" id="tab1" onclick="clrsearch();" value="arcade">
+<input type="radio" name="tab" id="tab2" onclick="clrsearch();" value="rpg">
+<input type="radio" name="tab" id="tab3" onclick="clrsearch();" value="fps">
+<input type="radio" name="tab" id="tab4" onclick="clrsearch();" value="logic">
+<input type="radio" name="tab" id="tab5" onclick="clrsearch();" value="strategy">
+<input type="radio" name="tab" id="tab6" onclick="clrsearch();" value="tools">
+<input type="radio" name="tab" id="tab7" onclick="clrsearch();" value="other">
+        <div class="row">
+          <div class="col-lg-2 tabcol">
+          <input class="form-control" id="srch" type="text" placeholder="Search..." onkeyup="dosearch();" style="display:none" value="">
+          </div>
+          <div class="col-lg-10" style="padding-left:0px;">
+            <ul class="nav nav-tabs">
+              <li class="nav-link" rel="tab0"><label for="tab0">
+                <span class="en">Demo</span>
+                <span class="hu">Demó</span>
+                <span class="de">Demo</span>
+                <span class="fr">Démo</span>
+                <span class="es">Demó</span>
+                <span class="ru">Демо</span>
+                <span class="zh">演示</span>
+                <span class="ja">デモ</span>
+              </label></li>
+              <li class="nav-link" rel="tab1"><label for="tab1">
+                <span class="en">Arcade</span>
+                <span class="hu">Árkád</span>
+                <span class="de">Arkade</span>
+                <span class="fr">Arcade</span>
+                <span class="es">Arcada</span>
+                <span class="ru">Аркада</span>
+                <span class="zh">拱廊</span>
+                <span class="ja">アーケード</span>
+              </label></li>
+              <li class="nav-link" rel="tab2"><label for="tab2">RPG</label></li>
+              <li class="nav-link" rel="tab3"><label for="tab3">FPS</label></li>
+              <li class="nav-link" rel="tab4"><label for="tab4">
+                <span class="en">Logic</span>
+                <span class="hu">Logikai</span>
+                <span class="de">Logik</span>
+                <span class="fr">Logique</span>
+                <span class="es">Lógica</span>
+                <span class="ru">Логика</span>
+                <span class="zh">逻辑</span>
+                <span class="ja">論理</span>
+              </label></li>
+              <li class="nav-link" rel="tab5"><label for="tab5">
+                <span class="en">Strategy</span>
+                <span class="hu">Stratégiai</span>
+                <span class="de">Strategie</span>
+                <span class="fr">Stratégie</span>
+                <span class="es">Estrategia</span>
+                <span class="ru">Стратегия</span>
+                <span class="zh">战略</span>
+                <span class="ja">ストラテジー</span>
+              </label></li>
+              <li class="nav-link" rel="tab6"><label for="tab6">
+                <span class="en">Tools</span>
+                <span class="hu">Eszközök</span>
+                <span class="de">Werkzeug</span>
+                <span class="fr">Outils</span>
+                <span class="es">Herramientas</span>
+                <span class="ru">Инструменты</span>
+                <span class="zh">工具</span>
+                <span class="ja">ツール</span>
+              </label></li>
+              <li class="nav-link" rel="tab7"><label for="tab7">
+                <span class="en">Other</span>
+                <span class="hu">Egyéb</span>
+                <span class="de">Andere</span>
+                <span class="fr">Autre</span>
+                <span class="es">Otro</span>
+                <span class="ru">Другой</span>
+                <span class="zh">其他</span>
+                <span class="ja">他の</span>
+              </label></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="row" id="results" style="display:none">
+        </div>
+
+        <div id="tabs">
+          <div class="row" rel="tab0">
+            <a href="floppies/demo.png" download><img draggable="true" src="floppies/demo.png" title="Demo"></a>
+          </div>
+
+          <div class="row" rel="tab1">
+            <a href="floppies/tetris.png" download><img draggable="true" src="floppies/tetris.png" title="Tetris"></a>
+            <a href="floppies/lander.png" download><img draggable="true" src="floppies/lander.png" title="Lander"></a>
+          </div>
+
+          <div class="row" rel="tab2">
+          </div>
+
+          <div class="row" rel="tab3">
+            <a href="floppies/maze.png" download><img draggable="true" src="floppies/maze.png" title="Maze"></a>
+          </div>
+
+          <div class="row" rel="tab4">
+          </div>
+
+          <div class="row" rel="tab5">
+          </div>
+
+          <div class="row" rel="tab6">
+            <a href="floppies/morse.png" download><img draggable="true" src="floppies/morse.png" title="Morse"></a>
+          </div>
+
+          <div class="row" rel="tab7">
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="text-center text-white">Copyright &copy; bzt (bztsrc@gitlab) 2023.</p>
+      </div>
+    </footer>
+    <script>
+    document.addEventListener("DOMContentLoaded", function(e) {
+      var dllinks = [
+        [ "Linux x86", "Linux",   "https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64-linux-sdl.tgz" ],
+        [ "Linux arm", "RaspiOS", "https://gitlab.com/bztsrc/meg4/raw/binaries/meg4_0.0.1-armhf.deb" ],
+        [ "Win",       "Windows", "https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-i686-win-sdl.zip" ],
+      ];
+      var dl = document.getElementById("dl"), dlos = document.getElementById("dlos"), os = navigator.appVersion.concat(navigator.platform);
+      for(var i = 0; i < dllinks.length; i++)
+          if(os.indexOf(dllinks[i][0]) != -1) {
+              dlos.innerHTML = dllinks[i][1]; dl.setAttribute("href", dllinks[i][2]); break;
+          }
+      var ls = ["hu", "de", "fr", "es", "ru", "zh", "ja"];
+      var ln = document.location.href.split('?')[1];
+      if(ln == undefined) ln = navigator.language.substr(0,2);
+      if(ls.indexOf(ln) != -1) {
+          var i, ds = document.getElementsByClassName("en"), di = document.getElementsByClassName(ln);
+          for(i = 0; i < ds.length; i++) ds[i].style.display = "none";
+          for(i = 0; i < di.length; i++) di[i].style.display = "inline";
+      }
+    });
+    function changediv(tab) {
+        var i, j, k = -1;
+        for(i = 0; i < 8; i++) {
+            j = tab!=undefined && tab==document.getElementById("tab"+i).value ? true : false;
+            if(j && k==-1) k=i;
+            document.getElementById("tab"+i).checked=j;
+        }
+        return k;
+    }
+    function clrsearch() {
+        document.getElementById("srch").value="";
+        document.getElementById("results").style.display="none";
+    }
+    function dosearch() {
+        var rslt = document.getElementById("results");
+        var srch = document.getElementById("srch"), srchval, titval, img;
+        var list = document.getElementById("tabs").getElementsByTagName("img"), i;
+        changediv();
+        if(srch.value) {
+            rslt.style.display="flex";
+            rslt.innerHTML="";
+            srchval = srch.value.toLowerCase();
+            for(i = 0; i < list.length; i++) {
+                titval = list[i].getAttribute("title").toLowerCase();
+                if(titval.indexOf(srchval) != -1) {
+                    img = document.createElement("a");
+                    img.setAttribute("href", list[i].src);
+                    img.setAttribute("download", list[i].src.replace(/^.*[\/]/, ''));
+                    img.innerHTML = list[i].outerHTML;
+                    rslt.appendChild(img);
+                }
+            }
+        } else {
+            rslt.style.display="none";
+            document.getElementById("tab0").checked=true;
+        }
+    }
+    if(changediv(document.location.href.split("#")[1])==-1)
+        document.getElementById("tab0").checked=true;
+    document.getElementById("wdiv").style.display="block";
+    document.getElementById("srch").style.display="block";
+    </script>
+    <script src="meg4.js"></script>
+  </body>
+</html>

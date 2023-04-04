@@ -1,0 +1,176 @@
+MEG-4 Floppy Format
+===================
+
+Floppies are 210 pixels wide and 220 pixels tall PNG images, with a special `flPy` chunk in them. For integrity and corruption
+detection, the PNG chunk has a CRC value, which is verified on load. The contents of that latter PNG chunk is zlib deflate
+compressed. Once uncompressed, it contains a series of further blocks (MEG-4 chunks), each with a common 4 bytes long header:
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic byte                                             |
+|      1 |     3 | Little endian size of the chunk, including this header |
+
+Single chunks may occur zero or one time, while multiple chunks may occur zero or multiple times. Multiple chunks have an
+index byte in them, which must be different for every chunk of the same type. Code that handles these chunks is located in
+[src/floppy.h](../src/floppy.h).
+
+META Info
+---------
+
+This is a mandatory single chunk and it always must be the very first.
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic 0, `MEG4_CHUNK_META`                             |
+|      1 |     3 | 136                                                    |
+|      4 |     3 | The MEG-4 Firmware's version that saved this floppy    |
+|      8 |     1 | must be zero                                           |
+|      8 |    64 | Zero terminated, UTF-8 program title                   |
+|     72 |    64 | Zero terminated, UTF-8 author                          |
+
+Checking this chunk's size is part of the magic, because further info might be added in the future, however that alone won't
+change the format. For now, firmware version is useless, always zero, but will be useful for backward compatibility if / when
+the floppy format changes.
+
+The author is only saved by the MEG-4 PRO, otherwise it's all zeros.
+
+Data
+----
+
+This is an optional single chunk.
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic 1, `MEG4_CHUNK_DATA`                             |
+|      1 |     3 | at least 5                                             |
+|      4 |     x | bytes copied to free RAM on load (initialized data)    |
+
+Only MEG-4 PRO version saves this chunk.
+
+Code
+----
+
+This is an optional single chunk.
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic 2, `MEG4_CHUNK_CODE`                             |
+|      1 |     3 | at least 5                                             |
+|      4 |     x | program's source code                                  |
+
+The MEG-4 PRO version saves a zero byte and compiled bytecode in this chunk when it exports standalone WebAssembly games.
+Otherwise it's plain text source code, which always starts with a shebang `#!(language)` line.
+
+Palette
+-------
+
+This is an optional single chunk.
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic 3, `MEG4_CHUNK_PAL`                              |
+|      1 |     3 | 1028                                                   |
+|      4 |  1024 | RGBA pixels (red channel is the least significant)     |
+
+Sprites
+-------
+
+This is an optional single chunk.
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic 4, `MEG4_CHUNK_SPRITES`                          |
+|      1 |     3 | at least 5                                             |
+|      4 |     x | RLE compressed palette indexes of a 256 x 256 image    |
+
+RLE packets start with a header byte, which encodes N (= header & 0x7F). If header bit 7 is set, then next byte should be
+repeated N+1 times, if not, then the next N+1 bytes are all different indeces.
+
+Map
+---
+
+This is an optional single chunk.
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic 5, `MEG4_CHUNK_MAP`                              |
+|      1 |     3 | at least 6                                             |
+|      4 |     1 | map sprite selector (valid values 0 - 3)               |
+|      5 |     x | RLE compressed sprite indexes of a 320 x 200 image     |
+
+RLE packets start with a header byte, same encoding as with sprites.
+
+Font
+----
+
+This is an optional single chunk.
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic 6, `MEG4_CHUNK_FONT`                             |
+|      1 |     3 | at least 5                                             |
+|      4 |     x | RLE compressed bitmap packets                          |
+
+The font data contains packets, each with a signed byte header. If the header is positive (0 - 127), then (header + 1) * 8
+bytes follow, the bitmap data. If it's negative, then no data follows, and -header many codepoints skipped.
+
+Waveform
+--------
+
+This is an optional multiple chunk.
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic 7, `MEG4_CHUNK_WAVE`                             |
+|      1 |     3 | at least 14                                            |
+|      4 |     1 | waveform index (valid values 1 - 31)                   |
+|      5 |     1 | waveform format (only 0 is valid for now, 8-bit mono)  |
+|      6 |     2 | number of samples                                      |
+|      8 |     2 | loop start                                             |
+|     10 |     2 | loop length                                            |
+|     12 |     1 | finetune                                               |
+|     13 |     1 | volume                                                 |
+|     14 |     x | interleaved waveform data                              |
+
+The actual chunk size might be smaller if there are less samples. Note that waveform index 0 is reserved.
+
+Sounds
+------
+
+This is an optional single chunk.
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic 8, `MEG4_CHUNK_SFX`                              |
+|      1 |     3 | 1028                                                   |
+|      4 |  1024 | sound data, 4 bytes for each 256 bank                  |
+
+The actual chunk size might be smaller if not all of the sound effects are configured.
+
+Music Tracks
+------------
+
+This is an optional multiple chunk.
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic 10, `MEG4_CHUNK_TRACK`                           |
+|      1 |     3 | 7541                                                   |
+|      4 |     1 | track index (valid values 0 - 7)                       |
+|      5 |  7536 | row data, 4 x 4 bytes each                             |
+
+The actual chunk size might be smaller if not all of the track rows are configured.
+
+Overlays
+--------
+
+This is an optional multiple chunk.
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | Magic 11, `MEG4_CHUNK_OVL`                             |
+|      1 |     3 | at least 5                                             |
+|      4 |     1 | overlay index (valid values 0 - 255)                   |
+|      5 |     x | overlay data                                           |
+
+Overlays are very similar to `MEG4_CHUNK_DATA`, but programs can load them to arbitrary positions dynamically in run-time.

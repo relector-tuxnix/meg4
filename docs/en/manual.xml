@@ -1,0 +1,61 @@
+<!--
+  to be used with gendoc, like this:
+  $ gendoc ../../pages/manuan_en.html manual.xml
+  see https://gitlab.com/bztsrc/gendoc
+-->
+<doc>
+    <titleimg>../img/logo.png MEG-4</titleimg>
+    <title>User's Manual</title>
+    <url>https://bztsrc.gitlab.io/meg4</url>
+    <version>0.0.1</version>
+    <theme>../manual.css</theme>
+    <lang>en</lang>
+    <rslt>Search Results</rslt>
+    <home>Home</home>
+    <link>Permalink to this headline</link>
+    <info>Important</info>
+    <hint>Hint</hint>
+    <note>Note</note>
+    <also>See Also</also>
+    <todo>To Do</todo>
+    <args>Arguments</args>
+    <rval>Return Value</rval>
+    <warn>Warning</warn>
+    <prev>Previous</prev>
+    <next>Next</next>
+    <copy>2023 bzt (bztsrc@gitlab)</copy>
+</doc>
+
+<hello>
+<include welcome.md>
+</hello>
+
+<cap>Basics</cap>
+<include getstart.md>
+<include formats.md>
+<include userinput.md>
+<include interface.md>
+
+<cap>Editors</cap>
+<include code.md>
+<include sprite.md>
+<include map.md>
+<include font.md>
+<include sound.md>
+<include music.md>
+<include overlay.md>
+<include visual.md>
+<include debug.md>
+
+<cap>Programming</cap>
+<include c.md>
+<include bas.md>
+<include asm.md>
+<include lua.md>
+
+<cap>API Reference</cap>
+<include ../../src/lang/en.md>
+
+<cap>Appendix</cap>
+<include license.md>
+<include links.md>

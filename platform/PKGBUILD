@@ -1,0 +1,34 @@
+# Maintainer: bzt <https://gitlab.com/bztsrc/meg4/issues>
+pkgname=meg4-git
+pkgver=0.0.1
+pkgrel=1
+pkgdesc="MEG-4 is a virtual fantasy console"
+arch=('x86_64')
+url="https://bztsrc.gitlab.io/meg4"
+license=('GPL3')
+depends=()
+makedepends=(make tar curl)
+optdepends=()
+provides=('meg4')
+conflicts=('meg4')
+
+_gitname=meg4
+
+build() {
+	echo "Getting latest MEG-4 Source Code..."
+	curl -L "https://gitlab.com/bztsrc/meg4/archive/main.tar.gz" --output $_gitname.tar.gz
+
+	echo "Extracting $_gitname.tar.gz..."
+	tar -xf $_gitname.tar.gz
+	cd $_gitname/platform/sdl
+
+	echo "Building MEG-4..."
+	make clean all
+}
+
+package() {
+	echo "Installing MEG-4..."
+
+	cd $_gitname/platform/sdl
+	INSTDIR=/usr make install
+}

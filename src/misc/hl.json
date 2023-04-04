@@ -1,0 +1,76 @@
+/*
+ * meg4/misc/highlight.json
+ *
+ * Copyright (C) 2023 bzt
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * @brief Syntax highlight rules
+ *
+ */
+{
+    "c": [
+    /* 0 comments */    [ "\/\/.*?$", "\/\*.*?\*\/" ],
+    /* 1 pseudo */      [ "#.*?$" ],
+    /* 2 operators */   [ "\->", "<<=", ">>=", "<<", ">>", "\+\+", "\-\-", "&&", "\|\|", "[=<>\+\-\*\/%~&\^\|!]=", "[=<>\+\-\*\/%~&\^\|!\?:\.]" ],
+    /* 3 numbers */     [ "[\-]?[0-9][0-9bx]?[0-9\.a-fp]*[UL]*" ],
+    /* 4 strings */     [ "\"", "'" ],
+    /* 5 delimiters */  [ "[", "]", "{", "}", ",", ";", ":" ],
+    /* 6 types */       [ "void", "float", "int8_t", "int16_t", "int32_t", "uint8_t", "uint16_t", "uint32_t", "str_t", "addr_t",
+                          "char", "short", "int", "signed", "unsigned", "enum", "struct", "union", "typedef" ],
+    /* 7 keywords */    [ "if", "else", "switch", "case", "default", "for", "while", "do", "break", "continue", "return", "goto",
+                          "sizeof", "debug" ]
+    ],
+
+    "bas": [
+    /* 0 comments */    [ "rem .*?$", "'.*?$" ],
+    /* 1 pseudo */      [ ],
+    /* 2 operators */   [ "@", "^", "\*", "/", "mod", "+", "\-", "<>", "<=", ">=", "<", ">", "=", "not", "and", "or" ],
+    /* 3 numbers */     [ "[\-\$]?[0-9][0-9\.a-fp]*" ],
+    /* 4 strings */     [ "\"" ],
+    /* 5 delimiters */  [ ",", ";", ":", "\n" ],
+    /* 6 types */       [ "rnd", "inkey$", "time", "now%" ],
+    /* 7 keywords */    [ "dim", "read", "restore", "data", "sub", "function", "end", "on", "goto", "gosub", "return", "for",
+                          "to", "step", "next", "if", "then", "elseif", "else", "input", "print", "peek", "poke", "let", "debug" ]
+    ],
+
+    "asm": [
+    /* 0 comments */    [ "\/\/.*?$", "\/\*.*?\*\/" ],
+    /* 1 pseudo */      [ ],
+    /* 2 operators */   [ ],
+    /* 3 numbers */     [ "[\-]?[0-9][0-9bx]?[0-9\.a-fp]*" ],
+    /* 4 strings */     [ "\"", "'" ],
+    /* 5 delimiters */  [ ",", ":", "\n" ],
+    /* 6 types */       [ ".data", ".code", "db", "dw", "di", "df" ],
+    /* 7 keywords */    [ "debug", "ret", "scall", "call", "jmp", "jz", "jnz", "js", "jns", "sw", "ci", "cf", "bnd", "lea", "adr",
+                          "sp", "pshci", "pshcf", "pushi", "pushf", "popi", "popf", "cnvi", "cnvf", "ldb", "ldw", "ldi", "ldf",
+                          "stb", "stw", "sti", "stf", "rdb", "rdw", "rdi", "rdf", "incb", "incw", "inci", "decb", "decw", "deci",
+                          "not", "neg", "or", "xor", "and", "shl", "shr", "eq", "ne", "lts", "gts", "les", "ges", "ltu", "gtu",
+                          "leu", "geu", "ltf", "gtf", "lef", "gef", "addi", "subi", "muli", "divi", "modi", "powi", "addf", "subf",
+                          "mulf", "divf", "modf", "powf" ]
+    ],
+
+    "lua": [
+    /* 0 comments */    [ "\-\-.*?$", "\-\-\[\[.*?\]\]" ],
+    /* 1 pseudo */      [ ],
+    /* 2 operators */   [ "[=\<\>\+\-\*\/%&\^\|!:\.~][=]?", "and", "or", "not" ],
+    /* 3 numbers */     [ "[\-]?[0-9][0-9bx]?[0-9\.a-fp]*" ],
+    /* 4 strings */     [ "\"", "'" ],
+    /* 5 delimiters */  [ "[", "]", "{", "}", ",", ";", ":" ],
+    /* 6 types */       [ "false", "local", "nil", "true" ],
+    /* 7 keywords */    [ "break", "do", "elseif", "else", "end", "for", "function", "if", "in", "repeat", "return", "then",
+                          "until", "while" ]
+    ]
+}

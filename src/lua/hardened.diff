@@ -1,0 +1,342 @@
+Only in a: all
+diff -r a/lauxlib.c lua/lauxlib.c
+245,262d244
+< LUALIB_API int luaL_fileresult (lua_State *L, int stat, const char *fname) {
+<   int en = errno;  /* calls to Lua API may change this value */
+<   if (stat) {
+<     lua_pushboolean(L, 1);
+<     return 1;
+<   }
+<   else {
+<     luaL_pushfail(L);
+<     if (fname)
+<       lua_pushfstring(L, "%s: %s", fname, strerror(en));
+<     else
+<       lua_pushstring(L, strerror(en));
+<     lua_pushinteger(L, en);
+<     return 3;
+<   }
+< }
+< 
+< 
+285,300d266
+< LUALIB_API int luaL_execresult (lua_State *L, int stat) {
+<   if (stat != 0 && errno != 0)  /* error with an 'errno'? */
+<     return luaL_fileresult(L, 0, NULL);
+<   else {
+<     const char *what = "exit";  /* type of termination */
+<     l_inspectstat(stat, what);  /* interpret result */
+<     if (*what == 'e' && stat == 0)  /* successful termination? */
+<       lua_pushboolean(L, 1);
+<     else
+<       luaL_pushfail(L);
+<     lua_pushstring(L, what);
+<     lua_pushinteger(L, stat);
+<     return 3;  /* return true/fail,what,code */
+<   }
+< }
+< 
+709,817d674
+< typedef struct LoadF {
+<   int n;  /* number of pre-read characters */
+<   FILE *f;  /* file being read */
+<   char buff[BUFSIZ];  /* area for reading file */
+< } LoadF;
+< 
+< 
+< static const char *getF (lua_State *L, void *ud, size_t *size) {
+<   LoadF *lf = (LoadF *)ud;
+<   (void)L;  /* not used */
+<   if (lf->n > 0) {  /* are there pre-read characters to be read? */
+<     *size = lf->n;  /* return them (chars already in buffer) */
+<     lf->n = 0;  /* no more pre-read characters */
+<   }
+<   else {  /* read a block from file */
+<     /* 'fread' can return > 0 *and* set the EOF flag. If next call to
+<        'getF' called 'fread', it might still wait for user input.
+<        The next check avoids this problem. */
+<     if (feof(lf->f)) return NULL;
+<     *size = fread(lf->buff, 1, sizeof(lf->buff), lf->f);  /* read block */
+<   }
+<   return lf->buff;
+< }
+< 
+< 
+< static int errfile (lua_State *L, const char *what, int fnameindex) {
+<   const char *serr = strerror(errno);
+<   const char *filename = lua_tostring(L, fnameindex) + 1;
+<   lua_pushfstring(L, "cannot %s %s: %s", what, filename, serr);
+<   lua_remove(L, fnameindex);
+<   return LUA_ERRFILE;
+< }
+< 
+< 
+< /*
+< ** Skip an optional BOM at the start of a stream. If there is an
+< ** incomplete BOM (the first character is correct but the rest is
+< ** not), returns the first character anyway to force an error
+< ** (as no chunk can start with 0xEF).
+< */
+< static int skipBOM (FILE *f) {
+<   int c = getc(f);  /* read first character */
+<   if (c == 0xEF && getc(f) == 0xBB && getc(f) == 0xBF)  /* correct BOM? */
+<     return getc(f);  /* ignore BOM and return next char */
+<   else  /* no (valid) BOM */
+<     return c;  /* return first character */
+< }
+< 
+< 
+< /*
+< ** reads the first character of file 'f' and skips an optional BOM mark
+< ** in its beginning plus its first line if it starts with '#'. Returns
+< ** true if it skipped the first line.  In any case, '*cp' has the
+< ** first "valid" character of the file (after the optional BOM and
+< ** a first-line comment).
+< */
+< static int skipcomment (FILE *f, int *cp) {
+<   int c = *cp = skipBOM(f);
+<   if (c == '#') {  /* first line is a comment (Unix exec. file)? */
+<     do {  /* skip first line */
+<       c = getc(f);
+<     } while (c != EOF && c != '\n');
+<     *cp = getc(f);  /* next character after comment, if present */
+<     return 1;  /* there was a comment */
+<   }
+<   else return 0;  /* no comment */
+< }
+< 
+< 
+< LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
+<                                              const char *mode) {
+<   LoadF lf;
+<   int status, readstatus;
+<   int c;
+<   int fnameindex = lua_gettop(L) + 1;  /* index of filename on the stack */
+<   if (filename == NULL) {
+<     lua_pushliteral(L, "=stdin");
+<     lf.f = stdin;
+<   }
+<   else {
+<     lua_pushfstring(L, "@%s", filename);
+<     lf.f = fopen(filename, "r");
+<     if (lf.f == NULL) return errfile(L, "open", fnameindex);
+<   }
+<   lf.n = 0;
+<   if (skipcomment(lf.f, &c))  /* read initial portion */
+<     lf.buff[lf.n++] = '\n';  /* add newline to correct line numbers */
+<   if (c == LUA_SIGNATURE[0]) {  /* binary file? */
+<     lf.n = 0;  /* remove possible newline */
+<     if (filename) {  /* "real" file? */
+<       lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
+<       if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
+<       skipcomment(lf.f, &c);  /* re-read initial portion */
+<     }
+<   }
+<   if (c != EOF)
+<     lf.buff[lf.n++] = c;  /* 'c' is the first character of the stream */
+<   status = lua_load(L, getF, &lf, lua_tostring(L, -1), mode);
+<   readstatus = ferror(lf.f);
+<   if (filename) fclose(lf.f);  /* close file (even in case of errors) */
+<   if (readstatus) {
+<     lua_settop(L, fnameindex);  /* ignore results from 'lua_load' */
+<     return errfile(L, "read", fnameindex);
+<   }
+<   lua_remove(L, fnameindex);
+<   return status;
+< }
+< 
+< 
+965a823
+> 
+diff -r a/lauxlib.h lua/lauxlib.h
+26,29d25
+< /* extra error code for 'luaL_loadfilex' */
+< #define LUA_ERRFILE     (LUA_ERRERR+1)
+< 
+< 
+81,84d76
+< LUALIB_API int (luaL_fileresult) (lua_State *L, int stat, const char *fname);
+< LUALIB_API int (luaL_execresult) (lua_State *L, int stat);
+< 
+< 
+92,96d83
+< LUALIB_API int (luaL_loadfilex) (lua_State *L, const char *filename,
+<                                                const char *mode);
+< 
+< #define luaL_loadfile(L,f)	luaL_loadfilex(L,f,NULL)
+< 
+144,146d130
+< #define luaL_dofile(L, fn) \
+< 	(luaL_loadfile(L, fn) || lua_pcall(L, 0, LUA_MULTRET, 0))
+< 
+242,249d225
+< #define LUA_FILEHANDLE          "FILE*"
+< 
+< 
+< typedef struct luaL_Stream {
+<   FILE *f;  /* stream (NULL for incompletely created streams) */
+<   lua_CFunction closef;  /* to close stream (NULL for closed streams) */
+< } luaL_Stream;
+< 
+258,266c234
+< /* print a string */
+< #if !defined(lua_writestring)
+< #define lua_writestring(s,l)   fwrite((s), sizeof(char), (l), stdout)
+< #endif
+< 
+< /* print a newline and flush the output */
+< #if !defined(lua_writeline)
+< #define lua_writeline()        (lua_writestring("\n", 1), fflush(stdout))
+< #endif
+---
+> void main_log(int lvl, const char* fmt, ...);
+270,271c238
+< #define lua_writestringerror(s,p) \
+<         (fprintf(stderr, (s), (p)), fflush(stderr))
+---
+> #define lua_writestringerror(s,p) (main_log(1, (s), (p)))
+diff -r a/lbaselib.c lua/lbaselib.c
+23,39d22
+< 
+< static int luaB_print (lua_State *L) {
+<   int n = lua_gettop(L);  /* number of arguments */
+<   int i;
+<   for (i = 1; i <= n; i++) {  /* for each argument */
+<     size_t l;
+<     const char *s = luaL_tolstring(L, i, &l);  /* convert it to string */
+<     if (i > 1)  /* not the first element? */
+<       lua_writestring("\t", 1);  /* add a tab before it */
+<     lua_writestring(s, l);  /* print it */
+<     lua_pop(L, 1);  /* pop result */
+<   }
+<   lua_writeline();
+<   return 0;
+< }
+< 
+< 
+340,347d322
+< static int luaB_loadfile (lua_State *L) {
+<   const char *fname = luaL_optstring(L, 1, NULL);
+<   const char *mode = luaL_optstring(L, 2, NULL);
+<   int env = (!lua_isnone(L, 3) ? 3 : 0);  /* 'env' index or 0 if no 'env' */
+<   int status = luaL_loadfilex(L, fname, mode);
+<   return load_aux(L, status, env);
+< }
+< 
+409,424d383
+< static int dofilecont (lua_State *L, int d1, lua_KContext d2) {
+<   (void)d1;  (void)d2;  /* only to match 'lua_Kfunction' prototype */
+<   return lua_gettop(L) - 1;
+< }
+< 
+< 
+< static int luaB_dofile (lua_State *L) {
+<   const char *fname = luaL_optstring(L, 1, NULL);
+<   lua_settop(L, 1);
+<   if (l_unlikely(luaL_loadfile(L, fname) != LUA_OK))
+<     return lua_error(L);
+<   lua_callk(L, 0, LUA_MULTRET, 0, dofilecont);
+<   return dofilecont(L, 0, 0);
+< }
+< 
+< 
+509d467
+<   {"dofile", luaB_dofile},
+513d470
+<   {"loadfile", luaB_loadfile},
+518d474
+<   {"print", luaB_print},
+diff -r a/linit.c lua/linit.c
+44,45d43
+<   {LUA_LOADLIBNAME, luaopen_package},
+<   {LUA_COLIBNAME, luaopen_coroutine},
+47,48d44
+<   {LUA_IOLIBNAME, luaopen_io},
+<   {LUA_OSLIBNAME, luaopen_os},
+Only in a: liolib.c
+Only in a: loadlib.c
+Only in a: loslib.c
+diff -r a/strlib.c lua/lstrlib.c
+1273c1273
+< static int str_format (lua_State *L) {
+---
+> int str_format (lua_State *L) {
+Only in a: ltests.c
+Only in a: ltests.h
+Only in a: lua.c
+diff -r a/luaconf.h lua/luaconf.h
+44c44
+< /* #define LUA_USE_C89 */
+---
+> #define LUA_USE_C89
+125c125
+< #define LUA_32BITS	0
+---
+> #define LUA_32BITS	1
+587c587
+< #if !defined(LUA_USE_C89)
+---
+> /*#if !defined(LUA_USE_C89)*/
+588a589
+> /*
+592c593
+< 
+---
+> */
+740c741
+< #define LUAI_MAXSTACK		1000000
+---
+> #define LUAI_MAXSTACK		16384
+742c743
+< #define LUAI_MAXSTACK		15000
+---
+> #define LUAI_MAXSTACK		16384
+diff -r a/lualib.h lua/lualib.h
+26,31d25
+< #define LUA_IOLIBNAME	"io"
+< LUAMOD_API int (luaopen_io) (lua_State *L);
+< 
+< #define LUA_OSLIBNAME	"os"
+< LUAMOD_API int (luaopen_os) (lua_State *L);
+< 
+43,45d36
+< 
+< #define LUA_LOADLIBNAME	"package"
+< LUAMOD_API int (luaopen_package) (lua_State *L);
+diff -r a/Makefile lua/Makefile
+74c74
+< MYCFLAGS= $(LOCAL) -std=c99 -DLUA_USE_LINUX -DLUA_USE_READLINE
+---
+> MYCFLAGS= $(LOCAL) -std=c99
+76c76
+< MYLIBS= -ldl -lreadline
+---
+> MYLIBS=
+95c95
+< 	ltm.o lundump.o lvm.o lzio.o ltests.o
+---
+> 	ltm.o lundump.o lvm.o lzio.o
+97,98c97,98
+< LIB_O=	lbaselib.o ldblib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o \
+< 	lutf8lib.o loadlib.o lcorolib.o linit.o
+---
+> LIB_O=	lbaselib.o ldblib.o lmathlib.o ltablib.o lstrlib.o \
+> 	lutf8lib.o lcorolib.o linit.o
+100,101c100,101
+< LUA_T=	lua
+< LUA_O=	lua.o
+---
+> LUA_T=
+> LUA_O=
+105c105
+< ALL_O= $(CORE_O) $(LUA_O) $(AUX_O) $(LIB_O)
+---
+> ALL_O= $(CORE_O) $(AUX_O) $(LIB_O)
+109d108
+< 	touch all
+140,141d138
+< $(ALL_O): makefile ltests.h
+< 
+169d165
+< liolib.o: liolib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
+Only in a: onelua.c

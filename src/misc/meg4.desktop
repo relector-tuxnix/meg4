@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=MEG-4
+Comment=The MEG-4 virtual fantasy console
+Exec=/usr/bin/meg4
+Icon=tnge
+Terminal=false
+StartupNotify=false
+Categories=Games;

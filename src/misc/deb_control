@@ -1,0 +1,14 @@
+Package: meg4
+Version: VERSION
+Architecture: ARCH
+Essential: no
+Section: games
+Priority: optional
+Depends: libsdl2 | libsdl2-2.0 | libsdl2-2.0-0
+Maintainer: bzt
+Homepage: https://bztsrc.github.io/meg4
+Installed-Size: SIZE
+Description: A neat virtual fantasy console.
+  This is a fantasy console, similar to PICO-8 and TIC-80, but easier to use,
+  easier to compile, more featureful and much more performant than those. It
+  is just simply more fun.

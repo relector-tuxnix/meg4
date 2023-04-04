@@ -1,0 +1,177 @@
+/*
+ * meg4/lang/hu.h
+ *
+ * Copyright (C) 2023 bzt
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * @brief Hungarian dictionary for MEG-4
+ *
+ */
+
+"hu",
+
+"Fantasy Konzol",
+"Förmver",
+
+"Kódpont",
+"Kompozit",
+"Ikonok (emoji)",
+"Katakana",
+"Hiragana",
+
+"Regisztrálva:",
+"nincsneve",
+"bináris adat",
+"OK",
+"Betölt",
+"Nem elérhető",
+"Export",
+"Programról",
+"Futtat",
+"Elment",
+"Import",
+"ZIP Export",
+"WASM Export",
+"Teljesképernyő",
+"Beviteli módok",
+"Súgó",
+
+"Debuggoló",
+"Vizuális Szerkesztő",
+"Kód Szerkesztő",
+"Szprájt Szerkesztő",
+"Térkép Szerkesztő",
+"Betű Szerkesztő",
+"Hangeffektek",
+"Zenesávok",
+"Memóriaátfedők",
+"Flopijaid",
+
+"Keresés",
+"Csere",
+"Sorraugrás",
+"Funkciólista",
+"Könyvjelzők",
+"Visszavon",
+"Mégis",
+"Kivágás",
+"Másolás",
+"Beillesztés",
+"Törlés",
+"Lejátszás/Leállítás",
+"Sor beszúrása",
+"Sor törlése",
+"Memóriacím",
+"Hossza",
+"Görgetés balra",
+"Görgetés felfelé",
+"Görgetés lefelé",
+"Görgetés jobbra",
+"Elforgatás",
+"Függőleges tükrözés",
+"Vízszintes tükrözés",
+"Rajzolás",
+"Kitöltés",
+"Szippantó",
+"Téglalap kijelölése",
+"Azonosak kijelölése",
+"HSV Színválasztó",
+"Nagyítás/Kicsinyítés",
+"Bankválasztó",
+"Hangmagasság",
+"Hullámminta",
+"Effekt",
+"Effektparaméter X",
+"Effektparaméter Y",
+"Hullám szerkesztése",
+"Finomhangolás",
+"Hangerő",
+"Ismétlés",
+"Szinusz generálás",
+"Háromszög generálás",
+"Fűrészfog generálás",
+"Négyzet generálás",
+"Minta betöltése a SoundBankból",
+"Hullámhossz csökkentése",
+"Hullámhossz növelése",
+"Hangosítás",
+"Halkítás",
+"Első és második fél felcserélése",
+"Hullámminta folyamatos lejátszása",
+"Szprájtválasztó",
+"Glifválasztó",
+"Hangeffektválasztó",
+"Sávválasztó",
+"Lépésenkénti futtatás",
+
+"Tartalomjegyzék",
+"Találatok",
+"Vissza",
+
+"Hívásverem",
+"Regiszterek",
+"Sor",
+"Forrás",
+"Cím",
+"Méret",
+"Változó",
+"Érték",
+"Kód",
+"Adat",
+"Verem",
+
+"Induláskor lefuttatandó dolgok",
+"Minden képkockánál lefuttatandó dolgok, 60 FPS",
+
+"paletta",
+"hangeffektek",
+"térkép",
+"szprájtok",
+"hanghullám",
+"zenesáv",
+"betűkészlet",
+"felhasználói memória"
+
+"Ismeretlen nyelv",
+"Nincs elég memória",
+"Verem alulcsurdulás",
+"Túl sok rekurzió",
+"Túl hosszú",
+"Túl összetett",
+"Túl nagy",
+"Számábrázolás túlcsordulás vagy alulcsordulás",
+"Nem numerikus vagy nem statikus kifejezés",
+"Szintaktikai hiba",
+"Nincs lezáró párja",
+"Nincs nyitó párja",
+"READ parancs DATA nélkül",
+"Nincs se setup() se loop() megadva",
+"Nincs return a funkcióban",
+"Nem megfelelő prototípus",
+"Nem megfelelő számú paraméter",
+"Nem megfelelő a paraméter típusa",
+"Nem megfelelő formázó sztring",
+"Nem lehet címként feloldani",
+"Nem lehet a címét venni",
+"Hibás bal oldali kifejezés érték",
+"Hiányzó kettőspont a ?: műveletnél",
+"Nem érvényes művelet",
+"Már van ilyen definiálva",
+"Nincs ilyen azonosító definiálva",
+"Itt nem megengedett",
+"Nullával nem lehet osztani",
+"Határon kívül esik",
+"Érvénytelen rendszerhívás"
