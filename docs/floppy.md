@@ -45,7 +45,8 @@ This is an optional single chunk.
 |      1 |     3 | at least 5                                             |
 |      4 |     x | bytes copied to free RAM on load (initialized data)    |
 
-Only MEG-4 PRO version saves this chunk.
+Only MEG-4 PRO version saves this chunk, and only needed with bytecode code block (see below). Normally code is stored
+as plain text source code which is compiled upon load, so there's no need to store the initialized data redundantly.
 
 Code
 ----
@@ -59,6 +60,7 @@ This is an optional single chunk.
 |      4 |     x | program's source code                                  |
 
 The MEG-4 PRO version saves a zero byte and compiled bytecode in this chunk when it exports standalone WebAssembly games.
+
 Otherwise it's plain text source code, which always starts with a shebang `#!(language)` line.
 
 Palette
@@ -132,7 +134,7 @@ This is an optional multiple chunk.
 |     13 |     1 | volume                                                 |
 |     14 |     x | interleaved waveform data                              |
 
-The actual chunk size might be smaller if there are less samples. Note that waveform index 0 is reserved.
+Note that waveform index 0 is reserved.
 
 Sounds
 ------
@@ -142,10 +144,8 @@ This is an optional single chunk.
 | Offset | Size  | Description                                            |
 |-------:|------:|--------------------------------------------------------|
 |      0 |     1 | Magic 8, `MEG4_CHUNK_SFX`                              |
-|      1 |     3 | 1028                                                   |
-|      4 |  1024 | sound data, 4 bytes for each 256 bank                  |
-
-The actual chunk size might be smaller if not all of the sound effects are configured.
+|      1 |     3 | 4 to 260                                               |
+|      4 |     x | sound data, 4 bytes for each 64 bank                   |
 
 Music Tracks
 ------------
@@ -155,11 +155,9 @@ This is an optional multiple chunk.
 | Offset | Size  | Description                                            |
 |-------:|------:|--------------------------------------------------------|
 |      0 |     1 | Magic 10, `MEG4_CHUNK_TRACK`                           |
-|      1 |     3 | 7541                                                   |
+|      1 |     3 | 5 to 16389                                             |
 |      4 |     1 | track index (valid values 0 - 7)                       |
-|      5 |  7536 | row data, 4 x 4 bytes each                             |
-
-The actual chunk size might be smaller if not all of the track rows are configured.
+|      5 |     x | row data, 4 x 4 bytes each                             |
 
 Overlays
 --------
