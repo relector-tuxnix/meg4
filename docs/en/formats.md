@@ -42,7 +42,7 @@ A 256 x 256 pixels indexed PNG file, containing the 256 colors palette and all o
 in the [sprite editor]. This image file is editable by [GrafX2](http://grafx2.chez.com), [GIMP](https://www.gimp.org), Paint etc.
 On import, true color images will be converted to the default MEG-4 palette using the smallest weighted sRGB distance method. This
 works, but not looking particularly good, therefore it is recommended to save and import paletted PNG images instead. Sprites can
-also be imported from [Truevision TARGA](http://www.gamers.org/dEngine/quake3.TGA.txt) (.tga) images, if they are indexed and have
+also be imported from [Truevision TARGA](http://www.gamers.org/dEngine/quake3/TGA.txt) (.tga) images, if they are indexed and have
 the correct dimensions of 256 x 256 pixels.
 
 ### map.tmx

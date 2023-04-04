@@ -7,7 +7,6 @@
 *.la
 *.lo
 *.pc
-*.mk
 *.in
 *.spec
 *.cmake

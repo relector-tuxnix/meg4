@@ -12,7 +12,7 @@ Installation
 
 | Platform   | Link                                                                                                           |
 |------------|----------------------------------------------------------------------------------------------------------------|
-| Windows    | [meg4-i686-win-sdl.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-i686-win-static.zip)                  |
+| Windows    | [meg4-i686-win-sdl.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-i686-win-sdl.zip)                     |
 | Linux      | [meg4-x86_64-linux-sdl.tgz](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64-linux-sdl.tgz)<br>[meg4-x86_64-linux-glfw.tgz](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64-linux-glfw.tgz) |
 | Ubuntu     | [meg4_0.0.1-amd64.deb](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4_0.0.1-amd64.deb)                       |
 | RaspiOS    | [meg4_0.0.1-armhf.deb](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4_0.0.1-armhf.deb)                       |
@@ -69,7 +69,7 @@ genuine games, no-one can tell they were created with MEG-4 (assuming your game 
 Known Bugs
 ----------
 
-Hopefully none. Please use the [issue tracker](https://gitlab.com/bztsrc/meg4/) if you find any.
+Hopefully none. Please use the [issue tracker](https://gitlab.com/bztsrc/meg4/issues) if you find any.
 
 Should compile and work on big-endian machines too (I mean, in theory all the necessary htoleX and leXtoh macros are in place, but
 in practice I probably missed a few spots). Since there's exactly zero big-endian machines in my vicinity, this is totally untested.

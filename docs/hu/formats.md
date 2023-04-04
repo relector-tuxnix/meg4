@@ -43,7 +43,7 @@ Egy indexelt, 256 x 256 pixeles PNG fájl, mind a 256 színnel és egyenként 8 
 [szprájt szerkesztő]ben csináltál. Ez a képfájl szerkeszthető a következő programokkal: [GrafX2](http://grafx2.chez.com),
 [GIMP](https://www.gimp.org), Paint stb. Importálásnál truecolor képek is betölthetők, ezek az alap MEG-4 palettára lesznek
 konvertálva, a legkissebb súlyozott sRGB távolság metódussal. Ez működik, de nem néz ki túl jól, ezért inkább azt javaslom, hogy
-eleve palettás képeket importálj be. Szprájtok beolvashatók még [Truevision TARGA](http://www.gamers.org/dEngine/quake3.TGA.txt)
+eleve palettás képeket importálj be. Szprájtok beolvashatók még [Truevision TARGA](http://www.gamers.org/dEngine/quake3/TGA.txt)
 (.tga) képformátumban is, ha indexáltak és a méretük a megfelelő 256 x 256 pixeles.
 
 ### map.tmx
