@@ -14,7 +14,7 @@ Menj a [repó](https://gitlab.com/bztsrc/meg4/tree/binaries)ba és töltsd le az
 
 ### Windows
 
-1. [meg4-i686-win-sdl.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/tngp-i686-win-static.zip) letöltése
+1. [meg4-i686-win-sdl.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/tngp-i686-win-sdl.zip) letöltése
 2. csomagold ki a `C:\Program Files` mappába és kész!
 
 Egy egy hordozható futtatható, semmilyen hagyományos telepítési eljárást nem igényel.

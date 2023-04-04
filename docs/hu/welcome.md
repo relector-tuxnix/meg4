@@ -1,7 +1,7 @@
 MEG-4 Felhasználói KéziKönyv
 ============================
 
-Üdvözöl a [MEG-4](https://tirnanog.codeberg.page), a Szabad és Nyílt Forráskódú virtuális fantasy konzol kézikönyve!
+Üdvözöl a [MEG-4](https://bztsrc.gitlab.io/meg4), a Szabad és Nyílt Forráskódú virtuális fantasy konzol kézikönyve!
 
 <imgc ../img/console.png>
 

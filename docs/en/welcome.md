@@ -1,7 +1,7 @@
 MEG-4 User's Manual
 ===================
 
-Welcome to the manual for the [MEG-4](https://tirnanog.codeberg.page), the Free and Open Source virtual fantasy console.
+Welcome to the manual for the [MEG-4](https://bztsrc.gitlab.io/meg4), the Free and Open Source virtual fantasy console.
 
 <imgc ../img/console.png>
 
