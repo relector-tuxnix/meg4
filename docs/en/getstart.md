@@ -14,7 +14,7 @@ Go to the [repository](https://gitlab.com/bztsrc/meg4/tree/binaries) and downloa
 
 ### Windows
 
-1. download [meg4-i686-win-sdl.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/tngp-i686-win-sdl.zip)
+1. download [meg4-i686-win-sdl.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-i686-win-sdl.zip)
 2. extract it to `C:\Program Files` directory and enjoy!
 
 This is a portable executable, no actual installation required.
