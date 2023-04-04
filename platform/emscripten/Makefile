@@ -44,7 +44,7 @@ meg4.js:
 	../sdl/*.o ../../src/*.o $(EDS) $(LUAO) -o meg4.js
 	@make --no-print-directory -C ../sdl clean
 ifeq ($(NOEDITORS),)
-	cp meg4.js meg4.wasm ../../pages
+	cp meg4.js meg4.wasm ../../public
 else
 ifneq ($(wildcard ../../src/editors/pro.c),)
 	@cc ../../src/bin2h.c -o bin2h

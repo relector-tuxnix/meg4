@@ -1,6 +1,6 @@
 <!--
   to be used with gendoc, like this:
-  $ gendoc ../../pages/manuan_en.html manual.xml
+  $ gendoc ../../public/manuan_en.html manual.xml
   see https://gitlab.com/bztsrc/gendoc
 -->
 <doc>

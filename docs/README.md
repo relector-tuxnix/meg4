@@ -9,7 +9,7 @@ gcc gendoc.c -o gendoc
 Simple as that. Once you have gendoc, you can create the manual by going into one of the language code directories and running
 ```
 cd docs/en
-gendoc ../../pages/manual_en.html manual.xml
+gendoc ../../public/manual_en.html manual.xml
 ```
 
 Translating the User's Manual
