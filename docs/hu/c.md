@@ -33,7 +33,7 @@ void loop()
 Leírás
 ------
 
-A konzol alapértelmezett nyelve a **MEG4- C**. Ez, bár maga a nyelv roppant egyszerű, mégis valamivel haladóbb programozóknak
+A konzol alapértelmezett nyelve a **MEG-4 C**. Ez, bár maga a nyelv roppant egyszerű, mégis valamivel haladóbb programozóknak
 való. Ha abszolút kezdő vagy, akkor javaslom inkább a [BASIC] nyelv használatát.
 
 Szándékosan egy lebutított ANSI C-nek lett megalkotva, hogy megkönnyítse a programozás tanulását. Emiatt eléggé korlátozott,
