@@ -7,7 +7,8 @@ The first gamepad's buttons and joysticks are mapped to the keyboard, they are w
 matter if you press Ⓧ on the controller, or <kbd>X</kbd> on the keyboard, in both case both gamepad button flag and keyboard
 state flag will be set. The mapping can be changed by writing the keyboard scancodes to MEG-4's memory, see [memory map] for
 details. The default mapping goes like cursor arrows are the directions ◁, △, ▽, ▷; the <kbd>Space</kbd> is the primary
-button Ⓐ, <kbd>C</kbd> is the secondary button Ⓑ and <kbd>X</kbd> is Ⓧ, <kbd>Z</kbd> is Ⓨ. The Konami Code is working too.
+button Ⓐ, <kbd>C</kbd> is the secondary button Ⓑ and <kbd>X</kbd> is Ⓧ, <kbd>Z</kbd> is Ⓨ. The Konami Code is working too
+(see `KEY_CHEAT` scancode).
 
 <h2 ui_ptr>Pointer</h2>
 

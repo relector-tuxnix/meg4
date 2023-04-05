@@ -50,18 +50,23 @@ the correct dimensions of 256 x 256 pixels.
 The map, created in the [map editor], in a format that can be used with the [Tiled MapEditor](https://www.mapeditor.org). Only
 CSV encoded *.tmx* is generated, but on import base64 encoded and compressed *.tmx* files can be loaded too (everything except
 zstd). Furthermore PNG or TARGA images are supported on import too, provided they are indexed and their dimensions match the
-required 320 x 200 pixels.
+required 320 x 200 pixels. The palette in these images aren't used, except the spritebank selector is stored in the first entry
+(index 0) alpha channel.
 
 ### font.bdf
 
-The font, created with the [font editor], in a format that can be edited by many tools. Obviously I'd recommend my
-[SFNEdit](https://gitlab.com/bztsrc/scalable-font2), but [FontForge](https://fontforge.org) works prefectly too. On import,
-besides of X11 Bitmap Distribution Format (.bdf), [Scalable Screen Font](https://gitlab.com/bztsrc/scalable-font2/blob/master/docs/sfn_format.md) (.sfn),
-PC Screen Font (.psfu) and FontForge's native SplineFontDB (.sfd) supported too.
+The font, created with the [font editor], in a format that can be edited by many tools, like xmbdfed or gbdfed. Obviously I'd
+recommend my [SFNEdit](https://gitlab.com/bztsrc/scalable-font2) instead, and [FontForge](https://fontforge.org) works prefectly
+too. On import, besides of [X11 Bitmap Distribution Format](https://www.x.org/docs/BDF/bdf.pdf) (.bdf),
+[PC Screen Font 2](https://www.win.tue.nl/~aeb/linux/kbd/font-formats-1.html) (.psfu, .psf2),
+[Scalable Screen Font](https://gitlab.com/bztsrc/scalable-font2/blob/master/docs/sfn_format.md) (.sfn) and FontForge's native
+[SplineFontDB](https://fontforge.org/docs/techref/sfdformat.html) (.sfd, bitmap variant only) supported too.
 
 ### sounds.mod
 
 The [sound effects] you created in the editor in Amiga MOD format. See music below. The song must be named `MEG-4 SFX`.
+
+All 31 waveforms are stored in this file, and only the first pattern used, and only one channel (64 notes in total).
 
 ### musicXX.mod
 
@@ -71,6 +76,8 @@ same hexadecimal number as in the filename. There are dozens of third party prog
 "[music tracker](https://en.wikipedia.org/wiki/Music_tracker)", for example [MilkyTracker](https://milkytracker.org) or
 [OpenMPT](https://openmpt.org), but for a true retro feeling, I'd recommend the moderized clone of
 [FastTracker II](https://github.com/8bitbubsy/ft2-clone), available for both Linux and Windows.
+
+From music files, only those waveforms are loaded that are referenced from the notes.
 
 You can find a huge database of downloadable Amiga MOD files at [modarchive.org](https://modarchive.org). But not all files are
 actually in *.mod* format on that site (some are *.xm*, *.it* or *.s3m* etc.); you'll have to load those in a tracker and save
@@ -104,14 +111,14 @@ loaded at that position, otherwise at the first empty slot.
 
 You can import MEG-4 Color Themes from "GIMP Palette" files. These are simple text files with a little header, and in each line
 red, green and blue numeric values. Each color entry line defines the color of a specific UI element, see the default theme
-[src/misc/theme.gpl](https://gitlab.com/bztsrc/meg4/blob/main/src/misc/theme.gpl) for an example.
+[src/misc/theme.gpl](https://gitlab.com/bztsrc/meg4/blob/main/src/misc/theme.gpl) for an example. Theme files can also be edited
+visually using [GIMP](https://www.gimp.org) or [Gpick](http://www.gpick.org) programs too.
 
 Furthermore, you can import PICO-8 cartridges (both in *.p8* and *.p8.png* formats) and TIC-80 cartridges (both in *.tic* and
 *.tic.png* formats), however you'll have to adjust the imported source code, because their memory layouts and API calls are
-different to MEG-4's. But at least you'll get their assets properly.
-
-The TIC-80 project format isn't supported because those files are unidentifiable. If you really want to import such a file, then
-first you'll have to convert it using the `prj2tic` tool, which can be found in the TIC-80 source repo.
+different to MEG-4's. But at least you'll get their assets properly. The TIC-80 project format isn't supported because those
+files are unidentifiable. If you really want to import such a file, then first you'll have to convert it using the `prj2tic`
+tool, which can be found in the TIC-80 source repo.
 
 Exporting into these cartridges is not possible, because the MEG-4 is lot more featureful than the competition. There's simply
 no place for all the MEG-4 features in those files.

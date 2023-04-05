@@ -51,19 +51,25 @@ eleve palettás képeket importálj be. Szprájtok beolvashatók még [Truevisio
 A [térkép szerkesztő]ben létrehozott térkép, olyan formátumban, ami használható a [Tiled MapEditor](https://www.mapeditor.org)
 programmal. Csakis CSV kódolt *.tmx* kerül mentésre, de importálásnál kezeli a base64 kódolt és tömörített *.tmx* fájlokat is
 (mindenfélét, kivéve zstd). Továbbá PNG és TARGA képek is használhatók betöltéskor, amennyiben indexáltak és a méretük megfelel
-az elvárt 320 x 200 pixelesnek.
+az elvárt 320 x 200 pixelesnek. Az ilyen képek palettája nem használt, kivéve, hogy a szprájtbank szelektor értéke a paletta első
+elemének (0-ás index) alfa csatornájában tárolódik.
 
 ### font.bdf
 
-A betűkészlet, amit a [betű szerkesztő]ben hoztál létre, olyan formátumban, amit sok program ismer. A módosításhoz nyilvánvalóan
-a saját [SFNEdit](https://gitlab.com/bztsrc/scalable-font2) programomat ajánlom elsősorban, de a [FontForge](https://fontforge.org)
-is tökéletesen megfelel a célnak. Betöltésnél az X11 Bitmap Distribution Format (.bdf) formátumon túl támogatott még a
-[Scalable Screen Font](https://gitlab.com/bztsrc/scalable-font2/blob/master/docs/sfn_format.md) (.sfn),
-PC Screen Font (.psfu) és a FontForge saját natív SplineFontDB (.sfd) formátuma is.
+A betűkészlet, amit a [betű szerkesztő]ben hoztál létre, olyan formátumban, amit sok program ismer, például xmbdfed vagy gbdfed.
+A módosításhoz nyilvánvalóan inkább a saját [SFNEdit](https://gitlab.com/bztsrc/scalable-font2) programomat ajánlom elsősorban, de
+a [FontForge](https://fontforge.org) is tökéletesen megfelel a célnak. Betöltésnél az
+[X11 Bitmap Distribution Format](https://www.x.org/docs/BDF/bdf.pdf) (.bdf) formátumon túl támogatott még a
+[PC Screen Font 2](https://www.win.tue.nl/~aeb/linux/kbd/font-formats-1.html) (.psfu, .psf2),
+[Scalable Screen Font](https://gitlab.com/bztsrc/scalable-font2/blob/master/docs/sfn_format.md) (.sfn), és a FontForge saját
+natív [SplineFontDB](https://fontforge.org/docs/techref/sfdformat.html) (.sfd, csak a bitmapes változat) formátuma is.
 
 ### sounds.mod
 
 Az általad létrehozott [hangeffektek], Amiga MOD formátumban. Lásd a zenesávokat alább. A zene nevének `MEG-4 SFX`-nek kell lennie.
+
+Mind a 31 hullámminta ebben a fájlban tárolódik, a patternekből viszont csak az első, és abból is csak egy csatorna használt
+(64 hangjegy összesen).
 
 ### musicXX.mod
 
@@ -72,6 +78,8 @@ felel meg (`00`-tól `07`-ig). A zene nevének `MEG-4 TRACKXX`-nek kell lennie, 
 Rengeteg programmal lehet szerkeszteni ezeket a fájlokat, csak guglizz a "[music tracker](https://en.wikipedia.org/wiki/Music_tracker)"-re,
 például [MilkyTracker](https://milkytracker.org) vagy [OpenMPT](https://openmpt.org), de az igazi retro életérzéshez ajánlom
 inkább a [FastTracker II](https://github.com/8bitbubsy/ft2-clone) modernizált klónját, ami fut Linuxon és Windowson egyaránt.
+
+A zenefájlok hullámmintáiból csak azok kerülnek betöltésre, amikre a zene kottája hivatkozik.
 
 Egy hatalmas adatbázis található letölthető Amiga MOD fájlokkal a [modarchive.org](https://modarchive.org)-on. De nem minden fájl
 *.mod*, amit letöltesz onnan (néhány *.xm*, *.it* vagy *.s3m* stb.); ezeket először be kell töltened egy trackerbe és *.mod*-ként
@@ -102,18 +110,18 @@ Egyéb formátumok
 Általában a hullámminták automatikusan betöltődnek az Amiga MOD fájlokból, de a hangmintákat külön-külön is importálhatod és
 exportálhatod *.wav* (RIFF Wave 44100 Hz, 8-bit, mono) formátumban. Ezek szerkeszthetők például az [Audacity](https://www.audacityteam.org)
 programmal. Amennyiben az importálandó fájlneve *dspXX.wav*, ahol az *XX* egy hexadecimális szám `01` és `1F` között, akkor a
-minta az adott pozícióra töltődik be, egyébként az első szabad helyre.
+hullámminta az adott pozícióra töltődik be, egyébként az első szabad helyre.
 
 Betölthetsz MEG-4 Színtémákat "GIMP Palette" fájlokból. Ezek sima szöveges fájlok, egy rövid fejléccel, és minden sorban piros,
 zöld és kék numerikus színértékekkel. Mindegyik színsor az interfész egy adott elemének színéért felelős, példának lásd a
-[src/misc/theme.gpl](https://gitlab.com/bztsrc/meg4/blob/main/src/misc/theme.gpl) alap téma definícióját.
+[src/misc/theme.gpl](https://gitlab.com/bztsrc/meg4/blob/main/src/misc/theme.gpl) alap téma definícióját. A témafájlok
+szerkeszthetők még vizuálisan a [GIMP](https://www.gimp.org) és a [Gpick](http://www.gpick.org) programokkal is.
 
 Továbbá betölthetők PICO-8 kertridzsek (mindkét *.p8* és *.p8.png* formátumban) valamint TIC-80 kertridzsek (mindkét *.tic* és
 *.tic.png* formátumban) is, de a beimportált forráskódot kézzel kell majd szerkesztened, mivel a címkiosztásuk és a függvényeik
-eltérnek a MEG-4-étől. De legalább a többi kelléked meglesz.
-
-A TIC-80 projektfurmátuma nem támogatott, mivel az ilyen fájlok felismerhetetlenek. Ha mégis ilyen fájlt szeretnél beimportálni,
-akkor előbb át kell konvertálnod a `prj2tic` programmal, ami megtalálható a TIC-80 forrás repójában.
+eltérnek a MEG-4-étől. De legalább a többi kelléked meglesz. A TIC-80 projektfurmátuma nem támogatott, mivel az ilyen fájlok
+felismerhetetlenek. Ha mégis ilyen fájlt szeretnél beimportálni, akkor előbb át kell konvertálnod a `prj2tic` programmal, ami
+megtalálható a TIC-80 forrás repójában.
 
 Exportálni kertridzsekbe nem lehet, mivel a MEG-4 sokkal többet tud, mint a vetélytársai. Egyszerűen nincs hely minden MEG-4
 funkciónak azokban a fájlokban.

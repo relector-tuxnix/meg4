@@ -320,7 +320,7 @@ csatornához egy-egy és 1024 sor van összesen; míg a hangeffekteknél csak eg
 
 A hangjegy sorszáma a következő: a 0 azt jelenti, nincs beállítva. A többi pedig 8 oktávonként 12 érték, azaz az 1-es a C-0,
 12-es a B-0 (a legmélyebb oktávon), 13-as a C-1 (egy oktávval magasabb), a 14-es pedig a C#1 (cisz, fél hanggal magasabb).
-A D hang a 4. oktávon tehát 1 + 4\*12 + 2 = 51. A B-7 a 96-os, a legmagasabb hang a legmagasabb oktávon. De vannak előredefiniált
+A D hang a 4. oktávon tehát 1 + 4\*12 + 2 = 51. A B-7 a 96-os, a legmagasabb hang a legmagasabb oktávon. De vannak
 define-ok hozzájuk, például a C-1 a `NOTE_C_1` és a C#1 az `NOTE_Cs1`, ha nem akarsz számolni, akkor használhatod ezeket is a
 programodban.
 

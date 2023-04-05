@@ -8,7 +8,7 @@ nyomod-e le a Ⓧ gombot, vagy a billentyűzeten a <kbd>X</kbd> billentyűt, min
 mind a billentyű lenyomott jelzője beállításra kerül. A leképezés megváltoztatható szkenkódok MEG-4 memóriába írásával, bővebb
 infóért lásd a [memóriatérkép] fejezetet. Az alapértelmezett leképezés a kurzornyilak az irányok ◁, △, ▽, ▷; a
 <kbd>Szóköz</kbd> az Ⓐ elsődleges gomb, a <kbd>C</kbd> a Ⓑ másodlagos gomb és az <kbd>X</kbd> az Ⓧ, <kbd>Y</kbd> az Ⓨ. A
-Konami Kód is működik.
+Konami Kód is működik (lásd `KEY_CHEAT` szkenkód).
 
 <h2 ui_ptr>Mutató</h2>
 

@@ -3,7 +3,8 @@ Sprite Editor
 
 <imgt ../img/sprite.png> Click on the stamp icon (or press <kbd>F3</kbd>) to modify the sprites.
 
-The sprites you create here can be displayed using [spr], and also used by [stext] when it displays text on screen.
+The sprites you create here can be displayed using [spr], and also used by [dlg] to generate a dialog window and by [stext] when
+it displays text on screen.
 
 The editor has three main boxes, two on the top, and one below.
 

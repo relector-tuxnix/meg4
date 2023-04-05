@@ -3,7 +3,8 @@ Szprájt Szerkesztő
 
 <imgt ../img/sprite.png> A bélyegző ikonra kattintva (vagy <kbd>F3</kbd>) jön elő a szprájtok szerkesztése.
 
-Az itt szerkesztett szprájtokat az [spr] paranccsal jelenítheted meg, illetve ezeket használva az [stext] szöveget ír ki.
+Az itt szerkesztett szprájtokat az [spr] paranccsal jelenítheted meg, illetve ezeket használva a [dlg] egy dialógusablakot
+generál, az [stext] pedig szöveget ír ki.
 
 A szerkesztőnek három fő mezője van, kettő felül, egy pedig alul.
 
