@@ -26,7 +26,7 @@
 
 /* scratch area for complex inputs */
 char meg4_kbdtmpbuf[8], meg4_kbdtmpsht, meg4_kbdtmpidx, meg4_emptyaltgr;
-static char meg4_kc[16], meg4_padbtns[sizeof(meg4.mmio.padbtns)] = { 0 };
+static char meg4_kc[16], meg4_padbtnsp[sizeof(meg4.mmio.padbtns)] = { 0 }, meg4_padbtnsr[sizeof(meg4.mmio.padbtns)] = { 0 };
 extern int load_list;
 
 /**
@@ -213,8 +213,8 @@ int meg4_api_getpad(int pad, int btn)
 int meg4_api_prspad(int pad, int btn)
 {
     int ret = (pad < 0 || pad > 3 || btn < 0 || btn > 255) ? 0 :
-        (meg4.mmio.padbtns[pad] & btn) && !(meg4_padbtns[pad] & btn);
-    memcpy(meg4_padbtns, meg4.mmio.padbtns, sizeof(meg4.mmio.padbtns));
+        (meg4.mmio.padbtns[pad] & btn) && !(meg4_padbtnsp[pad] & btn);
+    memcpy(meg4_padbtnsp, meg4.mmio.padbtns, sizeof(meg4.mmio.padbtns));
     return ret;
 }
 
@@ -228,8 +228,8 @@ int meg4_api_prspad(int pad, int btn)
 int meg4_api_relpad(int pad, int btn)
 {
     int ret = (pad < 0 || pad > 3 || btn < 0 || btn > 255) ? 0 :
-        !(meg4.mmio.padbtns[pad] & btn) && (meg4_padbtns[pad] & btn);
-    memcpy(meg4_padbtns, meg4.mmio.padbtns, sizeof(meg4.mmio.padbtns));
+        !(meg4.mmio.padbtns[pad] & btn) && (meg4_padbtnsr[pad] & btn);
+    memcpy(meg4_padbtnsr, meg4.mmio.padbtns, sizeof(meg4.mmio.padbtns));
     return ret;
 }
 
