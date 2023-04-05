@@ -58,8 +58,8 @@ There are some predefined built-in cursors:
 |  0001C |         64 | keyboard queue, 16 elements, each 4 bytes (see [popkey])           |
 |  0005C |         18 | keyboard keys pressed state by scancodes (see [getkey])            |
 
-The keys popped from the queue are represented in UTF-8. Some invalid UTF-8 sequences represent special
-(non-printable) keys, for example:
+The keys popped from the queue are represented in UTF-8. Some invalid UTF-8 sequences represent special (non-printable)
+keys, for example:
 
 | Keycode | Description                                     |
 |---------|-------------------------------------------------|
@@ -102,6 +102,8 @@ The gamepad buttons are as follows:
 | `BTN_B` |        32 | The `Ⓑ` button                                                     |
 | `BTN_X` |        64 | The `Ⓧ` button                                                     |
 | `BTN_Y` |       128 | The `Ⓨ` button                                                     |
+
+The `△△▽▽◁▷◁▷ⒷⒶ` sequence makes the `KEY_CHEAT` "key" pressed.
 
 ## Graphics Processing Unit
 
@@ -233,8 +235,7 @@ user memory.
 This is followed by the global variables that you have declared in your program, followed by the constants, like string literals.
 In case of BASIC, then this is followed by the actual DATA records.
 
-Memory addresses above the initialized data can be dynamically allocated and freed in your program via the
-[malloc] and [free] calls.
+Memory addresses above the initialized data can be dynamically allocated and freed in your program via the [malloc] and [free] calls.
 
 Lastly the stack, which is at the top (starting from C0000 or `MEM_LIMIT`) and growing *downwards*. Your program's local variables
 (that you declared inside a function) go here. The size of the stack always changes depending on which function calls which other

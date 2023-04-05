@@ -58,8 +58,8 @@ Van néhány beépített, előre definiált kurzor:
 |  0001C |         64 | billentyűsor, 16 elem, egyenként 4 bájt (lásd [popkey])            |
 |  0005C |         18 | lenyomott billentyű állapotok, szkenkódonként (lásd [getkey])      |
 
-A billentyűsorból kivett gombok UTF-8-ban vannak ábrázolva. Néhány érvénytelen UTF-8 sorozat
-speciális (nem-megjeleníthető) gombnak felel meg, például:
+A billentyűsorból kivett gombok UTF-8-ban vannak ábrázolva. Néhány érvénytelen UTF-8 sorozat speciális (nem-megjeleníthető)
+gombnak felel meg, például:
 
 | Gombkód | Leírás                                          |
 |---------|-------------------------------------------------|
@@ -240,6 +240,8 @@ A játékpad gombok a következők:
 | `BTN_X` |        64 | A `Ⓧ` gomb                                                         |
 | `BTN_Y` |       128 | A `Ⓨ` gomb                                                         |
 
+A `△△▽▽◁▷◁▷ⒷⒶ` sorozat a `KEY_CHEAT` "gombot" jelzi lenyomottnak.
+
 ## Grafikus Feldolgozó Egység
 
 | Cím    | Méret      | Leírás                                                             |
@@ -326,8 +328,8 @@ programodban.
 
 Az egyszerűség kedvéért a MEG-4 ugyanazokat az effektkódokat használja, mint az Amiga MOD fájlok (így ugyanazt látod a beépített
 zeneszerkesztőben mint egy külsős trackerben), de nem támogatja az összeset. Mint korábban említettük, ezek a kódok három hexa
-számból állnak, az első a típus `t`, az utolsó kettő pedig a paraméter, `xy` (vagy `xx`). Az `E1`-től `ED`-ig mind a típus
-bájtban van tárolva, annak ellenére, hogy úgy látszik, egy tetrádja a paraméterbe lóg, pedig nem is.
+számból állnak, az első a típus `t`, az utolsó kettő pedig a paraméter, `xy` (vagy `xx`). Az `E1`-től `ED`-ig mind a típus bájtban van
+tárolva, annak ellenére, hogy úgy látszik, egy tetrádja a paraméterbe lóg, pedig nem is.
 
 | Effekt | Kód  | Leírás                                                     |
 |--------|------|------------------------------------------------------------|
@@ -370,8 +372,7 @@ hasznosítható felhasználói memória.
 Ezt követi a globális változók blokkja, amiket a programodban deklaráltál, azt pedig a konstansok, mint például a sztring
 literálok. A BASIC nyelv esetén ezután jönnek a tényleges DATA rekordok.
 
-Az inicializált adatok feletti memóriacímeket dinamikusan allokálhatod és felszabadíthatod a programodból a
-[malloc] és [free] hívásokkal.
+Az inicializált adatok feletti memóriacímeket dinamikusan allokálhatod és felszabadíthatod a programodból a [malloc] és [free] hívásokkal.
 
 Végezetül pedig a verem, a memória legtetején (a C0000-ás címtől avagy `MEM_LIMIT`-től kezdődően), ami *lefele* növekszik. A
 programod lokális változói (amiket függvényeken belül deklaráltál) ide kerülnek. A verem mérete folyton változik, attól függően,
@@ -382,8 +383,8 @@ dob.
 
 ## Formázó sztring
 
-Néhány függvény, a [printf], [sprintf] és a [trace] formázó sztringet használ, amiben speciális karakterek lehetnek, amik a
-paraméterekre hivatkoznak és előírják, hogyan kell azokat megjeleníteni. Ezek a következők:
+Néhány függvény, a [printf], [sprintf] és a [trace] formázó sztringet használ, amiben speciális karakterek lehetnek, amik a paraméterekre
+hivatkoznak és előírják, hogyan kell azokat megjeleníteni. Ezek a következők:
 
 | Kód  | Leírás                                                     |
 |------|------------------------------------------------------------|
@@ -401,8 +402,8 @@ paraméterekre hivatkoznak és előírják, hogyan kell azokat megjeleníteni. E
 | `\n` | Kezd új sorban a kiírást                                   |
 
 Megadható kitöltés a `%` és a kód közötti méret megadásával. Ha ez `0`-val kezdődik, akkor nullával tölt ki, egyébként szóközzel.
-Például a `%4d` jobbra fogja igazítani az értéket szóközökkel, míg a `%04x` nullákkal teszi ezt. Az `f` elfogad pontot és egy
-számot utána, ami a tizedesjegyek számát adja meg (egészen 8-ig), például `%.6f`.
+Például a `%4d` jobbra fogja igazítani az értéket szóközökkel, míg a `%04x` nullákkal teszi ezt. Az `f` elfogad pontot és egy számot
+utána, ami a tizedesjegyek számát adja meg (egészen 8-ig), például `%.6f`.
 
 # Konzol
 

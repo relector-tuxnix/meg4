@@ -44,6 +44,42 @@ char *dict[NUMLANGS][NUMTEXTS + 1] = {{
 #include "lang/zh.h"
 },{
 #include "lang/ja.h"
+},{
+#include "lang/cs.h"
+},{
+#include "lang/da.h"
+},{
+#include "lang/el.h"
+},{
+#include "lang/fi.h"
+},{
+#include "lang/hr.h"
+},{
+#include "lang/it.h"
+},{
+#include "lang/nl.h"
+},{
+#include "lang/no.h"
+},{
+#include "lang/pl.h"
+},{
+#include "lang/pt.h"
+},{
+#include "lang/ro.h"
+},{
+#include "lang/sk.h"
+},{
+#include "lang/sl.h"
+},{
+#include "lang/sr.h"
+},{
+#include "lang/sv.h"
+},{
+#include "lang/cs.h"
+},{
+#include "lang/tr.h"
+},{
+#include "lang/uk.h"
 }};
 char **lang = NULL;
 #endif
@@ -122,7 +158,7 @@ void meg4_poweron(char *region)
     meg4_defwaves = NULL;
     memset(&meg4_edicons, 0 , sizeof(meg4_edicons));
     for(i = 0; i < NUMLANGS; i++) if(!strcmp(region, dict[i][0])) break;
-    if(i >= NUMLANGS) i = 0;
+    if(i >= NUMLANGS) { main_log(1, "no '%s' language dictionary, fallback to 'en'", region); i = 0; }
     lang = &dict[i][1];
     if((buf = main_cfgload("theme.gpl", &len))) { meg4_theme(buf, len); free(buf); }
     pro_init();

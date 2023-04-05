@@ -180,7 +180,7 @@ enum {
     NUMTEXTS
 };
 
-#define NUMLANGS         8
+#define NUMLANGS         26
 
 extern char **lang;
 

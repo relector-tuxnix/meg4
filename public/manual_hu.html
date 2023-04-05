@@ -1767,8 +1767,8 @@ Van néhány beépített, előre definiált kurzor:</p>
 <tr><td>0001B </td><td class="right">1 </td><td>billentyűsor fej </td></tr>
 <tr><td>0001C </td><td class="right">64 </td><td>billentyűsor, 16 elem, egyenként 4 bájt (lásd <a href="#popkey" onclick="c('popkey')">popkey</a>) </td></tr>
 <tr><td>0005C </td><td class="right">18 </td><td>lenyomott billentyű állapotok, szkenkódonként (lásd <a href="#getkey" onclick="c('getkey')">getkey</a>) </td></tr></table></div>
-<p>A billentyűsorból kivett gombok UTF-8-ban vannak ábrázolva. Néhány érvénytelen UTF-8 sorozat
-speciális (nem-megjeleníthető) gombnak felel meg, például:</p>
+<p>A billentyűsorból kivett gombok UTF-8-ban vannak ábrázolva. Néhány érvénytelen UTF-8 sorozat speciális (nem-megjeleníthető)
+gombnak felel meg, például:</p>
 <div class="table"><table><tr><th>Gombkód </th><th>Leírás </th></tr>
 <tr><td><samp>\x8</samp> </td><td>A 8-as karakter, <kbd>Backspace</kbd> gomb </td></tr>
 <tr><td><samp>\x9</samp> </td><td>A 9-es karakter, <kbd>Tab</kbd> gomb </td></tr>
@@ -1936,6 +1936,7 @@ speciális (nem-megjeleníthető) gombnak felel meg, például:</p>
 <tr><td><samp>BTN_B</samp> </td><td class="right">32 </td><td>A <samp>Ⓑ</samp> gomb </td></tr>
 <tr><td><samp>BTN_X</samp> </td><td class="right">64 </td><td>A <samp>Ⓧ</samp> gomb </td></tr>
 <tr><td><samp>BTN_Y</samp> </td><td class="right">128 </td><td>A <samp>Ⓨ</samp> gomb </td></tr></table></div>
+<p>A <samp>△△▽▽◁▷◁▷ⒷⒶ</samp> sorozat a <samp>KEY_CHEAT</samp> "gombot" jelzi lenyomottnak.</p>
 <h2 id="grafikus_feldolgozo_egyseg">Grafikus Feldolgozó Egység<a href="#grafikus_feldolgozo_egyseg"></a></h2>
 <div class="table"><table><tr><th>Cím </th><th>Méret </th><th>Leírás </th></tr>
 <tr><td>0007E </td><td class="right">1 </td><td>UNICODE kódpont felső bájtja a glifablakhoz </td></tr>
@@ -2005,8 +2006,8 @@ define-ok hozzájuk, például a C-1 a <samp>NOTE_C_1</samp> és a C#1 az <samp>
 programodban.</p>
 <p>Az egyszerűség kedvéért a MEG-4 ugyanazokat az effektkódokat használja, mint az Amiga MOD fájlok (így ugyanazt látod a beépített
 zeneszerkesztőben mint egy külsős trackerben), de nem támogatja az összeset. Mint korábban említettük, ezek a kódok három hexa
-számból állnak, az első a típus <samp>t</samp>, az utolsó kettő pedig a paraméter, <samp>xy</samp> (vagy <samp>xx</samp>). Az <samp>E1</samp>-től <samp>ED</samp>-ig mind a típus
-bájtban van tárolva, annak ellenére, hogy úgy látszik, egy tetrádja a paraméterbe lóg, pedig nem is.</p>
+számból állnak, az első a típus <samp>t</samp>, az utolsó kettő pedig a paraméter, <samp>xy</samp> (vagy <samp>xx</samp>). Az <samp>E1</samp>-től <samp>ED</samp>-ig mind a típus bájtban van
+tárolva, annak ellenére, hogy úgy látszik, egy tetrádja a paraméterbe lóg, pedig nem is.</p>
 <div class="table"><table><tr><th>Effekt </th><th>Kód </th><th>Leírás </th></tr>
 <tr><td>... </td><td>000 </td><td>Nincs effekt </td></tr>
 <tr><td>Arp </td><td>0xy </td><td>Arpeggio, játszd le a hangot, hang+x, hang+y félhangot is </td></tr>
@@ -2041,16 +2042,15 @@ hasznosítható felhasználói memória.</p>
 <tr><td>30008 </td><td class="right">4 </td><td>(csak BASIC) maximum READ számláló, DATA elemszáma </td></tr></table></div>
 <p>Ezt követi a globális változók blokkja, amiket a programodban deklaráltál, azt pedig a konstansok, mint például a sztring
 literálok. A BASIC nyelv esetén ezután jönnek a tényleges DATA rekordok.</p>
-<p>Az inicializált adatok feletti memóriacímeket dinamikusan allokálhatod és felszabadíthatod a programodból a
-<a href="#malloc" onclick="c('malloc')">malloc</a> és <a href="#free" onclick="c('free')">free</a> hívásokkal.</p>
+<p>Az inicializált adatok feletti memóriacímeket dinamikusan allokálhatod és felszabadíthatod a programodból a <a href="#malloc" onclick="c('malloc')">malloc</a> és <a href="#free" onclick="c('free')">free</a> hívásokkal.</p>
 <p>Végezetül pedig a verem, a memória legtetején (a C0000-ás címtől avagy <samp>MEM_LIMIT</samp>-től kezdődően), ami <i>lefele</i> növekszik. A
 programod lokális változói (amiket függvényeken belül deklaráltál) ide kerülnek. A verem mérete folyton változik, attól függően,
 hogy épp melyik függvény hív melyik másik függvényt a programodban.</p>
 <p>Amennyiben a dinamikusan allokált memória teteje és a verem alja összeérne, akkor a MEG-4 egy "Nincs elég memória" hibaüzenetet
 dob.</p>
 <h2 id="formazo_sztring">Formázó sztring<a href="#formazo_sztring"></a></h2>
-<p>Néhány függvény, a <a href="#printf" onclick="c('printf')">printf</a>, <a href="#sprintf" onclick="c('sprintf')">sprintf</a> és a <a href="#trace" onclick="c('trace')">trace</a> formázó sztringet használ, amiben speciális karakterek lehetnek, amik a
-paraméterekre hivatkoznak és előírják, hogyan kell azokat megjeleníteni. Ezek a következők:</p>
+<p>Néhány függvény, a <a href="#printf" onclick="c('printf')">printf</a>, <a href="#sprintf" onclick="c('sprintf')">sprintf</a> és a <a href="#trace" onclick="c('trace')">trace</a> formázó sztringet használ, amiben speciális karakterek lehetnek, amik a paraméterekre
+hivatkoznak és előírják, hogyan kell azokat megjeleníteni. Ezek a következők:</p>
 <div class="table"><table><tr><th>Kód </th><th>Leírás </th></tr>
 <tr><td><samp>%%</samp> </td><td>A <samp>%</samp> karakter maga </td></tr>
 <tr><td><samp>%d</samp> </td><td>A soronkövetkező paramétert decimális számként írja ki </td></tr>
@@ -2065,8 +2065,8 @@ paraméterekre hivatkoznak és előírják, hogyan kell azokat megjeleníteni. E
 <tr><td><samp>\t</samp> </td><td>Tab, igazítsd vízszintesen a pozíciót kiírás előtt </td></tr>
 <tr><td><samp>\n</samp> </td><td>Kezd új sorban a kiírást </td></tr></table></div>
 <p>Megadható kitöltés a <samp>%</samp> és a kód közötti méret megadásával. Ha ez <samp>0</samp>-val kezdődik, akkor nullával tölt ki, egyébként szóközzel.
-Például a <samp>%4d</samp> jobbra fogja igazítani az értéket szóközökkel, míg a <samp>%04x</samp> nullákkal teszi ezt. Az <samp>f</samp> elfogad pontot és egy
-számot utána, ami a tizedesjegyek számát adja meg (egészen 8-ig), például <samp>%.6f</samp>.</p><br style="clear:both;"><label class="btn prev" accesskey="p" for="_lua" title="Lua">Előző</label><label class="btn next" accesskey="n" for="_konzol" title="Konzol">Következő</label></div>
+Például a <samp>%4d</samp> jobbra fogja igazítani az értéket szóközökkel, míg a <samp>%04x</samp> nullákkal teszi ezt. Az <samp>f</samp> elfogad pontot és egy számot
+utána, ami a tizedesjegyek számát adja meg (egészen 8-ig), például <samp>%.6f</samp>.</p><br style="clear:both;"><label class="btn prev" accesskey="p" for="_lua" title="Lua">Előző</label><label class="btn next" accesskey="n" for="_konzol" title="Konzol">Következő</label></div>
 <div class="page" rel="konzol"><div><ul class="breadcrumbs"><li><label class="home" for="_" title="Főoldal"></label>&nbsp;»</li><li>&nbsp;Konzol</li></ul><hr></div>
 <h1 id="konzol">Konzol<a href="#konzol"></a></h1>
 <h2 id="putc">putc<a href="#putc"></a></h2>

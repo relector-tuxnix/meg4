@@ -1747,8 +1747,8 @@ There are some predefined built-in cursors:</p>
 <tr><td>0001B </td><td class="right">1 </td><td>keyboard queue head </td></tr>
 <tr><td>0001C </td><td class="right">64 </td><td>keyboard queue, 16 elements, each 4 bytes (see <a href="#popkey" onclick="c('popkey')">popkey</a>) </td></tr>
 <tr><td>0005C </td><td class="right">18 </td><td>keyboard keys pressed state by scancodes (see <a href="#getkey" onclick="c('getkey')">getkey</a>) </td></tr></table></div>
-<p>The keys popped from the queue are represented in UTF-8. Some invalid UTF-8 sequences represent special
-(non-printable) keys, for example:</p>
+<p>The keys popped from the queue are represented in UTF-8. Some invalid UTF-8 sequences represent special (non-printable)
+keys, for example:</p>
 <div class="table"><table><tr><th>Keycode </th><th>Description </th></tr>
 <tr><td><samp>\x8</samp> </td><td>The character 8, <kbd>Backspace</kbd> key </td></tr>
 <tr><td><samp>\x9</samp> </td><td>The character 9, <kbd>Tab</kbd> key </td></tr>
@@ -1916,6 +1916,7 @@ There are some predefined built-in cursors:</p>
 <tr><td><samp>BTN_B</samp> </td><td class="right">32 </td><td>The <samp>Ⓑ</samp> button </td></tr>
 <tr><td><samp>BTN_X</samp> </td><td class="right">64 </td><td>The <samp>Ⓧ</samp> button </td></tr>
 <tr><td><samp>BTN_Y</samp> </td><td class="right">128 </td><td>The <samp>Ⓨ</samp> button </td></tr></table></div>
+<p>The <samp>△△▽▽◁▷◁▷ⒷⒶ</samp> sequence makes the <samp>KEY_CHEAT</samp> "key" pressed.</p>
 <h2 id="graphics_processing_unit">Graphics Processing Unit<a href="#graphics_processing_unit"></a></h2>
 <div class="table"><table><tr><th>Offset </th><th>Size </th><th>Description </th></tr>
 <tr><td>0007E </td><td class="right">1 </td><td>UNICODE code point upper bits for font glyph mapping </td></tr>
@@ -2021,8 +2022,7 @@ user memory.</p>
 <tr><td>30008 </td><td class="right">4 </td><td>(BASIC only) maximum READ, number of DATA </td></tr></table></div>
 <p>This is followed by the global variables that you have declared in your program, followed by the constants, like string literals.
 In case of BASIC, then this is followed by the actual DATA records.</p>
-<p>Memory addresses above the initialized data can be dynamically allocated and freed in your program via the
-<a href="#malloc" onclick="c('malloc')">malloc</a> and <a href="#free" onclick="c('free')">free</a> calls.</p>
+<p>Memory addresses above the initialized data can be dynamically allocated and freed in your program via the <a href="#malloc" onclick="c('malloc')">malloc</a> and <a href="#free" onclick="c('free')">free</a> calls.</p>
 <p>Lastly the stack, which is at the top (starting from C0000 or <samp>MEM_LIMIT</samp>) and growing <i>downwards</i>. Your program's local variables
 (that you declared inside a function) go here. The size of the stack always changes depending on which function calls which other
 function in your program.</p>

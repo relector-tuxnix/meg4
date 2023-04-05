@@ -157,7 +157,7 @@
 "Error de sintaxis",
 "Sin par de cierre",
 "Sin par de apertura",
-"Comando LEER sin DATOS",
+"Comando READ sin DATA",
 "Ni setup() ni loop() definidos",
 "Sin retorno en la función",
 "Mal prototipo",
