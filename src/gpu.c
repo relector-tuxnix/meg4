@@ -45,6 +45,7 @@ void menu_view(uint32_t *dst, int dw, int dh, int dp);
 void textinp_view(uint32_t *dst, int dp);
 typedef struct { uint16_t d, o, id; float x, y; } maze_spr_t;
 static int mazecmp(const void *a, const void *b) { return ((maze_spr_t*)b)->d - ((maze_spr_t*)a)->d; }
+static float posX = 0.0, posY = 0.0;
 
 /**
  * Get screen
@@ -1505,6 +1506,7 @@ void meg4_api_move(int16_t x, int16_t y, uint16_t deg)
     meg4.mmio.turtlex = htole16(x);
     meg4.mmio.turtley = htole16(y);
     meg4.mmio.turtlea = htole16(deg % 360);
+    posX = (float)y / 128.0; posY = (float)x / 128.0;
 }
 
 /**
@@ -1569,6 +1571,7 @@ void meg4_api_forw(uint16_t cnt)
     meg4.mmio.turtley = htole16(le16toh(meg4.mmio.turtley) + (int)(cnt * sinf(((le16toh(meg4.mmio.turtlea) + 270) % 360) * MEG4_PI / 180.0)));
     if(meg4.mmio.turtlepen)
         meg4_api_line(meg4.mmio.turtlepalidx, oldx, oldy, le16toh(meg4.mmio.turtlex), le16toh(meg4.mmio.turtley));
+    posX = (float)(le16toh(meg4.mmio.turtley)) / 128.0; posY = (float)(le16toh(meg4.mmio.turtlex)) / 128.0;
 }
 
 /**
@@ -1583,6 +1586,7 @@ void meg4_api_back(uint16_t cnt)
     meg4.mmio.turtley = htole16(le16toh(meg4.mmio.turtley) - (int)(cnt * sinf(((le16toh(meg4.mmio.turtlea) + 270) % 360) * MEG4_PI / 180.0)));
     if(meg4.mmio.turtlepen)
         meg4_api_line(meg4.mmio.turtlepalidx, oldx, oldy, le16toh(meg4.mmio.turtlex), le16toh(meg4.mmio.turtley));
+    posX = (float)(le16toh(meg4.mmio.turtley)) / 128.0; posY = (float)(le16toh(meg4.mmio.turtlex)) / 128.0;
 }
 
 /**
@@ -1796,7 +1800,7 @@ void meg4_api_maze(uint16_t mx, uint16_t my, uint16_t mw, uint16_t mh, uint8_t s
     uint16_t sky, uint16_t grd, uint16_t door, uint16_t wall, uint16_t obj, uint8_t numnpc, addr_t npc)
 {
 #define SPRMAX 512
-    float posX, posY, dirX = -1.0, dirY = 0.0, planeX = 0.0, planeY = 0.66;
+    float dirX = -1.0, dirY = 0.0, planeX = 0.0, planeY = 0.66;
     float rd, dX, dY, fX, fY, sX, sY, rX, rY, zb[640];
     int x0 = le16toh(meg4.mmio.cropx0), x1 = le16toh(meg4.mmio.cropx1), y0 = le16toh(meg4.mmio.cropy0), y1 = le16toh(meg4.mmio.cropy1);
     int i, j, s, e, l, x, y, z, n, p, w = meg4.screen.w, h = meg4.screen.h, hw = w / 2, hh = h / 2, cx, cy, tx, ty, ts, tw, tn, tb, ti, si;
@@ -1823,20 +1827,21 @@ void meg4_api_maze(uint16_t mx, uint16_t my, uint16_t mw, uint16_t mh, uint8_t s
     /* failsafe, make sure turtle is on the map, on a walkable tile */
     if(le16toh(meg4.mmio.turtlex) >= ((mw + 1) << 7) || le16toh(meg4.mmio.turtley) >= ((mh + 1) << 7) ||
       meg4.mmio.map[(my + (le16toh(meg4.mmio.turtley) >> 7)) * 320 + mx + (le16toh(meg4.mmio.turtlex) >> 7)] >= wall) {
-        meg4.mmio.turtlex = meg4.mmio.turtley = 64;
+        meg4.mmio.turtlex = meg4.mmio.turtley = 64; posX = posY = 0.5;
         /* not checking the borders, because mazes are often surrounded by walls */
         for(y = 1; y < mh - 1; y++)
             for(x = 1; x < mw - 1; x++)
                 if(meg4.mmio.map[(my + y) * 320 + mx + x] < door) {
                     meg4.mmio.turtlex = htole16((x << 7) + 64);
                     meg4.mmio.turtley = htole16((y << 7) + 64);
+                    posX = (float)(le16toh(meg4.mmio.turtley)) / 128.0;
+                    posY = (float)(le16toh(meg4.mmio.turtlex)) / 128.0;
                     x = mw; y = mh; break;
                 }
     }
     fY = meg4_api_cos(le16toh(meg4.mmio.turtlea + 180)); fX = meg4_api_sin(le16toh(meg4.mmio.turtlea + 180));
     dX = dirX; dirX = dirX * fX - dirY * fY; dirY = dX * fY + dirY * fX;
     dX = planeX; planeX = planeX * fX - planeY * fY; planeY = dX * fY + planeY * fX;
-    posY = (float)(le16toh(meg4.mmio.turtlex)) / 128.0; posX = (float)(le16toh(meg4.mmio.turtley)) / 128.0;
 
     /* ceiling and floor */
     dX = ((dirX + planeX) - (dirX - planeX)) / (float)w;
@@ -2003,6 +2008,10 @@ void meg4_api_maze(uint16_t mx, uint16_t my, uint16_t mw, uint16_t mh, uint8_t s
         if(x >= 0 && x < mh && y >= 0 && y < mw && meg4.mmio.map[(x + my) * 320 + y + mx] < wall) {
             meg4.mmio.turtlex = htole16((int)(posY * 128.0));
             meg4.mmio.turtley = htole16((int)(posX * 128.0));
+        } else {
+            /* set position back where it was before the movement */
+            posX = (float)(le16toh(meg4.mmio.turtley)) / 128.0;
+            posY = (float)(le16toh(meg4.mmio.turtlex)) / 128.0;
         }
     }
     /* rotations */
