@@ -385,6 +385,7 @@ void main_setclipboard(char *str);
 void main_osk_show(void);
 void main_osk_hide(void);
 void main_fullscreen(void);
+void main_focus(void);
 
 /* meg4.c - top level MEG-4 API */
 void meg4_poweron(char *region);

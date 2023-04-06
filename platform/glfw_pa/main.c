@@ -109,6 +109,15 @@ void main_fullscreen(void)
 }
 
 /**
+ * Make window focused
+ */
+void main_focus(void)
+{
+    glfwFocusWindow(window);
+    if(win_f) glfwSetWindowMonitor(window, monitor, 0, 0, main_w, main_h, 0);
+}
+
+/**
  * The glfw error callback
  */
 void main_error(int error, const char *msg)

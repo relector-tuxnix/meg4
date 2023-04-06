@@ -618,6 +618,7 @@ int code_ctrl(void)
         /* editor area click */
         if(px >= 18 && px < 632 && py >= 12 && py < 378) {
             cursor = sels = code_pos(px - 18 - MEG4_PTR_HOTSPOT_X, py - 12); sele = -1U;
+            code_getfunc();
             lastc = cursor - 1;
         }
     } else

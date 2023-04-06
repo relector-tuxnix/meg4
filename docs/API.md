@@ -98,6 +98,12 @@ void main_fullscreen(void);
 
 This function should toggle between fullscreen and windowed modes.
 
+```c
+void main_focus(void);
+```
+
+This should raise the window and get focus for it.
+
 Imported Functions
 ------------------
 

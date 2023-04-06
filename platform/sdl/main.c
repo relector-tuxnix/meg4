@@ -140,6 +140,15 @@ void main_fullscreen(void)
 }
 
 /**
+ * Make window focused
+ */
+void main_focus(void)
+{
+    SDL_RaiseWindow(window);
+    if(win_f) SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+}
+
+/**
  * Calculate pointer coordinates
  */
 void main_pointer(SDL_Rect *dst, int x, int y)

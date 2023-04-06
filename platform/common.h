@@ -280,6 +280,7 @@ void main_openfile(void)
             meg4_insert(fn, buf, len);
             free(buf);
         }
+        main_focus();
     }
 #endif
 #endif
@@ -333,6 +334,7 @@ int main_savefile(const char *name, uint8_t *buf, int len)
             WideCharToMultiByte(CP_UTF8, 0, szFile, -1, fn, PATH_MAX + FILENAME_MAX + 1, NULL, NULL);
             ret = main_writefile(fn, buf, len);
         }
+        main_focus();
     }
 #endif
     return ret;
@@ -624,6 +626,7 @@ void main_openfile(void)
     munmap(tmp1, PATH_MAX);
 #endif
 #endif
+    main_focus();
     if(fn) {
         if((buf = main_readfile(fn, &len))) {
             n = strrchr(fn, SEP[0]); if(!n) n = fn; else n++;
@@ -769,6 +772,7 @@ int main_savefile(const char *name, uint8_t *buf, int len)
         munmap(tmp1, PATH_MAX);
 #endif
 #endif
+        main_focus();
         if(fn) { ret = main_writefile(fn, buf, len); free(fn); }
     }
 #endif
