@@ -56,6 +56,9 @@
 <cap>API Reference</cap>
 <include ../../src/lang/en.md>
 
+<cap>Tutorials</cap>
+<include tut_ball.md>
+
 <cap>Appendix</cap>
 <include license.md>
 <include links.md>

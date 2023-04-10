@@ -39,7 +39,7 @@ static meg4_pixbuf_t floppyimg = { 0 };
 static int anim = 0, next = MEG4_MODE_GAME, numfloppy = 0, curfloppy, dspfloppy, lkey = 0;
 static char search[64], lastsearch[64];
 static floppy_t *floppy = NULL;
-int strncasecmp(const char *, const char *, size_t);
+int casecmp(char *, char *, int);
 
 /**
  * Helper, natural comparition
@@ -57,7 +57,7 @@ static int strnatcmp(const void *a, const void *b)
             if(!pr_isdigit(*cb) && pr_isdigit(*ca)) return +1;
             if(result || (!*ca && !*cb)) return result;
         }
-        result = strncasecmp(ca, cb, 1);
+        result = casecmp(ca, cb, 1);
         if(result) return result;
     }
     return *ca - *cb;

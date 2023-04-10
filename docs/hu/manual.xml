@@ -56,6 +56,9 @@
 <cap>API Referencia</cap>
 <include ../../src/lang/hu.md>
 
+<cap>Példák</cap>
+<include tut_ball.md>
+
 <cap>Függelék</cap>
 <include license.md>
 <include links.md>

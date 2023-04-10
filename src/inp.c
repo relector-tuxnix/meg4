@@ -516,6 +516,7 @@ pushkey:            if(((meg4.mmio.kbdhead + 1) & 15) != meg4.mmio.kbdtail) {
                 default: /* every other, special key input modes */
                     if(s[0] == 8 || !memcmp(s, "Del", 4)) {
                         if(meg4_kbdtmpidx > 0) meg4_kbdtmpbuf[(int)--meg4_kbdtmpidx] = 0;
+                        else goto pushkey;
                     } else
                     if(meg4_kbdtmpidx < 7 && s[0] > ' ' && !(s[0] & 0x80) && !s[1]) {
                         if(!meg4_kbdtmpidx) meg4_kbdtmpsht = (s[0] >= 'A' && s[0] <= 'Z');

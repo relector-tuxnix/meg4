@@ -117,7 +117,7 @@ static int gettok(compiler_t *comp, int *s, tok_t **tok, int *nt, int *l, int lv
  */
 static int skip(compiler_t *comp, int s, char t)
 {
-    if(s >= comp->ntok || comp->tok[s].type != HL_D || comp->tok[s].id != t) { code_error(comp->tok[s].pos, lang[ERR_SYNTAX]); return 0; }
+    if(s >= comp->ntok || comp->tok[s].type != HL_D || comp->tok[s].id != t) { code_error(comp->tok[s == comp->ntok ? s - 1 : s].pos, lang[ERR_SYNTAX]); return 0; }
     return s + 1;
 }
 

@@ -377,7 +377,7 @@ void code_getfunc(void)
 
     hlp = lhlp = -1;
     if(!meg4.src || meg4.src_len < 1) return;
-    for(i = 0; i < numtok && (uint32_t)(tok[i] >> 4) <= cursor; i++);
+    for(i = 0; i + 1 < numtok && (uint32_t)(tok[i] >> 4) < cursor; i++);
     /* with Assembly there's no conventional function call, instead name prefixed by an SCALL keyword */
     if(meg4.src_len > 5 && !memcmp(meg4.src, "#!asm", 5)) {
         if(i > 3 && (tok[i - 1] & 15) == HL_V && (tok[i - 2] & 15) == HL_D && (tok[i - 3] & 15) == HL_K &&
@@ -385,7 +385,7 @@ void code_getfunc(void)
             hlp = help_find(meg4.src + (tok[i - 1] >> 4), (tok[i] >> 4) - (tok[i - 1] >> 4), 1);
         return;
     }
-    if(i > 0 && i + 1 < numtok) {
+    if(i > 0 && i < numtok) {
         for(i--, p = 1; i > 0 && p > 0; i--) {
             if(meg4.src[tok[i] >> 4] == '(') p--; else
             if(meg4.src[tok[i] >> 4] == ')') p++;
@@ -617,9 +617,8 @@ int code_ctrl(void)
     if(!last && clk) {
         /* editor area click */
         if(px >= 18 && px < 632 && py >= 12 && py < 378) {
-            cursor = sels = code_pos(px - 18 - MEG4_PTR_HOTSPOT_X, py - 12); sele = -1U;
+            cursor = lastc = sels = code_pos(px - 18 - MEG4_PTR_HOTSPOT_X, py - 12); sele = -1U;
             code_getfunc();
-            lastc = cursor - 1;
         }
     } else
     if(last && clk) {
@@ -699,7 +698,7 @@ book:               if(meg4.src_bm[0]) { modal = 6; modalclk = -1; }
                 if(!memcmp(&key, "End", 4)) { if(i) { sels = cursor; } while(cursor < meg4.src_len - 1 && meg4.src[cursor] != '\n') cursor++; } else
                 if(!memcmp(&key, "PgUp", 4)) { if(i) { sels = cursor; } for(j = 0; j < 40; j++) code_up(); } else
                 if(!memcmp(&key, "PgDn", 4)) { if(i) { sels = cursor; } for(j = 0; j < 40; j++) code_down(); } else
-                if(!memcmp(&key, "Sel", 4)) { sels = 0; sele = cursor = meg4.src_len; } else
+                if(!memcmp(&key, "Sel", 4)) { sels = 0; sele = cursor = lastc = meg4.src_len; } else
                 if(!memcmp(&key, "Cpy", 4) || !memcmp(&key, "Cut", 4)) {
 copy:               if(sels != -1U && sele != -1U) {
                         j = sels < sele ? sels : sele; k = sels < sele ? sele : sels;

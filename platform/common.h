@@ -32,7 +32,6 @@
 
 /* command line flags */
 int verbose = 0, zenity = 0, nearest = 0;
-int strcasecmp(const char *, const char *);
 char *main_floppydir = NULL;
 void main_hdr(void);
 void meg4_export(char *name, int binary);
@@ -459,6 +458,7 @@ void main_delay(int msec);
 #ifndef MAP_ANONYMOUS
 #define MAP_ANONYMOUS 0x20
 #endif
+int strcasecmp(const char *, const char *);
 /* some moron hide these behind feature defines which don't work if you have __USE_MISC... */
 int kill(pid_t pid, int sig);
 FILE *popen(const char *command, const char *type);
