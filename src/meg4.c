@@ -121,6 +121,7 @@ char meg4_title[64], meg4_author[64], meg4_pro = 0, meg4_takescreenshot = 0;
 static char meg4_locale[2];
 #ifndef NOEDITORS
 static int oldmode = MEG4_MODE_GAME, oldx0 = 0, oldx1 = htole16(320), oldy0 = 0, oldy1 = htole16(200), oldcs = MEG4_PTR_NORM;
+uint16_t oldsx, oldsy;
 #else
 int comp_lua(char *str, int len);
 #endif
@@ -434,6 +435,7 @@ void meg4_switchmode(int mode)
             oldcs = meg4.mmio.ptrspr; meg4.mmio.ptrspr = MEG4_PTR_NORM;
             oldx0 = meg4.mmio.cropx0; oldx1 = meg4.mmio.cropx1;
             oldy0 = meg4.mmio.cropy0; oldy1 = meg4.mmio.cropy1;
+            oldsx = meg4.mmio.scrx; oldsy = meg4.mmio.scry;
         break;
     }
     /* set up new mode */
@@ -456,6 +458,7 @@ void meg4_switchmode(int mode)
         meg4.mmio.ptrspr = oldcs;
         meg4.mmio.cropx0 = oldx0; meg4.mmio.cropx1 = oldx1;
         meg4.mmio.cropy0 = oldy0; meg4.mmio.cropy1 = oldy1;
+        meg4.mmio.scrx = oldsx; meg4.mmio.scry = oldsy;
         dsp = &meg4.dram;
     }
     /* enter new mode */

@@ -377,7 +377,7 @@ void code_getfunc(void)
 
     hlp = lhlp = -1;
     if(!meg4.src || meg4.src_len < 1) return;
-    for(i = 0; i + 1 < numtok && (uint32_t)(tok[i] >> 4) < cursor; i++);
+    for(i = 0; i + 1 < numtok && (uint32_t)(tok[i] >> 4) <= cursor; i++);
     /* with Assembly there's no conventional function call, instead name prefixed by an SCALL keyword */
     if(meg4.src_len > 5 && !memcmp(meg4.src, "#!asm", 5)) {
         if(i > 3 && (tok[i - 1] & 15) == HL_V && (tok[i - 2] & 15) == HL_D && (tok[i - 3] & 15) == HL_K &&
@@ -386,12 +386,12 @@ void code_getfunc(void)
         return;
     }
     if(i > 0 && i < numtok) {
-        for(i--, p = 1; i > 0 && p > 0; i--) {
+        for(p = 1; i > 0 && p > 0; i--) {
             if(meg4.src[tok[i] >> 4] == '(') p--; else
             if(meg4.src[tok[i] >> 4] == ')') p++;
         }
         if(i > 0 && (tok[i] & 15) == HL_D) i--;
-        if(i > 0 && i + 1 < numtok && (tok[i] & 15) == HL_F) {
+        if(i > 0 && i < numtok && (tok[i] & 15) == HL_F) {
             /* look for system functions first */
             if(meg4.src_len > 5 && !notc) {
                 /* The ECMA-55 BASIC spec requires renaming some of the system functions, but show help for those too */
@@ -408,8 +408,12 @@ void code_getfunc(void)
             if(hlp == -1) {
                 for(j = 0, p = (tok[i + 1] >> 4) - (tok[i] >> 4); j + 3 < numtok && lhlp == -1; j++)
                     if(code_isfuncdecl(j) && (tok[j + 3] >> 4) - (tok[j + 2] >> 4) == p &&
-                      !memcmp(meg4.src + (tok[j + 2] >> 4), meg4.src + (tok[i] >> 4), p))
-                        lhlp = j;
+                      !memcmp(meg4.src + (tok[j + 2] >> 4), meg4.src + (tok[i] >> 4), p)) {
+                        /* do not report the declaration that we're currently editing */
+                        for(lhlp = j; j < numtok && (tok[j] & 15) != HL_K && meg4.src[tok[j] >> 4] != ')'; j++);
+                        if((uint32_t)(tok[lhlp] >> 4) <= cursor && (uint32_t)(tok[j] >> 4) >= cursor) lhlp = -1;
+                        break;
+                    }
             }
         }
     }

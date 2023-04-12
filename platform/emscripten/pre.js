@@ -62,11 +62,8 @@ function meg4_savefile(fn, fnlen, buf, len) {
     var blob = new Blob([bview], { type: "application/octet-stream" });
     var url = window.URL.createObjectURL(blob);
     var a = document.getElementById('meg4_download');
-    name = prompt("Save As", name);
-    if(name) {
-        a.setAttribute('href',url);
-        a.setAttribute('download',name);
-        a.click();
-    }
+    a.setAttribute('href',url);
+    a.setAttribute('download', name != undefined ? name : "noname.png");
+    a.click();
     window.URL.revokeObjectURL(url);
 }

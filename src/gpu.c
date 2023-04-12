@@ -41,6 +41,7 @@ float sinf(float);
 float fabsf(float);
 extern char meg4_kbdtmpbuf[8], meg4_kbdtmpsht, *textinp_cur;
 extern uint32_t meg4_lasttick;
+extern uint16_t oldsx, oldsy;
 void menu_view(uint32_t *dst, int dw, int dh, int dp);
 void textinp_view(uint32_t *dst, int dp);
 typedef struct { uint16_t d, o, id; float x, y; } maze_spr_t;
@@ -121,8 +122,10 @@ void meg4_redraw(uint32_t *dst, int dw, int dh, int dp)
             for(x = 0; x < w; x++) d[x] = c;
     }
 #endif
-    for(j = w << 2; y < h; y++, ptr += 640, d += p)
+    for(j = w << 2; y < h; y++, ptr += 640, d += p) {
         memcpy(d, ptr, j);
+        if(w < dw) d[w] = 0;
+    }
 #ifndef NOEDITORS
     if(meg4.mode > MEG4_MODE_SAVE || load_list)
         menu_view(dst, dw, dh, dp);
@@ -177,13 +180,14 @@ void meg4_screenshot(uint32_t *dst, int dx, int dy, int dp)
 
     if(!dst || dx < 0 || dy < 0 || dp < 4) return;
     /* do not use meg4.screen, that might point to alternate vram */
-    if(meg4.mmio.scrx == 0xffff || meg4.mmio.scry == 0xffff) {
+    if(meg4.mode == MEG4_MODE_GAME) { x = meg4.mmio.scrx; y = meg4.mmio.scry; } else { x = oldsx; y = oldsy; }
+    if(x == 0xffff || y == 0xffff) {
         w = 640; h = 400;
         src = (uint8_t*)meg4.vram;
     } else {
         w = 320; h = 200;
-        x = le16toh(meg4.mmio.scrx) > 320 ? 320 : le16toh(meg4.mmio.scrx);
-        y = le16toh(meg4.mmio.scry) > 200 ? 200 : le16toh(meg4.mmio.scry);
+        x = le16toh(x) > 320 ? 320 : le16toh(x);
+        y = le16toh(y) > 200 ? 200 : le16toh(y);
         src = (uint8_t*)(meg4.vram + y * 640 + x);
     }
     dp >>= 2; dst += dy * dp + dx;

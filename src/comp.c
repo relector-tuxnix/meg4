@@ -319,7 +319,7 @@ int comp_addfunc(compiler_t *comp, int id, int s, int nargs, int *argtypes)
 int comp_addlbl(compiler_t *comp, int s)
 {
     tok_t *tok = comp->tok;
-    int i, j;
+    int i;
 
     /* check if this label was already referenced */
     for(i = comp->pf; i < comp->nid; i++)
@@ -332,11 +332,8 @@ int comp_addlbl(compiler_t *comp, int s)
     comp->id[i].o = comp->nc;
     if(!comp->code || !comp->id[i].f[1]) return 1;
     /* resolve forward references */
-    for(i = comp->id[i].f[1], comp->id[i].f[1] = 0; i;) {
-        j = comp->code[i];
-        comp->code[i] = comp->nc;
-        i = j;
-    }
+    comp_resolve(comp, comp->id[i].f[1]);
+    comp->id[i].f[1] = 0;
     return 1;
 }
 
@@ -357,6 +354,7 @@ int comp_addjmp(compiler_t *comp, int s)
             break;
         }
     if(i >= comp->nid && (i = comp_addid(comp, &comp->tok[s], T(T_LABEL, T_VOID))) < 0) return 0;
+    comp->id[i].r++;
     /* add true reference or forward reference */
     if(comp->id[i].o) { comp_gen(comp, comp->id[i].o); }
     else { comp_gen(comp, comp->id[i].f[1]); comp->id[i].f[1] = comp->nc - 1; }
@@ -431,6 +429,10 @@ int comp_eval(compiler_t *comp, int s, int e, int *val)
                         /* all the rest */
                         tmp[l].id = meg4_bdefs[j - MEG4_NUM_API].val;
                     tmp[l++].type = HL_N;
+                } else
+                if(j >= MEG4_NUM_API + MEG4_NUM_BDEF && comp->id[j].t == T(T_DEF, T_I32)) {
+                    tmp[l].id = comp->id[j].f[0];
+                    tmp[l++].type = HL_N;
                 } else { code_error(tok[i].pos, lang[ERR_BADARG]); return 0; }
             break;
             case HL_N:
@@ -469,7 +471,7 @@ int comp_eval(compiler_t *comp, int s, int e, int *val)
 /**
  * Add an expression to output (reentrant)
  */
-int comp_expr(compiler_t *comp, int s, int e, int *type, int lvl)
+int comp_expr(compiler_t *comp, int s, int e, int *type, int *end, int lvl)
 {
     func_t *func;
     tok_t *tok = comp->tok;
@@ -571,6 +573,13 @@ int comp_expr(compiler_t *comp, int s, int e, int *type, int lvl)
                     /* all the rest */
                     comp_gen(comp, meg4_bdefs[j - MEG4_NUM_API].val);
             } else
+            if(j >= MEG4_NUM_API + MEG4_NUM_BDEF && comp->id[j].t == T(T_DEF, T_I32)) {
+                /* user-defined, probably enum */
+                comp->lc = comp->nc;
+                comp_gen(comp, BC_CI);
+                *type = T(T_SCALAR, T_I32);
+                comp_gen(comp, comp->id[j].f[0]);
+            } else
             if((comp->id[j].t & 15) >= T_SCALAR) {
                 /* global and local variables */
                 comp->id[j].r++;
@@ -590,7 +599,7 @@ arrayindex:         s += 2; q = 1;
                                 if(l >= N_DIM || !comp->id[j].a[l]) { code_error(tok[s - 1].pos, lang[ERR_NUMARG]); return 0; }
                                 comp_push(comp, T(T_SCALAR, T_I32));
                                 t[0] = T(T_SCALAR, T_I32);
-                                if(!(k = comp_expr(comp, s, o, &t[0], O_CND))) return 0;
+                                if(!(k = comp_expr(comp, s, o, &t[0], end, O_CND))) return 0;
                                 if(k != o || (t[0] & 15) != T_SCALAR) { code_error(tok[s - 1].pos, lang[ERR_BADARG]); return 0; }
                                 /* subtract the first index if it's not zero */
                                 if(comp->id[j].f[l]) {
@@ -698,8 +707,10 @@ arrayindex:         s += 2; q = 1;
                         if(l == s + 1 || (tok[l].type == HL_D && tok[l].id == ',' && !p)) {
                             q = t[m]; if(tok[l].type == HL_D && tok[l].id) l++;
                             comp_cdbg(comp, l);
-                            if(comp_expr(comp, l, k, &q, O_LET) != k) return 0;
-                            if((q & 15) != (t[m] & 15) && !((t[m] & 15) == T_PTR && (q == T(T_SCALAR,T_I32) || q == T(T_SCALAR,T_U32))))
+                            if(comp_expr(comp, l, k, &q, end, O_LET) != k) return 0;
+                            /* we accept integer values as pointers (could be addresses), all the other combinations are invalid */
+                            if((q & 15) != (t[m] & 15) && !((t[m] & 15) == T_PTR && (q == T(T_SCALAR,T_I32) || q == T(T_SCALAR,T_U32))) &&
+                              !((q & 15) == T_PTR && (t[m] == T(T_SCALAR,T_I32) || t[m] == T(T_SCALAR,T_U32))))
                                 { code_error(tok[l].pos, lang[ERR_BADARG]); return 0; }
                             comp_push(comp, q);
                             m--; if(m >= 0) l--;
@@ -741,30 +752,30 @@ arrayindex:         s += 2; q = 1;
                 s++; t[0]++;
             }
             if(s >= e || tok[s].type != HL_D || tok[s].id != ')') { code_error(tok[m].pos, lang[ERR_NOCLOSE]); return 0; }
-            s++; if(!(s = comp_expr(comp, s, e, type, O_INC))) return 0;
+            s++; if(!(s = comp_expr(comp, s, e, type, end, O_INC))) return 0;
             *type = t[0];
         } else {
-            if(!(s = comp_expr(comp, s, e, type, O_LET))) return 0;
+            if(!(s = comp_expr(comp, s, e, type, end, O_LET))) return 0;
             if(s >= e || tok[s].type != HL_D || tok[s].id != ')') { code_error(tok[m].pos, lang[ERR_NOCLOSE]); return 0; }
             s++;
         }
     } else
     if(!meg4.code_type && tok[s].type == HL_O && tok[s].id == O_MUL) {
         /* dereference */
-        m = s++; if(!(s = comp_expr(comp, s, e, type, O_INC))) return 0;
+        m = s++; if(!(s = comp_expr(comp, s, e, type, end, O_INC))) return 0;
         if((*type & 15) < T_PTR) { code_error(tok[m].pos, lang[ERR_BADDRF]); return 0; }
         comp_load(comp, --(*type));
     } else
     if(tok[s].type == HL_O && tok[s].id == O_BAND) {
         /* address of */
-        m = s++; if(!(s = comp_expr(comp, s, e, type, O_INC))) return 0;
+        m = s++; if(!(s = comp_expr(comp, s, e, type, end, O_INC))) return 0;
         i = comp->code[--comp->nc];
         if(i < BC_LDB || i > BC_LDF || ((*type) & 15) >= T_PTR + N_DIM) { code_error(tok[m].pos, lang[ERR_BADADR]); return 0; }
         (*type)++;
     } else
     if(tok[s].type == HL_O && tok[s].id == O_NOT) {
         /* logical not */
-        s++; if(!(s = comp_expr(comp, s, e, type, O_INC))) return 0;
+        s++; if(!(s = comp_expr(comp, s, e, type, end, O_INC))) return 0;
         if(comp->nc - 2 == comp->lc && comp->code[comp->lc] == BC_CI)
             comp->code[comp->nc - 1] = !comp->code[comp->nc - 1];
         else
@@ -773,7 +784,7 @@ arrayindex:         s += 2; q = 1;
     } else
     if(tok[s].type == HL_O && tok[s].id == O_BNOT) {
         /* bitwise not */
-        s++; if(!(s = comp_expr(comp, s, e, type, O_INC))) return 0;
+        s++; if(!(s = comp_expr(comp, s, e, type, end, O_INC))) return 0;
         if(comp->nc - 2 == comp->lc && comp->code[comp->lc] == BC_CI)
             comp->code[comp->nc - 1] = ~comp->code[comp->nc - 1];
         else
@@ -782,11 +793,11 @@ arrayindex:         s += 2; q = 1;
     } else
     if(tok[s].type == HL_O && tok[s].id == O_ADD) {
         /* unary plus */
-        s++; if(!(s = comp_expr(comp, s, e, type, O_INC))) return 0;
+        s++; if(!(s = comp_expr(comp, s, e, type, end, O_INC))) return 0;
     } else
     if(tok[s].type == HL_O && tok[s].id == O_SUB) {
         /* unary minus */
-        s++; if(!(s = comp_expr(comp, s, e, type, O_INC))) return 0;
+        s++; if(!(s = comp_expr(comp, s, e, type, end, O_INC))) return 0;
         if(*type != T(T_SCALAR, T_FLOAT)) *type = T(T_SCALAR, T_I32);
         if(comp->nc - 2 == comp->lc && comp->code[comp->lc] == BC_CF) {
             memcpy(&f, &comp->code[comp->nc - 1], 4); f *= -1; memcpy(&comp->code[comp->nc - 1], &f, 4);
@@ -805,7 +816,7 @@ arrayindex:         s += 2; q = 1;
     } else
     if(tok[s].type == HL_O && (tok[s].id == O_INC || tok[s].id == O_DEC)) {
         /* prefix increment / decrement */
-        m = s++; if(!(s = comp_expr(comp, s, e, type, O_INC))) return 0;
+        m = s++; if(!(s = comp_expr(comp, s, e, type, end, O_INC))) return 0;
         i = comp->code[--comp->nc];
         if(i < BC_LDB || i >= BC_LDF) { code_error(tok[m + 1].pos, lang[ERR_BADLVAL]); return 0; }
         comp_push(comp, T(T_SCALAR, T_I32));
@@ -823,7 +834,7 @@ arrayindex:         s += 2; q = 1;
                 comp_push(comp, T(T_SCALAR, T_I32));
                 comp_gen(comp, i);
                 comp_gen(comp, BC_PUSHI);
-                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, O_LET))) return 0;
+                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, end, O_LET))) return 0;
                 comp_gen(comp, o - O_AOR + BC_OR);
                 comp_store(comp, *type = t[0]);
             break;
@@ -833,7 +844,7 @@ arrayindex:         s += 2; q = 1;
                 comp_push(comp, T(T_SCALAR, T_I32));
                 comp_gen(comp, i);
                 comp_gen(comp, i == BC_LDF ? BC_PUSHF : BC_PUSHI);
-                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, O_LET))) return 0;
+                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, end, O_LET))) return 0;
                 comp_gen(comp, o - O_AADD + (i == BC_LDF ? BC_ADDF : BC_ADDI));
                 comp_store(comp, *type = t[0]);
             break;
@@ -841,64 +852,64 @@ arrayindex:         s += 2; q = 1;
                 i = comp->code[--comp->nc];
                 if(i < BC_LDB || i > BC_LDF) { code_error(tok[s].pos, lang[ERR_BADLVAL]); return 0; }
                 comp_push(comp, T(T_SCALAR, T_I32));
-                s++; if(!(s = comp_expr(comp, s, e, type, O_LET))) return 0;
+                s++; if(!(s = comp_expr(comp, s, e, type, end, O_LET))) return 0;
                 comp_store(comp, *type = t[0]);
             break;
             case O_CND:
                 if(comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JNZ;
                 else comp_gen(comp, BC_JZ);
                 i = comp->nc; comp_gen(comp, 0);
-                m = s++; if(!(s = comp_expr(comp, s, e, type, O_LET))) return 0;
+                m = s++; if(!(s = comp_expr(comp, s, e, type, end, O_LET))) return 0;
                 if(s >= e || tok[s].type != HL_D || tok[s].id != ':') { code_error(tok[m].pos, lang[ERR_BADCND]); return 0; }
                 comp_gen(comp, BC_JMP);
                 comp->code[i] = comp->nc + 1; i = comp->nc; comp_gen(comp, 0);
-                s++; if(!(s = comp_expr(comp, s, e, type, O_LET))) return 0;
+                s++; if(!(s = comp_expr(comp, s, e, type, end, O_LET))) return 0;
                 comp->code[i] = comp->lc = comp->nc;
             break;
             case O_LOR:
                 if(comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JZ;
                 else comp_gen(comp, BC_JNZ);
-                i = comp->nc; comp_gen(comp, 0);
-                s++; if(!(s = comp_expr(comp, s, e, type, O_LOR + 1))) return 0;
-                comp->code[i] = comp->nc;
+                comp_gen(comp, end ? *end : 0); if(end) *end = comp->nc - 1;
+                s++; comp_cdbg(comp, s);
+                if(!(s = comp_expr(comp, s, e, type, end, O_LOR + 1))) return 0;
                 *type = T(T_SCALAR, T_I32);
             break;
             case O_LAND:
                 if(comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JNZ;
                 else comp_gen(comp, BC_JZ);
-                i = comp->nc; comp_gen(comp, 0);
-                s++; if(!(s = comp_expr(comp, s, e, type, O_LAND + 1))) return 0;
-                comp->code[i] = comp->nc;
+                comp_gen(comp, end ? *end : 0); if(end) *end = comp->nc - 1;
+                s++; comp_cdbg(comp, s);
+                if(!(s = comp_expr(comp, s, e, type, end, O_LAND + 1))) return 0;
                 *type = T(T_SCALAR, T_I32);
             break;
             case O_BOR: case O_XOR: case O_BAND:
                 comp_push(comp, *type);
-                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, o + 1))) return 0;
+                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, end, o + 1))) return 0;
                 comp_gen(comp, o - O_BOR + BC_OR);
                 *type = ((t[0] >> 4) < T_U8 || (t[0] >> 4) > T_U32) || ((*type >> 4) < T_U8 || (*type >> 4) > T_U32) ?
                     T(T_SCALAR, T_U32) : T(T_SCALAR, T_I32);
             break;
             case O_EQ: case O_NE:
                 comp_push(comp, *type);
-                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, O_LT))) return 0;
+                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, end, O_LT))) return 0;
                 comp_cmp(comp, o, t[0], *type);
                 *type = T(T_SCALAR, T_I32);
             break;
             case O_LT: case O_GT: case O_LE: case O_GE:
                 comp_push(comp, *type);
-                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, O_SHL))) return 0;
+                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, end, O_SHL))) return 0;
                 comp_cmp(comp, o, t[0], *type);
                 *type = T(T_SCALAR, T_I32);
             break;
             case O_SHL: case O_SHR:
                 comp_push(comp, *type);
-                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, o))) return 0;
+                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, end, o))) return 0;
                 comp_gen(comp, o - O_SHL + BC_SHL);
                 *type = ((t[0] >> 4) < T_U8 || (t[0] >> 4) > T_U32) ? T(T_SCALAR, T_U32) : T(T_SCALAR, T_I32);
             break;
             case O_ADD: case O_SUB:
                 comp_push(comp, *type);
-                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, O_MUL))) return 0;
+                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, end, O_MUL))) return 0;
                 if(t[0] == T(T_SCALAR, T_FLOAT) || *type == T(T_SCALAR, T_FLOAT)) {
                     if(*type != T(T_SCALAR, T_FLOAT)) comp_gen(comp, BC_CNVF);
                     comp_gen(comp, o - O_ADD + BC_ADDF);
@@ -928,7 +939,7 @@ arrayindex:         s += 2; q = 1;
             break;
             case O_MUL: case O_DIV: case O_MOD: case O_EXP:
                 comp_push(comp, *type);
-                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, O_INC))) return 0;
+                o = tok[s++].id; if(!(s = comp_expr(comp, s, e, type, end, O_INC))) return 0;
                 if(t[0] == T(T_SCALAR, T_FLOAT) || *type == T(T_SCALAR, T_FLOAT)) {
                     if(*type != T(T_SCALAR, T_FLOAT)) comp_gen(comp, BC_CNVF);
                     comp_gen(comp, o - O_MUL + BC_MULF);
@@ -951,7 +962,7 @@ arrayindex:         s += 2; q = 1;
             case O_LAST:
                 /* pointer disposition with array subscription */
                 comp_push(comp, *type);
-                m = s++; if(!(s = comp_expr(comp, s, e, type, O_LET))) return 0;
+                m = s++; if(!(s = comp_expr(comp, s, e, type, end, O_LET))) return 0;
                 if(s >= e || tok[s].type != HL_D || tok[s].id != ']') { code_error(tok[m].pos, lang[ERR_NOCLOSE]); return 0; }
                 i = *type >> 4;
                 if((*type & 15) != T_SCALAR || i < T_I8 || i > T_U32) { code_error(tok[m].pos, lang[ERR_BADARG]); return 0; } else
@@ -972,6 +983,19 @@ arrayindex:         s += 2; q = 1;
     }
 /*printf("expr ret s %d\n",s);*/
     return s;
+}
+
+/**
+ * Resolve forward references
+ */
+void comp_resolve(compiler_t *comp, int i)
+{
+    int j;
+    while(i) {
+        j = comp->code[i];
+        comp->code[i] = comp->nc;
+        i = j;
+    }
 }
 
 /**

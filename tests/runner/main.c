@@ -148,7 +148,7 @@ int main(int argc, char **argv)
 
     /* compile and run */
     i = cpu_compile();
-    printf("meg4: first compile, cpu_compile() = %d\r\n", i);
+    if(re) printf("meg4: first compile, cpu_compile() = %d\r\n", i);
     if(!i) print_error();
     else if(disasm) {
         if(!meg4.code || meg4.code_len < 4 || meg4.code_type >= 0x10) printf("No bytecode?\r\n");
@@ -168,8 +168,12 @@ int main(int argc, char **argv)
                     for(i = 0; i <= l; i++) printf(",%05X", meg4.code[pc++]);
                     printf("\n");
                 } else {
+                    for(i = -1, l = meg4.code[0]; (uint32_t)l < meg4.code_len && (uint32_t)l < meg4.code[1]; l += 2)
+                        if(meg4.code[l] == pc) { i = meg4.code[l + 1]; break; }
                     pc = debug_disasm(pc, tmp);
-                    printf("%s\r\n", tmp);
+                    printf("%-24s", tmp);
+                    if(i != -1) print_src(i, meg4.src_len);
+                    else printf("\r\n");
                 }
             }
             if(meg4.code_len > meg4.code[0]) {

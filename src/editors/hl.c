@@ -282,6 +282,7 @@ nextchar:   if(str[k]) k++;
                 if(i && (t[i] & 0xf) == 3 && (t[i - 1] & 0xf) == 2 && (str[t[i - 1] >> 4] == '-' || str[t[i - 1] >> 4] == '.'))
                     t[i] -= 16;
             }
+            t[nt] = size << 4;
         }
     }
     if(len) *len = nt;

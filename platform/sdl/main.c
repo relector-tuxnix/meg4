@@ -672,11 +672,12 @@ int main(int argc, char **argv)
     main_win(main_w, main_h, 0);
 #else
     SDL_GetDesktopDisplayMode(0, &dm);
+    /*dm.w = 640; dm.h = 400;*/
     win_w = main_w = dm.w; win_h = main_h = dm.h;
 #if DEBUG
     main_win(640, 400, 0);
 #else
-    main_win(640/*main_w*/, 400/*main_h*/, 1);
+    main_win(main_w, main_h, 1);
 #endif
 #endif
     if(!window || !renderer) {

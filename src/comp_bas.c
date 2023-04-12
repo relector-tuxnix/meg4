@@ -96,7 +96,7 @@ static int getst(compiler_t *comp, int s, int *e, int l)
 static int statement(compiler_t *comp, int s, int e)
 {
     tok_t *tok = comp->tok;
-    int i, j, k, l, m, n, o = s, p, l1, l2;
+    int i, j, k, l, m, n, o = s, p, l1, l2, end;
     float f;
 
     if(e > comp->ntok) e = comp->ntok;
@@ -136,14 +136,16 @@ static int statement(compiler_t *comp, int s, int e)
               (comp->id[j].t & 15) < T_SCALAR) { code_error(tok[s].pos, lang[ERR_SYNTAX]); return 0; }
             k = comp->id[j].t;
             comp_cdbg(comp, s);
-            if(!comp_expr(comp, s, i, &k, O_CND)) return 0;
+            end = 0;
+            if(!comp_expr(comp, s, i, &k, &end, O_CND)) return 0;
             j = comp->code[--comp->nc];
-            if(j < BC_LDB || j > BC_LDF) { code_error(tok[s].pos, lang[ERR_BADLVAL]); return 0; }
+            if(j < BC_LDB || j > BC_LDF || end) { code_error(tok[s].pos, lang[ERR_BADLVAL]); return 0; }
             comp_push(comp, T(T_SCALAR, T_I32));
             m = k;
             i++;
-            if(!(s = comp_expr(comp, i, l, &m, O_CND))) return 0;
+            if(!(s = comp_expr(comp, i, l, &m, &end, O_CND))) return 0;
             if(k != m) { code_error(tok[i].pos, lang[ERR_BADARG]); return 0; }
+            comp_resolve(comp, end);
             comp_store(comp, k);
         } else
         /* other statements */
@@ -163,8 +165,10 @@ static int statement(compiler_t *comp, int s, int e)
                     k = m = (comp->id[comp->f[comp->cf].id].t & ~0xff) | (comp->id[comp->f[comp->cf].id].t == T_FUNC ? T_SCALAR : T_PTR);
                     if(m != T(T_SCALAR, T_VOID)) {
                         if(s >= l) { code_error(tok[i].pos, lang[ERR_NUMARG]); return 0; }
-                        if(!(s = comp_expr(comp, s, l, &m, O_CND))) return 0;
+                        end = 0;
+                        if(!(s = comp_expr(comp, s, l, &m, &end, O_CND))) return 0;
                         if(k != m) { code_error(tok[i + 1].pos, lang[ERR_BADARG]); return 0; }
+                        comp_resolve(comp, end);
                     }
                     if(s != l) { code_error(tok[i].pos, lang[ERR_SYNTAX]); return 0; }
                     comp_gen(comp, BC_RET);
@@ -177,7 +181,9 @@ static int statement(compiler_t *comp, int s, int e)
                     s++;
                     if(s >= l || tok[s].type != HL_V || (j = comp_findid(comp, &tok[s])) < 0 ||
                       comp->id[j].t != T(T_FUNC, T_VOID)) { code_error(tok[s].pos, lang[ERR_SYNTAX]); return 0; }
-                    if(!(s = comp_expr(comp, s, l, &m, O_CND))) return 0;
+                    end = 0;
+                    if(!(s = comp_expr(comp, s, l, &m, &end, O_CND))) return 0;
+                    comp_resolve(comp, end);
                 break;
                 case BAS_RESTORE:
                     comp_gen(comp, BC_PSHCI);
@@ -192,9 +198,10 @@ static int statement(compiler_t *comp, int s, int e)
                             if((j = comp_findid(comp, &tok[s])) < MEG4_NUM_API + MEG4_NUM_BDEF || (comp->id[j].t & 15) < T_SCALAR) { code_error(tok[s].pos, lang[ERR_SYNTAX]); return 0; }
                             k = s; m = comp->id[j].t;
                             comp_cdbg(comp, s);
-                            if(!(s = comp_expr(comp, s, l, &m, O_CND))) return 0;
+                            end = 0;
+                            if(!(s = comp_expr(comp, s, l, &m, &end, O_CND))) return 0;
                             j = comp->code[--comp->nc];
-                            if(j < BC_LDB || j > BC_LDF) { code_error(tok[s].pos, lang[ERR_BADLVAL]); return 0; }
+                            if(j < BC_LDB || j > BC_LDF || end) { code_error(tok[s].pos, lang[ERR_BADLVAL]); return 0; }
                             comp_gen(comp, j - BC_LDB + BC_RDB);
                         } else { code_error(tok[s].pos, lang[ERR_SYNTAX]); return 0; }
                         if(tok[s].type == HL_O && tok[s].id == ',') s++;
@@ -209,12 +216,14 @@ static int statement(compiler_t *comp, int s, int e)
                     }
                     if(i >= l) { code_error(tok[s].pos, lang[ERR_NUMARG]); return 0; }
                     /* value */
-                    comp_cdbg(comp, i + 1); m = T(T_SCALAR, T_FLOAT);
-                    if(!comp_expr(comp, i + 1, l, &m, O_CND)) return 0;
+                    comp_cdbg(comp, i + 1); m = T(T_SCALAR, T_FLOAT); end = 0;
+                    if(!comp_expr(comp, i + 1, l, &m, &end, O_CND)) return 0;
+                    comp_resolve(comp, end);
                     comp_push(comp, T(T_SCALAR, T_I32));
                     /* address */
-                    comp_cdbg(comp, s + 1); m = T(T_SCALAR, T_FLOAT);
-                    if(!comp_expr(comp, s + 1, i, &m, O_CND)) return 0;
+                    comp_cdbg(comp, s + 1); m = T(T_SCALAR, T_FLOAT); end = 0;
+                    if(!comp_expr(comp, s + 1, i, &m, &end, O_CND)) return 0;
+                    comp_resolve(comp, end);
                     comp_push(comp, T(T_SCALAR, T_I32));
                     comp_gen(comp, (MEG4_OUTB << 8) | BC_SCALL);
                     comp_gen(comp, (8 << 8) | BC_SP);
@@ -225,8 +234,9 @@ static int statement(compiler_t *comp, int s, int e)
                         if(meg4.src[tok[i].pos] == ')') { p--; if(p < 0) { code_error(tok[i].pos, lang[ERR_NOOPEN]); return 0; } } else
                         if((meg4.src[tok[i].pos] == ',' && !p) || meg4.src[tok[i].pos] == ';' || meg4.src[tok[i].pos] == '\n') {
                             /* push the expression */
-                            comp_cdbg(comp, s); m = T(T_SCALAR, T_FLOAT);
-                            if(!comp_expr(comp, s, i, &m, O_CND)) return 0;
+                            comp_cdbg(comp, s); m = T(T_SCALAR, T_FLOAT); end = 0;
+                            if(!comp_expr(comp, s, i, &m, &end, O_CND)) return 0;
+                            comp_resolve(comp, end);
                             comp_push(comp, T(T_SCALAR, T_I32));
                             /* push an appropriate formating string */
                             if(m == T(T_PTR, T_I8) || m == T(T_SCALAR, T_STR)) k = fmt; else
@@ -252,9 +262,9 @@ static int statement(compiler_t *comp, int s, int e)
                     if(i >= l) { code_error(tok[s].pos, lang[ERR_NUMARG]); return 0; }
                     if(i > s + 1) {
                         /* push the expression */
-                        comp_cdbg(comp, s + 1); m = T(T_SCALAR, T_FLOAT);
-                        if(!comp_expr(comp, s + 1, i, &m, O_CND)) return 0;
-                        if(m != T(T_PTR, T_I8) && m != T(T_SCALAR, T_STR)) { code_error(tok[s + 1].pos, lang[ERR_BADARG]); return 0; }
+                        comp_cdbg(comp, s + 1); m = T(T_SCALAR, T_FLOAT); end = 0;
+                        if(!comp_expr(comp, s + 1, i, &m, &end, O_CND)) return 0;
+                        if(end || (m != T(T_PTR, T_I8) && m != T(T_SCALAR, T_STR))) { code_error(tok[s + 1].pos, lang[ERR_BADARG]); return 0; }
                         comp_push(comp, T(T_SCALAR, T_I32));
                         /* push an appropriate formating string */
                         comp_gen(comp, BC_PSHCI);
@@ -270,10 +280,10 @@ static int statement(compiler_t *comp, int s, int e)
                     comp_gen(comp, BC_PSHCI);
                     comp_gen(comp, MEG4_MEM_LIMIT - 256);
                     i++;
-                    comp_cdbg(comp, i); m = T(T_SCALAR, T_FLOAT);
-                    if(!comp_expr(comp, i, l, &m, O_CND)) return 0;
+                    comp_cdbg(comp, i); m = T(T_SCALAR, T_FLOAT); end = 0;
+                    if(!comp_expr(comp, i, l, &m, &end, O_CND)) return 0;
                     j = comp->code[--comp->nc];
-                    if(j < BC_LDB || j > BC_LDF) { code_error(tok[i].pos, lang[ERR_BADARG]); return 0; }
+                    if(j < BC_LDB || j > BC_LDF || end) { code_error(tok[i].pos, lang[ERR_BADARG]); return 0; }
                     comp_push(comp, T(T_SCALAR, T_I32));
                     /* convert the result */
                     if(m == T(T_PTR, T_I8) || m == T(T_SCALAR, T_STR)) {
@@ -294,8 +304,9 @@ static int statement(compiler_t *comp, int s, int e)
                 case BAS_ON:
                     for(i = s + 1; i < l && tok[i].type != HL_K; i++);
                     if(i >= l || tok[i].type != HL_K || tok[i].id != BAS_GOTO) { code_error(tok[i >= l ? s : i].pos, lang[ERR_SYNTAX]); return 0; }
-                    comp_cdbg(comp, s + 1); m = T(T_SCALAR, T_FLOAT);
-                    if(!comp_expr(comp, s + 1, i, &m, O_CND)) return 0;
+                    comp_cdbg(comp, s + 1); m = T(T_SCALAR, T_FLOAT); end = 0;
+                    if(!comp_expr(comp, s + 1, i, &m, &end, O_CND)) return 0;
+                    comp_resolve(comp, end);
                     for(s = ++i, p = 0; i < l && tok[i].type == HL_V; ) {
                         p++; i++;
                         if(!((tok[i].type == HL_K && tok[i].id == BAS_ELSE) ||
@@ -313,9 +324,10 @@ static int statement(compiler_t *comp, int s, int e)
                 case BAS_IF:
                     for(n = s, i = s + 1; i < l && tok[i].type != HL_K; i++);
                     if(i >= l || tok[i].type != HL_K || tok[i].id != BAS_THEN) { code_error(tok[i >= l ? s : i].pos, lang[ERR_SYNTAX]); return 0; }
-                    comp_cdbg(comp, s + 1); m = T(T_SCALAR, T_FLOAT);
-                    if(!comp_expr(comp, s + 1, i, &m, O_CND)) return 0;
-                    if(comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JNZ;
+                    comp_cdbg(comp, s + 1); m = T(T_SCALAR, T_FLOAT); end = 0;
+                    if(!comp_expr(comp, s + 1, i, &m, &end, O_CND)) return 0;
+                    comp_resolve(comp, end);
+                    if(!end && comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JNZ;
                     else comp_gen(comp, BC_JZ);
                     i++;
                     if(i < l) {
@@ -373,9 +385,9 @@ static int statement(compiler_t *comp, int s, int e)
                     if(j < comp->ng) { comp->lc = comp->nc; comp_gen(comp, BC_CI); comp_gen(comp, comp->id[j].o); }
                     else comp_gen(comp, (comp->id[j].o << 8) | BC_ADR);
                     comp_gen(comp, BC_PUSHI);
-                    comp_cdbg(comp, s); m = T(T_SCALAR, T_FLOAT);
-                    if(!comp_expr(comp, s, i, &m, O_CND)) return 0;
-                    if(m != T(T_SCALAR, T_FLOAT)) { code_error(tok[s].pos, lang[ERR_BADARG]); return 0; }
+                    comp_cdbg(comp, s); m = T(T_SCALAR, T_FLOAT); end = 0;
+                    if(!comp_expr(comp, s, i, &m, &end, O_CND)) return 0;
+                    if(m != T(T_SCALAR, T_FLOAT) || end) { code_error(tok[s].pos, lang[ERR_BADARG]); return 0; }
                     comp_gen(comp, BC_STF);
                     for(s += 2, i = s; i < l && tok[i].type != HL_K; i++);
                     /* get step, k variable id or if k == 0 then f is step constant */
@@ -392,8 +404,9 @@ static int statement(compiler_t *comp, int s, int e)
                     /* add check limit expression */
                     l1 = comp->nc;
                     comp_gen(comp, BC_PUSHF);
-                    comp_cdbg(comp, s); m = T(T_SCALAR, T_FLOAT);
-                    if(!comp_expr(comp, s, i, &m, O_CND)) return 0;
+                    comp_cdbg(comp, s); m = T(T_SCALAR, T_FLOAT); end = 0;
+                    if(!comp_expr(comp, s, i, &m, &end, O_CND)) return 0;
+                    comp_resolve(comp, end);
                     if(!k) {
                         comp_gen(comp, f > 0.0 ? BC_LTF : BC_GTF);
                         comp_gen(comp, BC_JNZ);

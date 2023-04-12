@@ -41,6 +41,8 @@ char *c_ops[] = {
     /* field select */  ".", "->"
 };
 
+static int lr = 0;
+
 /**
  * Convert tokens
  */
@@ -167,7 +169,7 @@ static int getarr(compiler_t *comp, int *s, int i, int p)
  */
 static int getcase(compiler_t *comp, int s, int *val)
 {
-    if((comp->tok[s].type != HL_N && comp->tok[s].type != HL_C) || !comp_eval(comp, s, s + 1, val)) return 0;
+    if((comp->tok[s].type != HL_N && comp->tok[s].type != HL_C && comp->tok[s].type != HL_V) || !comp_eval(comp, s, s + 1, val)) return 0;
     return comp->tok[s + 1].type == HL_D && comp->tok[s + 1].id == ':';
 }
 
@@ -249,9 +251,10 @@ static int getinit(compiler_t *comp, int s, int id, int len, int lvl, int offs)
 static int expression(compiler_t *comp, int s)
 {
     tok_t *tok = comp->tok;
-    int i = s, e, p = 0, t = T(T_SCALAR, T_I32);
+    int i = s, e, p = 0, end, t = T(T_SCALAR, T_I32);
 
     if(tok[s].type == HL_D && tok[s].id == ';') return s;
+    lr = 0;
     do {
         comp_cdbg(comp, s);
         for(e = s; e < comp->ntok && meg4.src[tok[e].pos] != ';'; e++) {
@@ -260,7 +263,9 @@ static int expression(compiler_t *comp, int s)
             if(meg4.src[tok[e].pos] == ',' && !p) break;
         }
         if(p > 0) { code_error(tok[i].pos, lang[ERR_NOCLOSE]); return 0; }
-        if(!comp_expr(comp, s, e, &t, O_AOR)) return 0;
+        end = 0;
+        if(!comp_expr(comp, s, e, &t, &end, O_AOR)) return 0;
+        if(end) { lr = 1; comp_resolve(comp, end); }
         s = e + 1;
     } while(meg4.src[tok[e].pos] == ',');
     return e;
@@ -381,7 +386,7 @@ static int statement(compiler_t *comp, int s, int sw, int sl, int *el)
                 s++; if(!(s = skip(comp, s, '('))) return 0;
                 if(!(s = expression(comp, s))) return 0;
                 if(!(s = skip(comp, s, ')'))) return 0;
-                if(comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JNZ;
+                if(!lr && comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JNZ;
                 else comp_gen(comp, BC_JZ);
                 l1 = comp->nc; comp_gen(comp, 0);
                 if(!(s = statement(comp, s, 0, sl, el))) return 0;
@@ -404,7 +409,7 @@ static int statement(compiler_t *comp, int s, int sw, int sl, int *el)
                 l1 = comp->nc;
                 if(!(s = expression(comp, s))) return 0;
                 if(!(s = skip(comp, s, ';'))) return 0;
-                if(comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JNZ;
+                if(!lr && comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JNZ;
                 else comp_gen(comp, BC_JZ);
                 l2 = comp->nc; comp_gen(comp, 0);
                 comp_gen(comp, BC_JMP); comp_gen(comp, 0);
@@ -424,7 +429,7 @@ static int statement(compiler_t *comp, int s, int sw, int sl, int *el)
                 l1 = comp->nc;
                 if(!(s = expression(comp, s))) return 0;
                 if(!(s = skip(comp, s, ')'))) return 0;
-                if(comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JNZ;
+                if(!lr && comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JNZ;
                 else comp_gen(comp, BC_JZ);
                 l2 = comp->nc; comp_gen(comp, 0); l3 = 0;
                 if(!(s = statement(comp, s, 0, l1, &l3))) return 0;
@@ -443,7 +448,7 @@ static int statement(compiler_t *comp, int s, int sw, int sl, int *el)
                 if(!(s = expression(comp, s))) return 0;
                 if(!(s = skip(comp, s, ')'))) return 0;
                 if(!(s = skip(comp, s, ';'))) return 0;
-                if(comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JZ;
+                if(!lr && comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JZ;
                 else comp_gen(comp, BC_JNZ);
                 comp_gen(comp, l1);
                 while(l3) { l2 = comp->code[l3]; comp->code[l3] = comp->nc; l3 = l2; }
@@ -474,7 +479,7 @@ static int statement(compiler_t *comp, int s, int sw, int sl, int *el)
             case C_GOTO:
                 comp_gen(comp, BC_JMP);
                 s++; if(!comp_addjmp(comp, s)) return 0;
-                if(!(s = skip(comp, s, ';'))) return 0;
+                if(!(s = skip(comp, s + 1, ';'))) return 0;
             break;
         }
     } else {

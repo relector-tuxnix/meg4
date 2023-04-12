@@ -32,7 +32,7 @@ typedef struct {
 static cb_t cb[33];
 static int numcb = 0;
 
-static int unaw = 0, cdew = 0, dtaw = 0, btnw = 0, tab = 0, numcd = 0;
+static int unaw = 0, cdew = 0, dtaw = 0, btnw = 0, tab = 0, numcd = 0, cont = 1;
 static char **opmne = NULL;
 
 /**
@@ -87,14 +87,17 @@ void debug_rte(int err)
  */
 void debug_step(void)
 {
-    meg4.mode = MEG4_MODE_GAME;
-    cpu_fetch();
-    /* if we have finished with setup() or loop(), restart loop() */
-    if(!meg4.pc && meg4.code && meg4.code_len > 4) {
-        meg4.pc = meg4.code[3];
-        main_log(3, "CPU: new entry point %05X", meg4.pc);
-    }
-    meg4.mode = MEG4_MODE_DEBUG;
+    if(cont) {
+        meg4.mode = MEG4_MODE_GAME;
+        cpu_fetch();
+        /* if we have finished with setup() or loop(), restart loop() */
+        if(!meg4.pc && meg4.code && meg4.code_len > 4) {
+            meg4.pc = meg4.code[3];
+            main_log(3, "CPU: new entry point %05X", meg4.pc);
+        }
+        meg4.mode = MEG4_MODE_DEBUG;
+    } else
+        debug_rte(ERR_BADADR);
     numcb = 0;
 }
 
@@ -232,11 +235,12 @@ void debug_view(void)
                     }
                     numcd = 0;
                 }
-                if(!numcd)
-                    for(u = 0; u < meg4.code[0] && u < meg4.code_len; numcd++) {
+                if(!numcd) {
+                    for(u = cont = 0; u < meg4.code[0] && u < meg4.code_len; numcd++) {
                         u = debug_disasm(u, tmp);
-                        if(u == meg4.pc) menu_scroll = numcd > 16 ? (numcd - 16) * 10 : 0;
+                        if(u == meg4.pc) { cont = 1; menu_scroll = numcd > 16 ? (numcd - 16) * 10 : 0; }
                     }
+                }
             }
             menu_scrmax = numcd * 10;
             if(menu_scroll + menu_scrhgt > menu_scrmax) menu_scroll = menu_scrmax - menu_scrhgt;
@@ -250,7 +254,7 @@ void debug_view(void)
                 meg4_text(meg4.valt, 504, 12 + j - menu_scroll, 2560, theme[o && o == meg4.pc ? THEME_SEL_FG : THEME_FG], 0, 1, meg4_font, tmp);
                 sprintf(tmp, "%05X", o);
                 meg4_text(meg4.valt, 497 - meg4_width(meg4_font, 1, tmp, NULL), 12 + j - menu_scroll, 2560,
-                    theme[o && o == meg4.pc ? THEME_SEL_FG : THEME_D], theme[THEME_L],
+                    theme[o && o == meg4.pc ? THEME_SEL_FG : (o < meg4.pc && u > meg4.pc ? THEME_ERR_FG : THEME_D)], theme[THEME_L],
                     1, meg4_font, tmp);
             }
             /* callstack */
