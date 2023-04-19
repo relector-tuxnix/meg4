@@ -18,15 +18,15 @@ uint32_t anarray[10];
 /* Things to do on startup */
 void setup()
 {
-    /* local variables */
-    int iamlocal = 123;
+  /* local variables */
+  int iamlocal = 123;
 }
 
 /* Things to run for every frame, at 60 FPS */
 void loop()
 {
-    /* Get MEG-4 style outputs */
-    printf("a counter %d, left shift %d\n", acounter, getkey(KEY_LSHIFT));
+  /* Get MEG-4 style outputs */
+  printf("a counter %d, left shift %d\n", acounter, getkey(KEY_LSHIFT));
 }
 ```
 
@@ -124,7 +124,7 @@ can be initialized (a value assigned to them using `=`), while local variables c
 to set their values.
 
 A declaration consist of two things: a type and a name. MEG-4 C supports all ANSI C types: `char` (signed byte), `short`
-(signed word), `int` (signed integer), `float` (floating point). You might also put `unsigned` in from of these to make
+(signed word), `int` (signed integer), `float` (floating point). You might also put `unsigned` in front of these to make
 them, well, unsigned. In ANSI C `int` can be omitted with `short`, but in MEG-4 you must not use it. So `short int` isn't a
 valid type, `short` in itself is. Furthermore MEG-4 C supports and prefers standard types instead (defined in stdint.h under
 ANSI C). These have some simple rules: if they are unsigned, then they start with the letter `u`; then `int` means integer

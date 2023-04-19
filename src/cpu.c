@@ -81,7 +81,7 @@ void cpu_getlang(void)
 void cpu_run(void)
 {
     /* temporarily suspend execution after this many instructions and continue in next frame */
-    int lim = 65536;
+    int lim = 1048576;
 
     /* check if there's bytecode, script finished or running is still blocked */
     if(!meg4.code || meg4.code_len < 4 ||                               /* no script */
@@ -110,11 +110,11 @@ void cpu_run(void)
                     meg4.pc = meg4.code[3];
                 /* nothing to run? */
                 if(!meg4.pc) meg4.flg |= 8;
-#ifndef NOEDITORS
+#if !defined(NOEDITORS) && defined(DEBUG)
                 else main_log(3, "CPU: new entry point %05X", meg4.pc);
 #endif
             }
-            /* execute until function finishes, gets blocked or debugger invoked */
+            /* execute until function finishes, gets blocked, debugger invoked or max instruction limit reached */
             do { cpu_fetch(); } while(meg4.pc && !(meg4.flg & ~1) && meg4.mode == MEG4_MODE_GAME && --lim);
         break;
     }
@@ -198,7 +198,7 @@ float cpu_topf(uint32_t offs)
  */
 void cpu_fetch(void)
 {
-#ifndef NOEDITORS
+#if !defined(NOEDITORS) && defined(DEBUG)
     char tmp[256];
 #endif
     uint32_t pc, sp;
@@ -210,9 +210,9 @@ void cpu_fetch(void)
     if(meg4.pc < 4 || meg4.pc >= meg4.code[0]) { meg4.pc = 0; return; }
 
     pc = meg4.pc + 1; i = meg4.code[meg4.pc]; val = i >> 8;
-#ifndef NOEDITORS
+#if !defined(NOEDITORS) && defined(DEBUG)
     debug_disasm(meg4.pc, tmp);
-    main_log(3, "CPU: %05X %s", meg4.pc, tmp);
+    main_log(3, "CPU: SP %05X PC %05X %s", meg4.sp, meg4.pc, tmp);
 #endif
     switch(i & 0xff) {
         /* transfer control */
@@ -290,9 +290,9 @@ void cpu_fetch(void)
             memcpy(&val, meg4.data + meg4.sp, 4); fval = (float)val; memcpy(meg4.data + meg4.sp, &fval, 4); } break;
         /* load */
         case BC_LDB: if(meg4.ac >= MEG4_MEM_LIMIT || meg4.ac < 0) { MEG4_DEBUGGER(ERR_BOUNDS); } else {
-            meg4.ac = meg4_api_inb(meg4.ac); meg4.af = (float)meg4.ac; } break;
+            meg4.ac = meg4_api_inb(meg4.ac); if(val && (meg4.ac & 0x80)) { meg4.ac |= 0xffffff00; } meg4.af = (float)meg4.ac; } break;
         case BC_LDW: if(meg4.ac >= MEG4_MEM_LIMIT || meg4.ac < 0) { MEG4_DEBUGGER(ERR_BOUNDS); } else {
-            meg4.ac = meg4_api_inw(meg4.ac); meg4.af = (float)meg4.ac; } break;
+            meg4.ac = meg4_api_inw(meg4.ac); if(val && (meg4.ac & 0x8000)) { meg4.ac |= 0xffff0000; } meg4.af = (float)meg4.ac; } break;
         case BC_LDI: if(meg4.ac >= MEG4_MEM_LIMIT || meg4.ac < 0) { MEG4_DEBUGGER(ERR_BOUNDS); } else {
             meg4.ac = meg4_api_ini(meg4.ac); meg4.af = (float)meg4.ac; } break;
         case BC_LDF: if(meg4.ac >= MEG4_MEM_LIMIT || meg4.ac < 0) { MEG4_DEBUGGER(ERR_BOUNDS); } else {

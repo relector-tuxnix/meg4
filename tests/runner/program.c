@@ -33,4 +33,6 @@ void setup()
 
 void loop(void)
 {
+    int g;
+    if(a == B && !g || a) debug;
 }

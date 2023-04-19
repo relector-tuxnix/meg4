@@ -34,8 +34,8 @@ void map_zoomin(int x, int y)
 {
     if(zoom > 0) {
         zoom--;
-        mx = ((zoom == 2 ? -152 : mx) + x) * 2 - x;
-        menu_scroll = ((zoom == 2 ? - 47 : menu_scroll) + y) * 2 - y;
+        mx = ((zoom == 3 ? -152 : mx) + x) * 2 - x;
+        menu_scroll = ((zoom == 3 ? - 47 : menu_scroll) + y) * 2 - y;
     }
 }
 
@@ -44,7 +44,7 @@ void map_zoomin(int x, int y)
  */
 void map_zoomout(int x, int y)
 {
-    if(zoom < 3) {
+    if(zoom < 4) {
         zoom++;
         mx = (mx + x) / 2 - x;
         menu_scroll = (menu_scroll + y) / 2 - y;
@@ -73,17 +73,20 @@ void map_free(void)
  */
 int map_ctrl(void)
 {
-    int npix = (8 >> zoom), key, clk = le16toh(meg4.mmio.ptrbtn) & (MEG4_BTN_L | MEG4_BTN_R);
+    int npix = (16 >> zoom), key, clk = le16toh(meg4.mmio.ptrbtn) & MEG4_BTN_L;
     int px = le16toh(meg4.mmio.ptrx), py = le16toh(meg4.mmio.ptry);
 
     if(py >= 16 && py < 310 && px >= 4 && px < 628) {
-        if(le16toh(meg4.mmio.ptrbtn) & MEG4_SCR_D) map_zoomout(px - 4, py - 16); else
-        if(le16toh(meg4.mmio.ptrbtn) & MEG4_SCR_U) map_zoomin(px - 4, py - 16);
+        if(le16toh(meg4.mmio.ptrbtn) & MEG4_SCR_D) { meg4_clrbtn(MEG4_SCR_D); map_zoomout(px - 4, py - 16); } else
+        if(le16toh(meg4.mmio.ptrbtn) & MEG4_SCR_U) { meg4_clrbtn(MEG4_SCR_U); map_zoomin(px - 4, py - 16); } else
         if(le16toh(meg4.mmio.ptrbtn) & MEG4_BTN_R) {
             if(!last) { dx = px; dy = py; ox = mx; oy = menu_scroll; }
             else { mx = ox - (px - dx); menu_scroll = oy - (py - dy); }
+            last = MEG4_BTN_R;
+            return 1;
         }
     }
+    last &= ~MEG4_BTN_R;
     if(ms > 0 && (mo || (py >= 392 && px >= mp && px < mp + mb))) {
         if(!last && clk)
             mo = px - mp;
@@ -93,8 +96,8 @@ int map_ctrl(void)
             mo = 0;
     }
     if(px >= 4 && px < 4+624 && py >= 16 && py < 16+294) {
-        tileex = (px - 4 + (zoom == 3 ? -152 : mx)) / npix;
-        tileey = (py - 16 + (zoom == 3 ? -47 : menu_scroll)) / npix;
+        tileex = (px - 4 + (zoom == 4 ? -152 : mx)) / npix;
+        tileey = (py - 16 + (zoom == 4 ? -47 : menu_scroll)) / npix;
     } else
         tileex = tileey = -1;
     if(last && !clk) {
@@ -233,7 +236,7 @@ void map_menu(uint32_t *dst, int dw, int dh, int dp)
  */
 void map_view(void)
 {
-    int i, j, k, l, p, npix = (8 >> zoom);
+    int i, j, k, l, p, npix = (16 >> zoom);
     char tmp[2] = { 0 };
 
     menu_scrhgt = 294; menu_scrmax = 200 * npix;
@@ -257,15 +260,17 @@ void map_view(void)
             meg4_box(meg4.valt, 640, 388, 2560, mp, 380, mb, 8, theme[THEME_MENU_L], theme[THEME_MENU_BG], theme[THEME_MENU_D], 0, 0, 0, 0, 0);
     }
     /* map */
-    meg4_box(meg4.valt, 640, 388, 2560, 3, 3, 626, 296, theme[THEME_D], 0, theme[THEME_L], 0, 0, 0, 0, 0);
-    toolbox_map(4, 4, 2560, 624, 294, zoom == 3 ? -152 : mx, zoom == 3 ? -47 : menu_scroll, zoom, mapsel, tileex, tileey,
+    toolbox_map(4, 4, 2560, 624, 294, zoom == 4 ? -152 : mx, zoom == 4 ? -47 : menu_scroll, zoom, mapsel, tileex, tileey,
         tool == 0 ? (inpaste ? -1 : sprs) : 256, spre);
     if(tool == 3 && (le16toh(meg4.mmio.ptrbtn) & MEG4_BTN_L) && le16toh(meg4.mmio.ptrx) >= 4 && le16toh(meg4.mmio.ptrx) < 4+624 &&
       le16toh(meg4.mmio.ptry) >= 16 && le16toh(meg4.mmio.ptry) < 16+294) {
-        meg4_box(meg4.valt, 640, 388, 2560, 4 - (zoom == 3 ? -152 : mx) + tilesx * npix,
-            4 - (zoom == 3 ? -47 : menu_scroll) + tilesy * npix, (tileex - tilesx + 1) * npix, (tileey - tilesy + 1) * npix,
+        meg4.mmio.cropx0 = meg4.mmio.cropy0 = htole16(4); meg4.mmio.cropx1 = htole16(628); meg4.mmio.cropy1 = htole16(298);
+        meg4_box(meg4.valt, 640, 388, 2560, 4 - (zoom == 4 ? -152 : mx) + tilesx * npix,
+            4 - (zoom == 4 ? -47 : menu_scroll) + tilesy * npix, (tileex - tilesx + 1) * npix, (tileey - tilesy + 1) * npix,
             theme[THEME_SEL_BG], 0, theme[THEME_SEL_BG], 0, 0, 0, 0, 0);
+        meg4.mmio.cropx0 = meg4.mmio.cropy0 = 0; meg4.mmio.cropx1 = htole16(639); meg4.mmio.cropy1 = htole16(399);
       }
+    meg4_box(meg4.valt, 640, 388, 2560, 3, 3, 626, 296, theme[THEME_D], 0, theme[THEME_L], 0, 0, 0, 0, 0);
     /* tool buttons */
     toolbox_view(10, 302, tool);
     toolbox_btn(240, 302, 0x0e, 0);

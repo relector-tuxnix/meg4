@@ -330,7 +330,7 @@ tok_t *hl_tok(char ***r, char *str, int *len)
                           (k + l >= size || !str[k + l] || str[k + l] == ' ' || str[k + l] == '\t' || str[k + l] == '\r' || str[k + l] == '\n' || str[k + l] == '(' ||
                             str[k + l] == '[' || (str[k + l] >= '0' && str[k + l] <= '9')))))) {
                             if(m == 1) { p = nt; e = k + l; t[nt].type = m; t[nt].len = l; t[nt++].pos = k; last = m; goto nextchar; }
-                            if(m && (!nt || last != m)) {
+                            if(m && (!nt || last != m || m == 2)) {
                                 if(nt && m == 3 && last == 2 && t[nt - 1].pos + t[nt - 1].len == k && str[t[nt - 1].pos] == '.') {
                                     t[nt - 1].type = m; t[nt - 1].len += l;
                                 } else {

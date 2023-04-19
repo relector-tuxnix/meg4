@@ -60,8 +60,8 @@ enum {
     BC_CNVI,    /* [SP]             convert the element on top of the stack to integer */
     BC_CNVF,    /* [SP]             convert the element on top of the stack to float */
     /* load */
-    BC_LDB,     /* ACC, [ACC]       load byte */
-    BC_LDW,     /* ACC, [ACC]       load word */
+    BC_LDB,     /* ACC, [ACC]       load byte (IMM: sign extend) */
+    BC_LDW,     /* ACC, [ACC]       load word (IMM: sign extend) */
     BC_LDI,     /* ACC, [ACC]       load integer */
     BC_LDF,     /* ACC, [ACC]       load float */
     /* store */
@@ -130,7 +130,7 @@ enum { T_VOID, T_FLOAT, T_I8, T_I16, T_I32, T_U8, T_U16, T_U32, T_STR, T_ADDR,  
 /* operators in precedence order, compiler uses the highlighter tokens except for these as it needs a language independent list
  * NOTE: here exact order and aligning with BC_ enums above within one group DOES matter */
 enum {
-    /* assignments */   O_AOR, O_AAND, O_AXOR, O_ASHL, O_ASHR, O_AADD, O_ASUB, O_AMUL, O_ADIV, O_AMOD, O_AEXP, O_LET,
+    /* assignments */   O_AOR, O_AXOR, O_AAND, O_ASHL, O_ASHR, O_AADD, O_ASUB, O_AMUL, O_ADIV, O_AMOD, O_AEXP, O_LET,
     /* logical */       O_CND, O_LOR, O_LAND,
     /* bitwise */       O_BOR, O_XOR, O_BAND,
     /* conditionals */  O_EQ, O_NE, O_LT, O_GT, O_LE, O_GE,

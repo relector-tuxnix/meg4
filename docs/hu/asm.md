@@ -20,24 +20,24 @@ fmt:        db "a számláló %d, balshift %d\n"
     .code
 /* Induláskor lefuttatandó dolgok */
 setup:
-    /* lokális változó (igazából nem, csak helyet foglalunk a veremben) */
-    sp -4
-    ret
+  /* lokális változó (igazából nem, csak helyet foglalunk a veremben) */
+  sp -4
+  ret
 
 /* Minden képkockánál lefuttatandó dolgok, 60 FPS */
 loop:
-    /* MEG-4 stílusú kimenet */
-    pshci KEY_LSHIFT
-    scall getkey
-    sp 4
-    pushi
-    ci számláló
-    ldi
-    pushi
-    pshci fmt
-    scall printf
-    sp 12
-    ret
+  /* MEG-4 stílusú kimenet */
+  pshci KEY_LSHIFT
+  scall getkey
+  sp 4
+  pushi
+  ci számláló
+  ldi
+  pushi
+  pshci fmt
+  scall printf
+  sp 12
+  ret
 ```
 
 <h2 asm_desc>Leírás</h2>
@@ -60,7 +60,8 @@ Assemblyben nincs olyan, hogy változó. Helyette a `.data` kulcsszó indítja a
 adatfolyamba az utasítások elé rakhatsz címkéket, amik az adott adat címét fogják jelenteni. A betöltéshez a kód szekcióban,
 előbb be kell tölteni az akkumulátor regiszterbe egy ilyen címkét a `ci` utasítással, majd pedig kiadni a `ldb`
 (load, bájt betöltése), `ldw` (szó betöltése), `ldi` (egészszám betöltése) vagy `ldf` (lebegőpontos szám betöltése) utasítás
-valamelyikét.
+valamelyikét. Ha az `ldb` vagy `ldw` betöltő utasításoknak num-nulla paramétert adunk, akkor előjelesen 32 bitre kiegészítik az
+értéket.
 
 <h2 asm_flow>Vezérlésirányítás</h2>
 
@@ -89,8 +90,6 @@ API funkció nevét adod paraméterül. Hívás után mindig a hívó fél felel
 
 Mnemonikok
 ----------
-
-NOTE: Ha extra szószátyár `meg4 -vvv` módban indítottad, akkor minden éppen végrehajtott utasítás kiíródik a szabványos kimenetre.
 
 Mielőtt belemennénk a részletekbe, muszáj pár szót ejteni a MEG-4 CPU specifikációjáról.
 
@@ -152,8 +151,8 @@ bájtokra. A kódszegmensre a következő mnemonikokkal lehet utasításokat elh
 | `popf`   |                         | Kiveszi az adatverem legfelső elemét a lebegőpontos akkumulátorba                   |
 | `cnvi`   |                         | Az adatverem legfelső elemét egészszámmá konvertálja                                |
 | `cnvf`   |                         | Az adatverem legfelső elemét lebegőpontos számmá konvertálja                        |
-| `ldb`    |                         | Az akkumulátor által mutatott adatcímről egy bájtot tölt be                         |
-| `ldw`    |                         | Az akkumulátor által mutatott adatcímről egy szót tölt be                           |
+| `ldb`    | 0/1                     | Az akkumulátor által mutatott adatcímről egy bájtot tölt be (előjelesre egészít, ha nem-nulla a paraméter) |
+| `ldw`    | 0/1                     | Az akkumulátor által mutatott adatcímről egy szót tölt be (előjelesre egészít, ha nem-nulla a paraméter) |
 | `ldi`    |                         | Az akkumulátor által mutatott adatcímről egy egészszámot tölt be                    |
 | `ldf`    |                         | Az akkumulátor által mutatott adatcímről egy lebegőpontost tölt be                  |
 | `stb`    |                         | Kiveszi a címet a veremből, és egy bájtot rak oda az akkumulátorból                 |

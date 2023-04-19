@@ -17,16 +17,16 @@ tomb = {}
 
 -- Induláskor lefuttatandó dolgok
 function setup()
-    -- lokális változók
-    lokalisvagyok = 234
+  -- lokális változók
+  lokalisvagyok = 234
 end
 
 -- Minden képkockánál lefuttatandó dolgok, 60 FPS
 function loop()
-    -- Lua stílusú print
-    print("Épp", "futok")
-    -- MEG-4 stílusú kimenet
-    printf("a számláló %d, balshift %d\n", szamlalo, getkey(KEY_LSHIFT))
+  -- Lua stílusú print
+  print("Épp", "futok")
+  -- MEG-4 stílusú kimenet
+  printf("a számláló %d, balshift %d\n", szamlalo, getkey(KEY_LSHIFT))
 end
 ```
 

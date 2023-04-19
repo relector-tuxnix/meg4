@@ -815,10 +815,11 @@ void toolbox_blit(int x, int y, int dp, int w, int h, int sx, int sy, int sw, in
  */
 void toolbox_spr(int sx, int sy, int sw, int idx, int a)
 {
-    int i, j, k, l, sp = 0, sd = 0, ss = 0, R, G, B, A, D, sR, sG, sB, sA = 256 -ta;
+    int i, j, k, l, dp = 2560, xs = 0, sp = 0, sd = 0, ss = 0, R, G, B, A, D, sR, sG, sB, sA = 256 -ta;
     uint8_t *s, *d, *e, *f, *b, *cS = (uint8_t*)&theme[THEME_SEL_BG], bg[4];
 
     switch(sw) {
+        case 16: sp = 256; sd = 1; ss = 0; dp = 5120; xs = 1; break;
         case 8: sp = 256; sd = 1; ss = 0; break;
         case 4: sp = 512; sd = 2; ss = 2; break;
         case 2: sp = 1024; sd = 4; ss = 4; break;
@@ -829,10 +830,10 @@ void toolbox_spr(int sx, int sy, int sw, int idx, int a)
     memcpy(bg, &theme[THEME_INP_BG], 4); bg[0] = (bg[0] + 4) & 0x7f; bg[1] = (bg[1] + 4) & 0x7f; bg[2] = (bg[2] + 4) & 0x7f;
     f = (uint8_t*)meg4.valt + sy * 2560 + sx * 4;
     s = meg4.mmio.sprites + (((idx >> 5) << 11) + ((idx & 31) << 3));
-    for(j = 0; j < sw && sy + j < le16toh(meg4.mmio.cropy1); j++, s += sp, f += 2560)
-        if(sy + j >= le16toh(meg4.mmio.cropy0)) {
-            for(e = s, d = f, i = 0; i < sw; i++, e += sd, d += 4)
-                if(sx + i >= le16toh(meg4.mmio.cropx0) && sx + i < le16toh(meg4.mmio.cropx1)) {
+    for(j = 0; j < sw && sy + j < le16toh(meg4.mmio.cropy1); j += xs + 1, s += sp, f += dp)
+        if(sy + j + xs >= le16toh(meg4.mmio.cropy0)) {
+            for(e = s, d = f, i = 0; i < sw; i += xs + 1, e += sd, d += xs ? 8 : 4)
+                if(sx + i + xs >= le16toh(meg4.mmio.cropx0) && sx + i < le16toh(meg4.mmio.cropx1)) {
                     if(idx) {
                         R = G = B = A = 0;
                         for(k = 0; k < sd; k++)
@@ -844,13 +845,28 @@ void toolbox_spr(int sx, int sy, int sw, int idx, int a)
                         if(a > 0) A >>= a;
                         D = 256 - A;
                         d[2] = (B*A + D*d[2]) >> 8; d[1] = (G*A + D*d[1]) >> 8; d[0] = (R*A + D*d[0]) >> 8;
+                        if(xs) {
+                            d[6] = (B*A + D*d[6]) >> 8; d[5] = (G*A + D*d[5]) >> 8; d[4] = (R*A + D*d[4]) >> 8;
+                            d[2562] = (B*A + D*d[2562]) >> 8; d[2561] = (G*A + D*d[2561]) >> 8; d[2560] = (R*A + D*d[2560]) >> 8;
+                            d[2566] = (B*A + D*d[2566]) >> 8; d[2565] = (G*A + D*d[2565]) >> 8; d[2564] = (R*A + D*d[2564]) >> 8;
+                        }
                     } else {
                         if(a > 0) continue;
                         b = a == -1 || a == -3 ? bg : (uint8_t*)&theme[THEME_INP_BG];
                         d[0] = b[0]; d[1] = b[1]; d[2] = b[2];
+                        if(xs) {
+                            d[4] = d[2560] = d[2564] = b[0];
+                            d[5] = d[2561] = d[2565] = b[1];
+                            d[6] = d[2562] = d[2566] = b[2];
+                        }
                     }
                     if(a < -1) {
                         d[2] = (sB + sA*d[2]) >> 8; d[1] = (sG + sA*d[1]) >> 8; d[0] = (sR + sA*d[0]) >> 8;
+                        if(xs) {
+                            d[6] = (sB + sA*d[6]) >> 8; d[5] = (sG + sA*d[5]) >> 8; d[4] = (sR + sA*d[4]) >> 8;
+                            d[2562] = (sB + sA*d[2562]) >> 8; d[2561] = (sG + sA*d[2561]) >> 8; d[2560] = (sR + sA*d[2560]) >> 8;
+                            d[2566] = (sB + sA*d[2566]) >> 8; d[2565] = (sG + sA*d[2565]) >> 8; d[2564] = (sR + sA*d[2564]) >> 8;
+                        }
                     }
                 }
         }
@@ -861,13 +877,13 @@ void toolbox_spr(int sx, int sy, int sw, int idx, int a)
  */
 void toolbox_map(int x, int y, int dp, int w, int h, int mx, int my, int zoom, int mapsel, int px, int py, int sprs, int spre)
 {
-    int i, j, k, dx, dy, npix = 8 >> zoom, sw = 0, sh = 0, ex, ey, x0, x1, y0, y1;
+    int i, j, k, dx, dy, npix = 16 >> zoom, xs, xd = 0, sw = 0, sh = 0, ex, ey, x0, x1, y0, y1;
 
     x0 = meg4.mmio.cropx0; meg4.mmio.cropx0 = htole16(x);
     x1 = meg4.mmio.cropx1; meg4.mmio.cropx1 = htole16(x + w);
     y0 = meg4.mmio.cropy0; meg4.mmio.cropy0 = htole16(y);
     y1 = meg4.mmio.cropy1; meg4.mmio.cropy1 = htole16(y + h);
-    dx = x - mx; dy = y - my;
+    dx = x - mx; dy = y - my; xs = npix == 16 ? 8 : npix; xd = npix == 16 ? 4 : 0;
     if(px < 0 || py < 0) sprs = 256;
     if(sprs == -1 && ts && tc && tcw > 0 && tch > 0) { sw = tcw; sh = tch; } else
     if(sprs >= 0 && sprs < 256) { i = sprs & 31; j = spre & 31; sw = j - i + 1; i = sprs >> 5; j = spre >> 5; sh = j - i + 1; }
@@ -890,7 +906,7 @@ void toolbox_map(int x, int y, int dp, int w, int h, int mx, int my, int zoom, i
                             }
                         } else
                         if(!sprs && !(j - py) && !(i - px))
-                            meg4_blit(meg4.valt, dx + i * npix, dy + j * npix, dp, npix, npix, meg4_edicons.buf, 144, 48, meg4_edicons.w * 4, 1);
+                            meg4_blit(meg4.valt, dx + i * npix + xd, dy + j * npix + xd, dp, xs, xs, meg4_edicons.buf, 144, 48, meg4_edicons.w * 4, 1);
                         else if(sprs < 256)
                             toolbox_spr(dx + i * npix, dy + j * npix, npix, (mapsel << 8) | (sprs + (j - py) * 32 + i - px), 1);
                     }

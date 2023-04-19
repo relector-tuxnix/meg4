@@ -17,16 +17,16 @@ DIM anarray(10)
 
 REM Things to do on startup
 SUB setup
-    REM local variables
-    LET iamlocal = 123
+  REM local variables
+  LET iamlocal = 123
 END SUB
 
 REM Things to run for every frame, at 60 FPS
 SUB loop
-    REM BASIC style print
-    PRINT "I"; " am"; " running"
-    REM Get MEG-4 style outputs
-    GOSUB printf("a counter %d, left shift %d\n", acounter%, getkey%(KEY_LSHIFT))
+  REM BASIC style print
+  PRINT "I"; " am"; " running"
+  REM Get MEG-4 style outputs
+  GOSUB printf("a counter %d, left shift %d\n", acounter%, getkey%(KEY_LSHIFT))
 END SUB
 ```
 

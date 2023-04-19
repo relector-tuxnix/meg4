@@ -968,15 +968,15 @@ FLG, TMR and PC registers are available. See <a href="#mnemonics" onclick="c('mn
 <span class="hl_c">/* Things to do on startup */</span>
 <span class="hl_t">void</span> <span class="hl_f">setup</span>()
 {
-    <span class="hl_c">/* local variables */</span>
-    <span class="hl_t">int</span> <span class="hl_v">iamlocal</span> <span class="hl_o">=</span> <span class="hl_n">123</span>;
+  <span class="hl_c">/* local variables */</span>
+  <span class="hl_t">int</span> <span class="hl_v">iamlocal</span> <span class="hl_o">=</span> <span class="hl_n">123</span>;
 }
 
 <span class="hl_c">/* Things to run for every frame, at 60 FPS */</span>
 <span class="hl_t">void</span> <span class="hl_f">loop</span>()
 {
-    <span class="hl_c">/* Get MEG-4 style outputs */</span>
-    <span class="hl_f">printf</span>(<span class="hl_s">&quot;a counter %d, left shift %d\n&quot;</span>, <span class="hl_v">acounter</span>, <span class="hl_f">getkey</span>(<span class="hl_v">KEY_LSHIFT</span>));
+  <span class="hl_c">/* Get MEG-4 style outputs */</span>
+  <span class="hl_f">printf</span>(<span class="hl_s">&quot;a counter %d, left shift %d\n&quot;</span>, <span class="hl_v">acounter</span>, <span class="hl_f">getkey</span>(<span class="hl_v">KEY_LSHIFT</span>));
 }</code></div>
 <h2 id="description">Description<a href="#description"></a></h2>
 <p>The default language of the console is <b>MEG-4 C</b>. Despite being a very simple language, it is for somewhat intermediate
@@ -1036,7 +1036,7 @@ be a local variable, accessible only to the function where it was declared. Anot
 can be initialized (a value assigned to them using <samp>=</samp>), while local variables cannot be, you must explicitly write code
 to set their values.</p>
 <p>A declaration consist of two things: a type and a name. MEG-4 C supports all ANSI C types: <samp>char</samp> (signed byte), <samp>short</samp>
-(signed word), <samp>int</samp> (signed integer), <samp>float</samp> (floating point). You might also put <samp>unsigned</samp> in from of these to make
+(signed word), <samp>int</samp> (signed integer), <samp>float</samp> (floating point). You might also put <samp>unsigned</samp> in front of these to make
 them, well, unsigned. In ANSI C <samp>int</samp> can be omitted with <samp>short</samp>, but in MEG-4 you must not use it. So <samp>short int</samp> isn't a
 valid type, <samp>short</samp> in itself is. Furthermore MEG-4 C supports and prefers standard types instead (defined in stdint.h under
 ANSI C). These have some simple rules: if they are unsigned, then they start with the letter <samp>u</samp>; then <samp>int</samp> means integer
@@ -1247,16 +1247,16 @@ suffixes, nor substitutions either.</p><br style="clear:both;"><label class="btn
 
 <span class="hl_c">REM Things to do on startup</span>
 <span class="hl_k">SUB</span> <span class="hl_v">setup</span>
-    <span class="hl_c">REM local variables</span>
-    <span class="hl_k">LET</span> <span class="hl_v">iamlocal</span> <span class="hl_o">=</span> <span class="hl_n">123</span>
+  <span class="hl_c">REM local variables</span>
+  <span class="hl_k">LET</span> <span class="hl_v">iamlocal</span> <span class="hl_o">=</span> <span class="hl_n">123</span>
 <span class="hl_k">END</span> <span class="hl_k">SUB</span>
 
 <span class="hl_c">REM Things to run for every frame, at 60 FPS</span>
 <span class="hl_k">SUB</span> <span class="hl_k">loop</span>
-    <span class="hl_c">REM BASIC style print</span>
-    <span class="hl_k">PRINT</span> <span class="hl_s">&quot;I&quot;</span>; <span class="hl_s">&quot; am&quot;</span>; <span class="hl_s">&quot; running&quot;</span>
-    <span class="hl_c">REM Get MEG-4 style outputs</span>
-    <span class="hl_k">GOSUB</span> <span class="hl_f">printf</span>(<span class="hl_s">&quot;a counter %d, left shift %d\n&quot;</span>, <span class="hl_v">acounter%</span>, <span class="hl_f">getkey%</span>(<span class="hl_v">KEY_LSHIFT</span>))
+  <span class="hl_c">REM BASIC style print</span>
+  <span class="hl_k">PRINT</span> <span class="hl_s">&quot;I&quot;</span>; <span class="hl_s">&quot; am&quot;</span>; <span class="hl_s">&quot; running&quot;</span>
+  <span class="hl_c">REM Get MEG-4 style outputs</span>
+  <span class="hl_k">GOSUB</span> <span class="hl_f">printf</span>(<span class="hl_s">&quot;a counter %d, left shift %d\n&quot;</span>, <span class="hl_v">acounter%</span>, <span class="hl_f">getkey%</span>(<span class="hl_v">KEY_LSHIFT</span>))
 <span class="hl_k">END</span> <span class="hl_k">SUB</span></code></div>
 <h2 id="dialect">Dialect<a href="#dialect"></a></h2>
 <p>BASIC stands for Beginners' All-purpose Symbolic Instruction Code. It was created by John Kemeny in 1963 with the explicit goal
@@ -1276,7 +1276,7 @@ numbers must be prefixed by <samp>$</samp> (not in the specification, but this w
 dialects of the '80s) and strings must be enclosed in double quotes:</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br>4<br>5<br></pre><code><span class="hl_n">42</span>
 <span class="hl_n">3.1415</span>
-<span class="hl_v">.123e</span><span class="hl_n">-10</span>
+<span class="hl_n">.123e</span><span class="hl_n">-10</span>
 <span class="hl_n">$0048C</span>
 <span class="hl_s">&quot;Goodbye and thanks for all the fish!\n&quot;</span></code></div>
 <div class="warn"><p><span>Warning</span></p><p> The specification expects 7-bit ASCII, but MEG-4 BASIC uses zero terminated UTF-8 encoding. It also accepts C-like escape
@@ -1287,8 +1287,8 @@ sequences (eg. <samp>\&quot;</samp> is double quotes, <samp>\t</samp> is tab, <s
 strings, and not in the specification, but MEG-4 BASIC accepts <samp>!</samp> for bytes and <samp>#</samp> for double bytes (word). Anything else is
 interpreted as a floating point variable.</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br>4<br>5<br></pre><code><span class="hl_k">LET</span> <span class="hl_v">A%</span> <span class="hl_o">=</span> <span class="hl_n">42</span>
-<span class="hl_k">LET</span> <span class="hl_v">B!</span> <span class="hl_o">=</span> <span class="hl_v">$FF</span>
-<span class="hl_k">LET</span> <span class="hl_v">C#</span> <span class="hl_o">=</span> <span class="hl_v">$FFFF</span>
+<span class="hl_k">LET</span> <span class="hl_v">B!</span> <span class="hl_o">=</span> <span class="hl_n">$FF</span>
+<span class="hl_k">LET</span> <span class="hl_v">C#</span> <span class="hl_o">=</span> <span class="hl_n">$FFFF</span>
 <span class="hl_k">LET</span> <span class="hl_v">D$</span> <span class="hl_o">=</span> <span class="hl_s">&quot;string&quot;</span>
 <span class="hl_k">LET</span> <span class="hl_v">E</span> <span class="hl_o">=</span> <span class="hl_n">3.1415</span></code></div>
 <p>The conversion between byte, integer and floating point is automatic and fully transparent. However trying to use a string literal
@@ -1371,7 +1371,7 @@ multi line <samp>IF</samp> .. <samp>THEN</samp> .. <samp>ELSE</samp> .. <samp>EN
 <p>For iterations, the counting loop checks its condition before the iteration (does not execute the block if the initial value is
 greater (or less) than the limit), and looks like this:</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br></pre><code><span class="hl_k">FOR</span> <span class="hl_v">i</span> <span class="hl_o">=</span> <span class="hl_n">1</span> <span class="hl_k">TO</span> <span class="hl_n">100</span> <span class="hl_k">STEP</span> <span class="hl_n">2</span>
-<span class="hl_v">...</span>
+<span class="hl_n">...</span>
 <span class="hl_k">NEXT</span> <span class="hl_v">i</span></code></div>
 <p>This <samp>FOR</samp> .. <samp>NEXT</samp> is essentially the same as:</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></pre><code><span class="hl_k">LET</span> <span class="hl_v">i</span> <span class="hl_o">=</span> <span class="hl_n">1</span>
@@ -1379,7 +1379,7 @@ greater (or less) than the limit), and looks like this:</p>
 <span class="hl_k">LET</span> <span class="hl_v">inc</span> <span class="hl_o">=</span> <span class="hl_n">2</span>
 <span class="hl_v">line1</span>:
 <span class="hl_k">IF</span> (<span class="hl_v">i</span> <span class="hl_o">-</span> <span class="hl_v">lim</span>) <span class="hl_o">*</span> <span class="hl_f">SGN</span>(<span class="hl_v">inc</span>) <span class="hl_o">&gt;</span> <span class="hl_n">0</span> <span class="hl_k">THEN</span> <span class="hl_v">line2</span>
-<span class="hl_v">...</span>
+<span class="hl_n">...</span>
 <span class="hl_k">LET</span> <span class="hl_v">i</span> <span class="hl_o">=</span> <span class="hl_v">i</span> <span class="hl_o">+</span> <span class="hl_v">inc</span>
 <span class="hl_k">GOTO</span> <span class="hl_v">line1</span>
 <span class="hl_v">line2</span>:</code></div>
@@ -1387,24 +1387,24 @@ greater (or less) than the limit), and looks like this:</p>
 literal or another float variable. The from and limit both can be more complex expressions, but they too must return a floating
 point value.</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br></pre><code><span class="hl_k">FOR</span> <span class="hl_v">i</span> <span class="hl_o">=</span> (<span class="hl_n">1</span><span class="hl_o">+</span><span class="hl_n">2</span><span class="hl_o">+</span><span class="hl_v">a</span>)<span class="hl_o">*</span><span class="hl_n">3</span> <span class="hl_k">TO</span> <span class="hl_n">4</span><span class="hl_o">*</span>(<span class="hl_n">5</span><span class="hl_o">+</span><span class="hl_n">6</span>)<span class="hl_o">/</span><span class="hl_v">b</span><span class="hl_o">+</span><span class="hl_v">c</span> <span class="hl_k">STEP</span> <span class="hl_v">j</span>
-<span class="hl_v">...</span>
+<span class="hl_n">...</span>
 <span class="hl_k">NEXT</span> <span class="hl_v">i</span></code></div>
 <div class="warn"><p><span>Warning</span></p><p> Unlike the specification, which allows multiple variables after <samp>NEXT</samp>, MEG-4 BASIC accepts <i>exactly one</i>. So for
 nested loops you'll have to use multiple <samp>NEXT</samp> commands, exactly as many as <samp>FOR</samp> statements there are.</p></div>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br>4<br>5<br></pre><code><span class="hl_k">FOR</span> <span class="hl_v">y</span> <span class="hl_o">=</span> <span class="hl_n">1</span> <span class="hl_k">TO</span> <span class="hl_n">10</span>
  <span class="hl_k">FOR</span> <span class="hl_v">x</span> <span class="hl_o">=</span> <span class="hl_n">1</span> <span class="hl_k">TO</span> <span class="hl_n">100</span>
- <span class="hl_v">...</span>
+ <span class="hl_n">...</span>
  <span class="hl_k">NEXT</span> <span class="hl_v">x</span>
 <span class="hl_k">NEXT</span> <span class="hl_v">y</span></code></div>
 <p>MEG-4 BASIC has no other kind of loops like C, but if you want a non-counting pre-testing loop, you can do this:</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br>4<br>5<br></pre><code><span class="hl_v">again</span>:
 <span class="hl_k">IF</span> <span class="hl_v">a</span> <span class="hl_o">&gt;</span> <span class="hl_n">0</span> <span class="hl_k">THEN</span>
- <span class="hl_v">...</span>
+ <span class="hl_n">...</span>
  <span class="hl_k">GOTO</span> <span class="hl_v">again</span>
 <span class="hl_k">END</span> <span class="hl_k">IF</span></code></div>
 <p>And instead of a post-testing loop:</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br></pre><code><span class="hl_v">again</span>:
- <span class="hl_v">...</span>
+ <span class="hl_n">...</span>
 <span class="hl_k">IF</span> <span class="hl_v">a</span> <span class="hl_o">&gt;</span> <span class="hl_n">0</span> <span class="hl_k">THEN</span> <span class="hl_v">again</span></code></div>
 <h2 id="bas_funcs">Subroutines and Functions<a href="#bas_funcs"></a></h2>
 <div class="info"><p><span>Important</span></p><p> Statements not inside of any subroutine are simply threated as if they were inside the <samp>setup</samp> subroutine.</p></div>
@@ -1505,24 +1505,24 @@ integer type suffix for example, as it returns degrees in an integer.</p><br sty
     <span class="hl_t">.code</span>
 <span class="hl_c">/* Things to do on startup */</span>
 <span class="hl_v">setup</span>:
-    <span class="hl_c">/* local variables (not really, just reserve space on the stack) */</span>
-    <span class="hl_k">sp</span> <span class="hl_n">-4</span>
-    <span class="hl_k">ret</span>
+  <span class="hl_c">/* local variables (not really, just reserve space on the stack) */</span>
+  <span class="hl_k">sp</span> <span class="hl_n">-4</span>
+  <span class="hl_k">ret</span>
 
 <span class="hl_c">/* Things to run for every frame, at 60 FPS */</span>
 <span class="hl_v">loop</span>:
-    <span class="hl_c">/* Get MEG-4 style outputs */</span>
-    <span class="hl_k">pshci</span> <span class="hl_v">KEY_LSHIFT</span>
-    <span class="hl_k">scall</span> <span class="hl_v">getkey</span>
-    <span class="hl_k">sp</span> <span class="hl_n">4</span>
-    <span class="hl_k">pushi</span>
-    <span class="hl_k">ci</span> <span class="hl_v">acounter</span>
-    <span class="hl_k">ldi</span>
-    <span class="hl_k">pushi</span>
-    <span class="hl_k">pshci</span> <span class="hl_v">fmt</span>
-    <span class="hl_k">scall</span> <span class="hl_v">printf</span>
-    <span class="hl_k">sp</span> <span class="hl_n">12</span>
-    <span class="hl_k">ret</span></code></div>
+  <span class="hl_c">/* Get MEG-4 style outputs */</span>
+  <span class="hl_k">pshci</span> <span class="hl_v">KEY_LSHIFT</span>
+  <span class="hl_k">scall</span> <span class="hl_v">getkey</span>
+  <span class="hl_k">sp</span> <span class="hl_n">4</span>
+  <span class="hl_k">pushi</span>
+  <span class="hl_k">ci</span> <span class="hl_v">acounter</span>
+  <span class="hl_k">ldi</span>
+  <span class="hl_k">pushi</span>
+  <span class="hl_k">pshci</span> <span class="hl_v">fmt</span>
+  <span class="hl_k">scall</span> <span class="hl_v">printf</span>
+  <span class="hl_k">sp</span> <span class="hl_n">12</span>
+  <span class="hl_k">ret</span></code></div>
 <h2 id="asm_desc">Description<a href="#asm_desc"></a></h2>
 <p>This isn't an actual programming language. When you compile one of the built-in languages, the compiler generates bytecode that
 the CPU executes. Assembly is a one-to-one transcription of that bytecode with human-readable textual mnemonics. It has two
@@ -1536,7 +1536,8 @@ parameter.</p>
 one of the <samp>db</samp> (byte), <samp>dw</samp> (word), <samp>di</samp> (integer), <samp>df</samp> (float) instructions. In this stream of data, before the instruction,
 you can place labels which will hold the address of that data. To load a value in your code section, first you put that label in
 the accumulator register using <samp>ci</samp>, and then issue one of the <samp>ldb</samp> (load byte), <samp>ldw</samp> (load word), <samp>ldi</samp> (load integer)
-or <samp>ldf</samp> (load float) instructions.</p>
+or <samp>ldf</samp> (load float) instructions. If the <samp>ldb</samp> or <samp>ldw</samp> instructions has a non-zero argument, then they sign-extend the value
+to 32 bit.</p>
 <h2 id="asm_flow">Control Flow<a href="#asm_flow"></a></h2>
 <p>Everything that you place after the <samp>.code</samp> keyword will be code. There's no implicit control flow, each instruction is executed
 one after another; you have to alter the PC (program counter) using one of the <samp>jmp</samp> (jump), <samp>jz</samp> (jump if zero), <samp>jnz</samp> (jump if
@@ -1555,7 +1556,6 @@ using an <samp>sp</samp> + number of parameters times four instruction.</p>
 <p>You have to push all arguments on the stack <i>in reverse order</i>, then use an <samp>scall</samp> (system call) mnemonic with a MEG-4 API
 function name as parameter. After the call it is the caller's responsibility to remove the parameters from the stack.</p>
 <h2 id="mnemonics">Mnemonics<a href="#mnemonics"></a></h2>
-<div class="info"><p><span>Note</span></p><p> If you start with <samp>meg4 -vvv</samp> extra verbose flags, then the instructions will be printed to stdout as they are executed.</p></div>
 <p>Before we go into the details, we must talk about the MEG-4 CPU specification.</p>
 <p>The MEG-4 CPU is a 32-bit, little endian CPU. All values are stored in a way that smallest digits are placed on the smaller
 addresses. It is capable of performing operations on 8 bit, 16 bit and 32 bit integers (signed and unsigned) and on 32 bit
@@ -1607,20 +1607,20 @@ these 32 bit units and not bytes. The following mnemonics can be used to place i
 <tr><td><samp>popf</samp> </td><td></td><td>Pop a float value from the data stack into the accumulator </td></tr>
 <tr><td><samp>cnvi</samp> </td><td></td><td>Convert the value on the top of the stack into an integer </td></tr>
 <tr><td><samp>cnvf</samp> </td><td></td><td>Convert the value on the top of the stack into a float </td></tr>
-<tr><td><samp>ldb</samp> </td><td></td><td>Loads a byte from the address in the accumulator </td></tr>
-<tr><td><samp>ldw</samp> </td><td></td><td>Loads a word from the address in the accumulator </td></tr>
+<tr><td><samp>ldb</samp> </td><td>0/1 </td><td>Loads a byte from the address in the accumulator (sign extend if arg is non-zero) </td></tr>
+<tr><td><samp>ldw</samp> </td><td>0/1 </td><td>Loads a word from the address in the accumulator (sign extend if arg is non-zero) </td></tr>
 <tr><td><samp>ldi</samp> </td><td></td><td>Loads an integer from the address in the accumulator </td></tr>
 <tr><td><samp>ldf</samp> </td><td></td><td>Loads a float from the address in the accumulator </td></tr>
 <tr><td><samp>stb</samp> </td><td></td><td>Pops the address from stack and stores a byte from accumulator </td></tr>
 <tr><td><samp>stw</samp> </td><td></td><td>Pops the address from stack and stores a word from accumulator </td></tr>
 <tr><td><samp>sti</samp> </td><td></td><td>Pops the address from stack and stores an int from accumulator </td></tr>
 <tr><td><samp>stf</samp> </td><td></td><td>Pops the address from stack and stores a float from accumulator </td></tr>
-<tr><td><samp>incb</samp> </td><td>number </td><td>Pops the address from stack and increase the byte at address </td></tr>
-<tr><td><samp>incw</samp> </td><td>number </td><td>Pops the address from stack and increase the word at address </td></tr>
-<tr><td><samp>inci</samp> </td><td>number </td><td>Pops the address from stack and increase the integer at address </td></tr>
-<tr><td><samp>decb</samp> </td><td>number </td><td>Pops the address from stack and decrease the byte at address </td></tr>
-<tr><td><samp>decw</samp> </td><td>number </td><td>Pops the address from stack and decrease the word at address </td></tr>
-<tr><td><samp>deci</samp> </td><td>number </td><td>Pops the address from stack and decrease the integer at address </td></tr>
+<tr><td><samp>incb</samp> </td><td>number </td><td>Pops the address from stack and increase the byte at address by number </td></tr>
+<tr><td><samp>incw</samp> </td><td>number </td><td>Pops the address from stack and increase the word at address by number </td></tr>
+<tr><td><samp>inci</samp> </td><td>number </td><td>Pops the address from stack and increase the integer at address by number </td></tr>
+<tr><td><samp>decb</samp> </td><td>number </td><td>Pops the address from stack and decrease the byte at address by number </td></tr>
+<tr><td><samp>decw</samp> </td><td>number </td><td>Pops the address from stack and decrease the word at address by number </td></tr>
+<tr><td><samp>deci</samp> </td><td>number </td><td>Pops the address from stack and decrease the integer at address by number </td></tr>
 <tr><td><samp>not</samp> </td><td></td><td>Perform logical NOT on the accumulator </td></tr>
 <tr><td><samp>neg</samp> </td><td></td><td>Perform bitwise NOT on the accumulator </td></tr>
 <tr><td><samp>or</samp> </td><td></td><td>Pop a value from stack and perform bitwise OR on the accumulator </td></tr>
@@ -1684,16 +1684,16 @@ sw (value), (label to jump to otherwise),
 
 <span class="hl_c">-- Things to do on startup</span>
 <span class="hl_k">function</span> <span class="hl_f">setup</span>()
-    <span class="hl_c">-- local variables</span>
-    <span class="hl_v">iamlocal</span> <span class="hl_o">=</span> <span class="hl_n">234</span>
+  <span class="hl_c">-- local variables</span>
+  <span class="hl_v">iamlocal</span> <span class="hl_o">=</span> <span class="hl_n">234</span>
 <span class="hl_k">end</span>
 
 <span class="hl_c">-- Things to run for every frame, at 60 FPS</span>
 <span class="hl_k">function</span> <span class="hl_f">loop</span>()
-    <span class="hl_c">-- Lua style print</span>
-    <span class="hl_f">print</span>(<span class="hl_s">&quot;I&quot;</span>, <span class="hl_s">&quot;am&quot;</span>, <span class="hl_s">&quot;running&quot;</span>)
-    <span class="hl_c">-- Get MEG-4 style outputs</span>
-    <span class="hl_f">printf</span>(<span class="hl_s">&quot;a counter %d, left shift %d\n&quot;</span>, <span class="hl_v">acounter</span>, <span class="hl_f">getkey</span>(<span class="hl_v">KEY_LSHIFT</span>))
+  <span class="hl_c">-- Lua style print</span>
+  <span class="hl_f">print</span>(<span class="hl_s">&quot;I&quot;</span>, <span class="hl_s">&quot;am&quot;</span>, <span class="hl_s">&quot;running&quot;</span>)
+  <span class="hl_c">-- Get MEG-4 style outputs</span>
+  <span class="hl_f">printf</span>(<span class="hl_s">&quot;a counter %d, left shift %d\n&quot;</span>, <span class="hl_v">acounter</span>, <span class="hl_f">getkey</span>(<span class="hl_v">KEY_LSHIFT</span>))
 <span class="hl_k">end</span></code></div>
 <h2 id="further_info">Further Info<a href="#further_info"></a></h2>
 <p>Unlike the other languages, this isn't integral part of MEG-4, rather provided by a thrid party library. Due to that it does
@@ -1945,13 +1945,13 @@ keys, for example:</p>
 <tr><td>00492 </td><td class="right">2 </td><td>turtle Y offset in pixels </td></tr>
 <tr><td>00494 </td><td class="right">2 </td><td>maze walking speed in 1/128 tiles (see <a href="#maze" onclick="c('maze')">maze</a>) </td></tr>
 <tr><td>00496 </td><td class="right">2 </td><td>maze rotating speed in degrees (1 to 90) </td></tr>
-<tr><td>00498 </td><td class="right">2 </td><td>camera X offset in pixels (see <a href="#tri3d" onclick="c('tri3d')">tri3d</a>) </td></tr>
-<tr><td>0049A </td><td class="right">2 </td><td>camera Y offset in pixels </td></tr>
-<tr><td>0049C </td><td class="right">2 </td><td>camera Z offset in pixels </td></tr>
-<tr><td>0049E </td><td class="right">1 </td><td>console foreground color, palette index 0 to 255 (see <a href="#printf" onclick="c('printf')">printf</a>) </td></tr>
-<tr><td>0049F </td><td class="right">1 </td><td>console background color, palette index 0 to 255 </td></tr>
-<tr><td>004A0 </td><td class="right">2 </td><td>console X offset in pixels </td></tr>
-<tr><td>004A2 </td><td class="right">2 </td><td>console Y offset in pixels </td></tr>
+<tr><td>00498 </td><td class="right">1 </td><td>console foreground color, palette index 0 to 255 (see <a href="#printf" onclick="c('printf')">printf</a>) </td></tr>
+<tr><td>00499 </td><td class="right">1 </td><td>console background color, palette index 0 to 255 </td></tr>
+<tr><td>0049A </td><td class="right">2 </td><td>console X offset in pixels </td></tr>
+<tr><td>0049C </td><td class="right">2 </td><td>console Y offset in pixels </td></tr>
+<tr><td>0049E </td><td class="right">2 </td><td>camera X offset in pixels (see <a href="#tri3d" onclick="c('tri3d')">tri3d</a>) </td></tr>
+<tr><td>004A0 </td><td class="right">2 </td><td>camera Y offset in pixels </td></tr>
+<tr><td>004A2 </td><td class="right">2 </td><td>camera Z offset in pixels </td></tr>
 <tr><td>00600 </td><td class="right">64000 </td><td>map, 320 x 200 sprite indeces (see <a href="#map" onclick="c('map')">map</a> and <a href="#maze" onclick="c('maze')">maze</a>) </td></tr>
 <tr><td>10000 </td><td class="right">65536 </td><td>sprites, 256 x 256 palette indeces, 1024 8 x 8 pixels (see <a href="#spr" onclick="c('spr')">spr</a>) </td></tr>
 <tr><td>28000 </td><td class="right">2048 </td><td>window for 4096 font glyphs (see 0007E, <a href="#width" onclick="c('width')">width</a> and <a href="#text" onclick="c('text')">text</a>) </td></tr></table></div>
@@ -2320,21 +2320,21 @@ Draws a filled triangle with color gradients.</dd>
     <span class="hl_t">uint8_t</span> <span class="hl_v">pi1</span>, <span class="hl_t">int16_t</span> <span class="hl_v">x1</span>, <span class="hl_t">int16_t</span> <span class="hl_v">y1</span>, <span class="hl_t">int16_t</span> <span class="hl_v">z1</span>,
     <span class="hl_t">uint8_t</span> <span class="hl_v">pi2</span>, <span class="hl_t">int16_t</span> <span class="hl_v">x2</span>, <span class="hl_t">int16_t</span> <span class="hl_v">y2</span>, <span class="hl_t">int16_t</span> <span class="hl_v">z2</span>)</code></div>
 <dt>Description</dt><dd>
-Draws a filled triangle with color gradients in 3D space from the camera perspective (see <a href="#graphics_processing_unit" onclick="c('graphics_processing_unit')">Graphics Processing Unit</a> address 00498).</dd>
+Draws a filled triangle with color gradients in 3D space from the camera perspective (see <a href="#graphics_processing_unit" onclick="c('graphics_processing_unit')">Graphics Processing Unit</a> address 0049E).</dd>
 <dt>Parameters</dt><dd>
 <div class="table"><table><tr><th>Argument </th><th>Description </th></tr>
 <tr><td>pi0 </td><td>first edge color, palette index 0 to 255 </td></tr>
-<tr><td>x0 </td><td>first edge X coordinate in pixels </td></tr>
-<tr><td>y0 </td><td>first edge Y coordinate in pixels </td></tr>
-<tr><td>z0 </td><td>first edge Z coordinate in pixels </td></tr>
+<tr><td>x0 </td><td>first edge X coordinate in space </td></tr>
+<tr><td>y0 </td><td>first edge Y coordinate in space </td></tr>
+<tr><td>z0 </td><td>first edge Z coordinate in space </td></tr>
 <tr><td>pi1 </td><td>second edge color, palette index 0 to 255 </td></tr>
-<tr><td>x1 </td><td>second edge X coordinate in pixels </td></tr>
-<tr><td>y1 </td><td>second edge Y coordinate in pixels </td></tr>
-<tr><td>z1 </td><td>second edge Z coordinate in pixels </td></tr>
+<tr><td>x1 </td><td>second edge X coordinate in space </td></tr>
+<tr><td>y1 </td><td>second edge Y coordinate in space </td></tr>
+<tr><td>z1 </td><td>second edge Z coordinate in space </td></tr>
 <tr><td>pi2 </td><td>third edge color, palette index 0 to 255 </td></tr>
-<tr><td>x2 </td><td>third edge X coordinate in pixels </td></tr>
-<tr><td>y2 </td><td>third edge Y coordinate in pixels </td></tr>
-<tr><td>z2 </td><td>third edge Z coordinate in pixels </td></tr></table></div></dd>
+<tr><td>x2 </td><td>third edge X coordinate in space </td></tr>
+<tr><td>y2 </td><td>third edge Y coordinate in space </td></tr>
+<tr><td>z2 </td><td>third edge Z coordinate in space </td></tr></table></div></dd>
 <dt>See Also</dt><dd>
 <a href="#tri" onclick="c('tri')">tri</a>, <a href="#ftri" onclick="c('ftri')">ftri</a>, <a href="#tri2d" onclick="c('tri2d')">tri2d</a></dd>
 <hr>
@@ -3014,7 +3014,7 @@ Returns the value at that address.</dd>
 <h2 id="ini">ini<a href="#ini"></a></h2>
 <div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">uint32_t</span> <span class="hl_f">ini</span>(<span class="hl_t">addr_t</span> <span class="hl_v">src</span>)</code></div>
 <dt>Description</dt><dd>
-Read in a long word (four bytes) from memory.</dd>
+Read in an integer (four bytes) from memory.</dd>
 <dt>Parameters</dt><dd>
 <div class="table"><table><tr><th>Argument </th><th>Description </th></tr>
 <tr><td>src </td><td>address, 0x00000 to 0xBFFFC </td></tr></table></div></dd>
@@ -3024,7 +3024,7 @@ Returns the value at that address.</dd>
 <h2 id="outb">outb<a href="#outb"></a></h2>
 <div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">void</span> <span class="hl_f">outb</span>(<span class="hl_t">addr_t</span> <span class="hl_v">dst</span>, <span class="hl_t">uint8_t</span> <span class="hl_v">value</span>)</code></div>
 <dt>Description</dt><dd>
-Write one byte to memory.</dd>
+Write out one byte to memory.</dd>
 <dt>Parameters</dt><dd>
 <div class="table"><table><tr><th>Argument </th><th>Description </th></tr>
 <tr><td>dst </td><td>address, 0x00000 to 0xBFFFF </td></tr>
@@ -3033,7 +3033,7 @@ Write one byte to memory.</dd>
 <h2 id="outw">outw<a href="#outw"></a></h2>
 <div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">void</span> <span class="hl_f">outw</span>(<span class="hl_t">addr_t</span> <span class="hl_v">dst</span>, <span class="hl_t">uint16_t</span> <span class="hl_v">value</span>)</code></div>
 <dt>Description</dt><dd>
-Write a word (two bytes) to memory.</dd>
+Write out a word (two bytes) to memory.</dd>
 <dt>Parameters</dt><dd>
 <div class="table"><table><tr><th>Argument </th><th>Description </th></tr>
 <tr><td>dst </td><td>address, 0x00000 to 0xBFFFE </td></tr>
@@ -3042,7 +3042,7 @@ Write a word (two bytes) to memory.</dd>
 <h2 id="outi">outi<a href="#outi"></a></h2>
 <div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">void</span> <span class="hl_f">outi</span>(<span class="hl_t">addr_t</span> <span class="hl_v">dst</span>, <span class="hl_t">uint32_t</span> <span class="hl_v">value</span>)</code></div>
 <dt>Description</dt><dd>
-Write a long word (four bytes) to memory.</dd>
+Write out an integer (four bytes) to memory.</dd>
 <dt>Parameters</dt><dd>
 <div class="table"><table><tr><th>Argument </th><th>Description </th></tr>
 <tr><td>dst </td><td>address, 0x00000 to 0xBFFFC </td></tr>

@@ -1154,19 +1154,19 @@ void meg4_api_tri2d(uint8_t pi0, int16_t x0, int16_t y0,
 }
 
 /**
- * Draws a filled triangle with color gradients in 3D space from the camera perspective (see [Graphics Processing Unit] address 00498).
+ * Draws a filled triangle with color gradients in 3D space from the camera perspective (see [Graphics Processing Unit] address 0049E).
  * @param pi0 first edge color, palette index 0 to 255
- * @param x0 first edge X coordinate in pixels
- * @param y0 first edge Y coordinate in pixels
- * @param z0 first edge Z coordinate in pixels
+ * @param x0 first edge X coordinate in space
+ * @param y0 first edge Y coordinate in space
+ * @param z0 first edge Z coordinate in space
  * @param pi1 second edge color, palette index 0 to 255
- * @param x1 second edge X coordinate in pixels
- * @param y1 second edge Y coordinate in pixels
- * @param z1 second edge Z coordinate in pixels
+ * @param x1 second edge X coordinate in space
+ * @param y1 second edge Y coordinate in space
+ * @param z1 second edge Z coordinate in space
  * @param pi2 third edge color, palette index 0 to 255
- * @param x2 third edge X coordinate in pixels
- * @param y2 third edge Y coordinate in pixels
- * @param z2 third edge Z coordinate in pixels
+ * @param x2 third edge X coordinate in space
+ * @param y2 third edge Y coordinate in space
+ * @param z2 third edge Z coordinate in space
  * @see [tri], [ftri], [tri2d]
  */
 void meg4_api_tri3d(uint8_t pi0, int16_t x0, int16_t y0, int16_t z0,

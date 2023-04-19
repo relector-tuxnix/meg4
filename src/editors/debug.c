@@ -87,17 +87,17 @@ void debug_rte(int err)
  */
 void debug_step(void)
 {
-    if(cont) {
-        meg4.mode = MEG4_MODE_GAME;
-        cpu_fetch();
-        /* if we have finished with setup() or loop(), restart loop() */
-        if(!meg4.pc && meg4.code && meg4.code_len > 4) {
-            meg4.pc = meg4.code[3];
-            main_log(3, "CPU: new entry point %05X", meg4.pc);
-        }
-        meg4.mode = MEG4_MODE_DEBUG;
-    } else
-        debug_rte(ERR_BADADR);
+    if(!errmsg[0]) {
+        if(cont) {
+            meg4.mode = MEG4_MODE_GAME;
+            cpu_fetch();
+            /* if we have finished with setup() or loop(), restart loop() */
+            if(!meg4.pc && meg4.code && meg4.code_len > 4)
+                meg4.pc = meg4.code[3];
+            meg4.mode = MEG4_MODE_DEBUG;
+        } else
+            debug_rte(ERR_BADADR);
+    }
     numcb = 0;
 }
 

@@ -187,9 +187,9 @@ void meg4_export(char *name, int binary)
         }
     }
 
-    /* font */
-    for(i = len = 0; i < 65536; i++) if(i == 0 || i == 32 || i == 160 || !meg4_isbyte(meg4.font + (i << 3), 0, 8)) len++;
-    if(len > 3) {
+    /* font (only save if it differs to the built-in one) */
+    if(!meg4_isbyte(meg4.font, 0, 32 * 8) || memcmp(meg4.font + 32 * 8, meg4_font + 32 * 8, 65504 * 8)) {
+        for(i = len = 0; i < 65536; i++) if(i == 0 || i == 32 || i == 160 || !meg4_isbyte(meg4.font + (i << 3), 0, 8)) len++;
         if(binary) {
             out = (uint8_t*)malloc(32 + len * 16);
             if(out) {
@@ -783,7 +783,7 @@ readuints:                  for(i = j = 0; j < h; data++) {
         ptr = buf + 12; while(memcmp(ptr, "data", 4) && ptr < end) { ptr += ((ptr[5]<<8)|ptr[4]) + 8; }
         if(ptr < end && !memcmp(ptr, "data", 4)) {
             memset(tmp, 0, sizeof(tmp));
-            ptr += 4; l = (ptr[3]<<24)|(ptr[2]<<16)|(ptr[1]<<8)|ptr[0]; if(end > ptr + l) end = ptr + l;
+            ptr += 4; l = (ptr[3]<<24)|(ptr[2]<<16)|(ptr[1]<<8)|ptr[0]; if(end > ptr + l + 4) end = ptr + l + 4;
             ptr += 4;
             c = buf[22];                                                                        /* number of channels */
             l = w = (int)((buf[31]<<24)|(buf[30]<<16)|(buf[29]<<8)|buf[28])/c/(buf[34]>>3);     /* number of samples */

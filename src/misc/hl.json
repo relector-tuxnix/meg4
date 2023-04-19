@@ -38,7 +38,7 @@
     /* 0 comments */    [ "rem .*?$", "'.*?$" ],
     /* 1 pseudo */      [ ],
     /* 2 operators */   [ "@", "^", "\*", "/", "mod", "+", "\-", "<>", "<=", ">=", "<", ">", "=", "not", "and", "or" ],
-    /* 3 numbers */     [ "[\-\$]?[0-9][0-9\.a-fp]*" ],
+    /* 3 numbers */     [ "[\-]?[0-9\.\$][0-9\.a-fp]*" ],
     /* 4 strings */     [ "\"" ],
     /* 5 delimiters */  [ ",", ";", ":", "\n" ],
     /* 6 types */       [ "rnd", "inkey$", "time", "now%" ],
@@ -59,7 +59,7 @@
                           "stb", "stw", "sti", "stf", "rdb", "rdw", "rdi", "rdf", "incb", "incw", "inci", "decb", "decw", "deci",
                           "not", "neg", "or", "xor", "and", "shl", "shr", "eq", "ne", "lts", "gts", "les", "ges", "ltu", "gtu",
                           "leu", "geu", "ltf", "gtf", "lef", "gef", "addi", "subi", "muli", "divi", "modi", "powi", "addf", "subf",
-                          "mulf", "divf", "modf", "powf" ]
+                          "mulf", "divf", "modf", "powf", "ssp", "csp" ]
     ],
 
     "lua": [

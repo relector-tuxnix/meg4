@@ -262,13 +262,13 @@ A `△△▽▽◁▷◁▷ⒷⒶ` sorozat a `KEY_CHEAT` "gombot" jelzi lenyomot
 |  00492 |          2 | teknős Y koordináta pixelben                                       |
 |  00494 |          2 | útvesztő haladási sebesség 1/128-ad csempében (lásd [maze])        |
 |  00496 |          2 | útvesztő forgási sebesség fokokban (1-től 90-ig)                   |
-|  00498 |          2 | kamera X koordináta pixelben (lásd [tri3d])                        |
-|  0049A |          2 | kamera Y koordináta pixelben                                       |
-|  0049C |          2 | kamera Z koordináta pixelben                                       |
-|  0049E |          1 | konzol betűszíne, paletta index 0-tól 255-ig (lásd [printf])       |
-|  0049F |          1 | konzol háttérszíne, paletta index 0-tól 255-ig                     |
-|  004A0 |          2 | konzol X koordináta pixelben                                       |
-|  004A2 |          2 | konzol Y koordináta pixelben                                       |
+|  00498 |          1 | konzol betűszíne, paletta index 0-tól 255-ig (lásd [printf])       |
+|  00499 |          1 | konzol háttérszíne, paletta index 0-tól 255-ig                     |
+|  0049A |          2 | konzol X koordináta pixelben                                       |
+|  0049C |          2 | konzol Y koordináta pixelben                                       |
+|  0049E |          2 | kamera X koordináta pixelben (lásd [tri3d])                        |
+|  004A0 |          2 | kamera Y koordináta pixelben                                       |
+|  004A2 |          2 | kamera Z koordináta pixelben                                       |
 |  00600 |      64000 | térkép, 320 x 200 szprájt index (lásd [map] és [maze])             |
 |  10000 |      65536 | szprájtok, 256 x 256 paletta index, 1024 8 x 8 pixel (lásd [spr])  |
 |  28000 |      32768 | csúszóablak 4096 betűglifhez (lásd 0007E, [width] és [text])       |
@@ -793,22 +793,22 @@ void tri3d(uint8_t pi0, int16_t x0, int16_t y0, int16_t z0,
     uint8_t pi2, int16_t x2, int16_t y2, int16_t z2)
 ```
 <dt>Leírás</dt><dd>
-Kirajzol egy háromszöget színátmenetekkel 3D-s térben, a kamera szemszögéből (lásd [Grafikus Feldolgozó Egység] 00498-as cím).
+Kirajzol egy háromszöget színátmenetekkel 3D-s térben, a kamera szemszögéből (lásd [Grafikus Feldolgozó Egység] 0049E-as cím).
 </dd>
 <dt>Paraméterek</dt><dd>
 | Paraméter | Leírás |
 | pi0 | első csúcs színe, paletta index 0-tól 255-ig |
-| x0 | első csúcs X koordináta pixelekben |
-| y0 | első csúcs Y koordináta pixelekben |
-| z0 | első csúcs Z koordináta pixelekben |
+| x0 | első csúcs X koordináta a térben |
+| y0 | első csúcs Y koordináta a térben |
+| z0 | első csúcs Z koordináta a térben |
 | pi1 | második csúcs színe, paletta index 0-tól 255-ig |
-| x1 | második csúcs X koordináta pixelekben |
-| y1 | második csúcs Y koordináta pixelekben |
-| z1 | második csúcs Z koordináta pixelekben |
+| x1 | második csúcs X koordináta a térben |
+| y1 | második csúcs Y koordináta a térben |
+| z1 | második csúcs Z koordináta a térben |
 | pi2 | harmadik csúcs színe, paletta index 0-tól 255-ig |
-| x2 | harmadik csúcs X koordináta pixelekben |
-| y2 | harmadik csúcs Y koordináta pixelekben |
-| z2 | harmadik csúcs Z koordináta pixelekben |
+| x2 | harmadik csúcs X koordináta a térben |
+| y2 | harmadik csúcs Y koordináta a térben |
+| z2 | harmadik csúcs Z koordináta a térben |
 </dd>
 <dt>Lásd még</dt><dd>
 [tri], [ftri], [tri2d]

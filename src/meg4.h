@@ -75,9 +75,9 @@ typedef struct {
     uint16_t turtlea;                       /* 0048E turtle direction (angle in degrees, 0 - 359) */
     uint16_t turtlex, turtley;              /* 00490 turtle position (could be off-screen) */
     uint16_t mazew, mazer;                  /* 00494 maze walking and rotating speed */
-    uint16_t camx, camy, camz;              /* 00498 camera position (for tri3d) */
-    uint8_t  conf, conb;                    /* 0049E console foreground and background (for print) */
-    uint16_t conx, cony;                    /* 004A0 console cursor position (for print) */
+    uint8_t  conf, conb;                    /* 00498 console foreground and background (for print) */
+    uint16_t conx, cony;                    /* 0049A console cursor position (for print) */
+    uint16_t camx, camy, camz;              /* 0049E camera position (for tri3d) */
     uint8_t  mbz2[22];                      /* reserved for future GPU use */
     /* DSP */
     uint8_t  dsp_ticks;                     /* 004BA current tempo */

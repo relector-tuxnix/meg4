@@ -32,7 +32,7 @@ enum { C_IF, C_ELSE, C_SWITCH, C_CASE, C_DEFAULT, C_FOR, C_WHILE, C_DO, C_BREAK,
 
 /* operators in precedence order, must match O_ defines in cpu.h */
 char *c_ops[] = {
-    /* assignments */   "|=", "&=", "^=", "<<=", ">>=", "+=", "-=", "*=", "/=", "%=", "", "=",
+    /* assignments */   "|=", "^=", "&=", "<<=", ">>=", "+=", "-=", "*=", "/=", "%=", "", "=",
     /* logical */       "?", "||", "&&",
     /* bitwise */       "|", "^", "&",
     /* conditionals */  "==", "!=", "<", ">", "<=", ">=",
@@ -84,7 +84,8 @@ static int gettok(compiler_t *comp, int *s, tok_t **tok, int *nt, int *l, int lv
         /* typedef only allowed with structs */
         if(comp->tok[*s].id == C_TYPEDEF) {
             (*s)++;
-            if(comp->tok[*s].id != C_STRUCT && comp->tok[*s].id != C_UNION) { code_error(comp->tok[(*s) - 1].pos, lang[ERR_NOTHERE]); return 0; }
+            if(comp->tok[*s].id != C_STRUCT && comp->tok[*s].id != C_UNION)
+                { code_error(comp->tok[(*s) - 1].pos, lang[ERR_NOTHERE]); return 0; }
         }
         /* convert multiple tokens into a single one */
         if((comp->tok[*s].id == C_SIGNED || comp->tok[*s].id == C_UNSIGNED)) {
@@ -119,7 +120,8 @@ static int gettok(compiler_t *comp, int *s, tok_t **tok, int *nt, int *l, int lv
  */
 static int skip(compiler_t *comp, int s, char t)
 {
-    if(s >= comp->ntok || comp->tok[s].type != HL_D || comp->tok[s].id != t) { code_error(comp->tok[s == comp->ntok ? s - 1 : s].pos, lang[ERR_SYNTAX]); return 0; }
+    if(s >= comp->ntok || comp->tok[s].type != HL_D || comp->tok[s].id != t)
+        { code_error(comp->tok[s == comp->ntok ? s - 1 : s].pos, lang[ERR_SYNTAX]); return 0; }
     return s + 1;
 }
 
@@ -132,7 +134,7 @@ static int gettype(compiler_t *comp, int *s, int *p, int t)
 
     *p = T_SCALAR;
     if(t == T_STR) { *p = T_PTR; t = T_I8; }     /* str_t  -> char* */
-    if(t == T_ADDR) { *p = T_PTR; t = T_U8; }    /* addr_t -> uint8_t* */
+    if(t == T_ADDR) { *p = T_PTR; t = T_VOID; }    /* addr_t -> void* */
     while(comp->tok[*s].type == HL_O && meg4.src[comp->tok[*s].pos] == '*') {
         if(i >= N_DIM) { code_error(comp->tok[*s].pos, lang[ERR_TOOCLX]); return 0; }
         *p = T_PTR + i; (*s)++;
@@ -148,13 +150,13 @@ static int getarr(compiler_t *comp, int *s, int i, int p)
 {
     int e, l;
 
-    if(comp->tok[*s].type == HL_D && comp->tok[*s].id == '[') {
+    if(meg4.src[comp->tok[*s].pos] == '[') {
         /* we do not support pointer arrays (at least, not yet in this version) */
         if(p != T_SCALAR) { code_error(comp->tok[*s].pos, lang[ERR_SYNTAX]); return 0; }
         /* array */
-        for(l = 0; *s < comp->ntok && comp->tok[*s].type == HL_D && comp->tok[*s].id == '['; l++) {
+        for(l = 0; *s < comp->ntok && meg4.src[comp->tok[*s].pos] == '['; l++) {
             if(l >= N_DIM) { code_error(comp->tok[*s].pos, lang[ERR_NUMARG]); return 0; }
-            (*s)++; for(e = *s; e < comp->ntok && (comp->tok[e].type != HL_D || comp->tok[e].id != ']'); e++);
+            (*s)++; for(e = *s; e < comp->ntok && meg4.src[comp->tok[e].pos] != ']'; e++);
             if(!comp_eval(comp, *s, e, &comp->id[i].a[l])) return 0;
             if(comp->id[i].a[l] < 1) { code_error(comp->tok[*s].pos, lang[ERR_BADARG]); return 0; }
             comp->id[i].l *= comp->id[i].a[l];
@@ -169,7 +171,8 @@ static int getarr(compiler_t *comp, int *s, int i, int p)
  */
 static int getcase(compiler_t *comp, int s, int *val)
 {
-    if((comp->tok[s].type != HL_N && comp->tok[s].type != HL_C && comp->tok[s].type != HL_V) || !comp_eval(comp, s, s + 1, val)) return 0;
+    if((comp->tok[s].type != HL_N && comp->tok[s].type != HL_C && comp->tok[s].type != HL_V) || !comp_eval(comp, s, s + 1, val))
+        return 0;
     return comp->tok[s + 1].type == HL_D && comp->tok[s + 1].id == ':';
 }
 
@@ -198,7 +201,8 @@ static int getinit(compiler_t *comp, int s, int id, int len, int lvl, int offs)
         maxlvl = (comp->id[id].t & 15) - T_SCALAR;
         if(tok[s].type == HL_S) {
             /* string constant */
-            if(lvl + 1 != maxlvl || comp->id[id].s != 4 || (comp->id[id].t >> 4) == T_FLOAT) { code_error(tok[s].pos, lang[ERR_NOTHERE]); return 0; }
+            if(lvl + 1 != maxlvl || comp->id[id].s != 4 || (comp->id[id].t >> 4) == T_FLOAT)
+                { code_error(tok[s].pos, lang[ERR_NOTHERE]); return 0; }
             i = htole32(comp->str[tok[s].id].n);
             memcpy(meg4.data + offs, &i, comp->id[id].s);
             s++;
@@ -253,8 +257,8 @@ static int expression(compiler_t *comp, int s)
     tok_t *tok = comp->tok;
     int i = s, e, p = 0, end, t = T(T_SCALAR, T_I32);
 
-    if(tok[s].type == HL_D && tok[s].id == ';') return s;
     lr = 0;
+    if(tok[s].type == HL_D && tok[s].id == ';') return s;
     do {
         comp_cdbg(comp, s);
         for(e = s; e < comp->ntok && meg4.src[tok[e].pos] != ';'; e++) {
@@ -367,7 +371,7 @@ static int statement(compiler_t *comp, int s, int sw, int sl, int *el)
                 if(comp->code[comp->nc - 2] == BC_JMP && l3 == comp->nc - 1) { l3 = comp->code[l3]; comp->nc -= 2; }
                 for(i = 0; i <= k; i++)
                     if(!comp->code[sw + 1 + i]) comp->code[sw + 1 + i] = comp->nc;
-                while(l3) { l2 = comp->code[l3]; comp->code[l3] = comp->nc; l3 = l2; }
+                comp_resolve(comp, l3);
                 comp->ls = C_SWITCH;
             break;
             case C_CASE:
@@ -421,7 +425,7 @@ static int statement(compiler_t *comp, int s, int sw, int sl, int *el)
                 comp_gen(comp, BC_JMP);
                 comp_gen(comp, l2 + 3);
                 comp->code[l2] = comp->nc;
-                while(l3) { l2 = comp->code[l3]; comp->code[l3] = comp->nc; l3 = l2; }
+                comp_resolve(comp, l3);
                 comp->ls = C_FOR;
             break;
             case C_WHILE:
@@ -436,7 +440,7 @@ static int statement(compiler_t *comp, int s, int sw, int sl, int *el)
                 comp_gen(comp, BC_JMP);
                 comp_gen(comp, l1);
                 comp->code[l2] = comp->nc;
-                while(l3) { l2 = comp->code[l3]; comp->code[l3] = comp->nc; l3 = l2; }
+                comp_resolve(comp, l3);
                 comp->ls = C_WHILE;
             break;
             case C_DO:
@@ -451,7 +455,7 @@ static int statement(compiler_t *comp, int s, int sw, int sl, int *el)
                 if(!lr && comp->code[comp->nc - 1] == BC_NOT) comp->code[comp->nc - 1] = BC_JZ;
                 else comp_gen(comp, BC_JNZ);
                 comp_gen(comp, l1);
-                while(l3) { l2 = comp->code[l3]; comp->code[l3] = comp->nc; l3 = l2; }
+                comp_resolve(comp, l3);
                 comp->ls = C_DO;
             break;
             case C_BREAK:
@@ -673,7 +677,7 @@ int comp_c(compiler_t *comp)
                     }
                     if(!skip(comp, s, ';')) return 0;
                 }
-            } else { code_error(tok[s].pos, lang[ERR_SYNTAX]); return 0; }
+            } else if(!P) { code_error(tok[s].pos, lang[ERR_SYNTAX]); return 0; }
         } else
         if(tf != -1 && tok[s].type == HL_V && tok[s].len == 8 && !memcmp(&meg4.src[tok[s].pos], "__FUNC__", 8)) {
             /* we got a __FUNC__ reference, add the current function's name to the string literals */
@@ -697,8 +701,10 @@ noclose:for(P = B = S = 0; s >= 0; s--)
     }
     /* check setup and loop functions */
     if(setupid == -1 && loopid == -1) { code_error(4, lang[ERR_NOCODE]); return 0; }
-    if(setupid != -1 && (comp->id[setupid].t != T(T_FUNC, T_VOID) || comp->f[comp->id[setupid].f[0]].n)) { code_error(comp->id[setupid].p, lang[ERR_BADPROTO]); return 0; }
-    if(loopid != -1 && (comp->id[loopid].t != T(T_FUNC, T_VOID) || comp->f[comp->id[loopid].f[0]].n)) { code_error(comp->id[loopid].p, lang[ERR_BADPROTO]); return 0; }
+    if(setupid != -1 && (comp->id[setupid].t != T(T_FUNC, T_VOID) || comp->f[comp->id[setupid].f[0]].n))
+        { code_error(comp->id[setupid].p, lang[ERR_BADPROTO]); return 0; }
+    if(loopid != -1 && (comp->id[loopid].t != T(T_FUNC, T_VOID) || comp->f[comp->id[loopid].f[0]].n))
+        { code_error(comp->id[loopid].p, lang[ERR_BADPROTO]); return 0; }
     /* finalize initialized data */
     if(!comp_addinit(comp)) return 0;
     /* save number of global identifiers */

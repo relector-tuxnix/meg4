@@ -984,15 +984,15 @@ esetén csak az FLG, TMR és a PC regiszter elérhető. Bővebb leírást az egy
 <span class="hl_c">/* Induláskor lefuttatandó dolgok */</span>
 <span class="hl_t">void</span> <span class="hl_f">setup</span>()
 {
-    <span class="hl_c">/* lokális változók */</span>
-    <span class="hl_t">int</span> <span class="hl_v">lokálisvagyok</span> <span class="hl_o">=</span> <span class="hl_n">123</span>;
+  <span class="hl_c">/* lokális változók */</span>
+  <span class="hl_t">int</span> <span class="hl_v">lokálisvagyok</span> <span class="hl_o">=</span> <span class="hl_n">123</span>;
 }
 
 <span class="hl_c">/* Minden képkockánál lefuttatandó dolgok, 60 FPS */</span>
 <span class="hl_t">void</span> <span class="hl_f">loop</span>()
 {
-    <span class="hl_c">/* MEG-4 stílusú kimenet */</span>
-    <span class="hl_f">printf</span>(<span class="hl_s">&quot;a számláló %d, balshift %d\n&quot;</span>, <span class="hl_v">számláló</span>, <span class="hl_f">getkey</span>(<span class="hl_v">KEY_LSHIFT</span>));
+  <span class="hl_c">/* MEG-4 stílusú kimenet */</span>
+  <span class="hl_f">printf</span>(<span class="hl_s">&quot;a számláló %d, balshift %d\n&quot;</span>, <span class="hl_v">számláló</span>, <span class="hl_f">getkey</span>(<span class="hl_v">KEY_LSHIFT</span>));
 }</code></div>
 <h2 id="leiras">Leírás<a href="#leiras"></a></h2>
 <p>A konzol alapértelmezett nyelve a <b>MEG-4 C</b>. Ez, bár maga a nyelv roppant egyszerű, mégis valamivel haladóbb programozóknak
@@ -1265,16 +1265,16 @@ nincs átnevezés, se utótagok sem konverzió.</p><br style="clear:both;"><labe
 
 <span class="hl_c">REM Induláskor lefuttatandó dolgok</span>
 <span class="hl_k">SUB</span> <span class="hl_v">setup</span>
-    <span class="hl_c">REM lokális változók</span>
-    <span class="hl_k">LET</span> <span class="hl_v">lokálisvagyok</span> <span class="hl_o">=</span> <span class="hl_n">123</span>
+  <span class="hl_c">REM lokális változók</span>
+  <span class="hl_k">LET</span> <span class="hl_v">lokálisvagyok</span> <span class="hl_o">=</span> <span class="hl_n">123</span>
 <span class="hl_k">END</span> <span class="hl_k">SUB</span>
 
 <span class="hl_c">REM Minden képkockánál lefuttatandó dolgok, 60 FPS</span>
 <span class="hl_k">SUB</span> <span class="hl_k">loop</span>
-    <span class="hl_c">REM BASIC stílusú print</span>
-    <span class="hl_k">PRINT</span> <span class="hl_s">&quot;Épp&quot;</span>; <span class="hl_s">&quot; futok&quot;</span>
-    <span class="hl_c">REM MEG-4 stílusú kimenet</span>
-    <span class="hl_k">GOSUB</span> <span class="hl_f">printf</span>(<span class="hl_s">&quot;a számláló %d, balshift %d\n&quot;</span>, <span class="hl_v">számláló%</span>, <span class="hl_f">getkey%</span>(<span class="hl_v">KEY_LSHIFT</span>))
+  <span class="hl_c">REM BASIC stílusú print</span>
+  <span class="hl_k">PRINT</span> <span class="hl_s">&quot;Épp&quot;</span>; <span class="hl_s">&quot; futok&quot;</span>
+  <span class="hl_c">REM MEG-4 stílusú kimenet</span>
+  <span class="hl_k">GOSUB</span> <span class="hl_f">printf</span>(<span class="hl_s">&quot;a számláló %d, balshift %d\n&quot;</span>, <span class="hl_v">számláló%</span>, <span class="hl_f">getkey%</span>(<span class="hl_v">KEY_LSHIFT</span>))
 <span class="hl_k">END</span> <span class="hl_k">SUB</span></code></div>
 <h2 id="dialektus">Dialektus<a href="#dialektus"></a></h2>
 <p>A BASIC egy mozaikszó, Beginners' All-purpose Symbolic Instruction Code, ami annyit tesz, Kezdők Általános célú Szimbólikus
@@ -1294,7 +1294,7 @@ annélkül). Hexadecimális számokat a <samp>$</samp> karakterrel kell kezdeni 
 nagyjából az összes többi 80-as évekbeli dialektus is), a sztringeket pedig macskakörömbe kell tenni:</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br>4<br>5<br></pre><code><span class="hl_n">42</span>
 <span class="hl_n">3.1415</span>
-<span class="hl_v">.123e</span><span class="hl_n">-10</span>
+<span class="hl_n">.123e</span><span class="hl_n">-10</span>
 <span class="hl_n">$0048C</span>
 <span class="hl_s">&quot;Viszlát és kösz a halakat!\n&quot;</span></code></div>
 <div class="warn"><p><span>FIGYELEM</span></p><p> A specikiáció szerint 7 bites ASCII-nak kellene lennie, de a MEG-4 BASIC nullával lezárt UTF-8 kódolt sztringeket használ.
@@ -1305,8 +1305,8 @@ maximális hossza 255 bájtnyi (a specifikáció 18 bájtot vár el).</p></div>
 sztringeknél, és ez nincs a specifikációban, de a MEG-4 BASIC esetében a <samp>!</samp> bájtot, a <samp>#</samp> pedig duplabájtot jelent (szó). Bármi
 más lebegőpontos számot tároló változót eredményez.</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br>4<br>5<br></pre><code><span class="hl_k">LET</span> <span class="hl_v">A%</span> <span class="hl_o">=</span> <span class="hl_n">42</span>
-<span class="hl_k">LET</span> <span class="hl_v">B!</span> <span class="hl_o">=</span> <span class="hl_v">$FF</span>
-<span class="hl_k">LET</span> <span class="hl_v">C#</span> <span class="hl_o">=</span> <span class="hl_v">$FFFF</span>
+<span class="hl_k">LET</span> <span class="hl_v">B!</span> <span class="hl_o">=</span> <span class="hl_n">$FF</span>
+<span class="hl_k">LET</span> <span class="hl_v">C#</span> <span class="hl_o">=</span> <span class="hl_n">$FFFF</span>
 <span class="hl_k">LET</span> <span class="hl_v">D$</span> <span class="hl_o">=</span> <span class="hl_s">&quot;sztring&quot;</span>
 <span class="hl_k">LET</span> <span class="hl_v">E</span> <span class="hl_o">=</span> <span class="hl_n">3.1415</span></code></div>
 <p>A konverzió bájt, integer és a lebegőpontos számok között teljesen automatikus. Azonban ha egy sztringet akarsz szám változóba
@@ -1388,7 +1388,7 @@ többsoros <samp>IF</samp> .. <samp>THEN</samp> .. <samp>ELSE</samp> .. <samp>EN
 <p>Az ismétlő utasítás, a számlálósciklus elöltesztelős (nem futtatja le a blokkot, ha az indulóérték nagyobb (vagy kissebb), mint
 a határ), és így néz ki:</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br></pre><code><span class="hl_k">FOR</span> <span class="hl_v">i</span> <span class="hl_o">=</span> <span class="hl_n">1</span> <span class="hl_k">TO</span> <span class="hl_n">100</span> <span class="hl_k">STEP</span> <span class="hl_n">2</span>
-<span class="hl_v">...</span>
+<span class="hl_n">...</span>
 <span class="hl_k">NEXT</span> <span class="hl_v">i</span></code></div>
 <p>Ez a <samp>FOR</samp> .. <samp>NEXT</samp> lényegében pontosan ugyanaz, mint:</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></pre><code><span class="hl_k">LET</span> <span class="hl_v">i</span> <span class="hl_o">=</span> <span class="hl_n">1</span>
@@ -1396,7 +1396,7 @@ a határ), és így néz ki:</p>
 <span class="hl_k">LET</span> <span class="hl_v">inc</span> <span class="hl_o">=</span> <span class="hl_n">2</span>
 <span class="hl_v">sor1</span>:
 <span class="hl_k">IF</span> (<span class="hl_v">i</span> <span class="hl_o">-</span> <span class="hl_v">lim</span>) <span class="hl_o">*</span> <span class="hl_f">SGN</span>(<span class="hl_v">inc</span>) <span class="hl_o">&gt;</span> <span class="hl_n">0</span> <span class="hl_k">THEN</span> <span class="hl_v">sor2</span>
-<span class="hl_v">...</span>
+<span class="hl_n">...</span>
 <span class="hl_k">LET</span> <span class="hl_v">i</span> <span class="hl_o">=</span> <span class="hl_v">i</span> <span class="hl_o">+</span> <span class="hl_v">inc</span>
 <span class="hl_k">GOTO</span> <span class="hl_v">sor1</span>
 <span class="hl_v">sor2</span>:</code></div>
@@ -1404,24 +1404,24 @@ a határ), és így néz ki:</p>
 lehet egy lebegőpontos literál vagy egy másik lebegőpontos változó. A kiindulási érték és a határ lehet összetettebb kifejezés is,
 de azoknak is lebegőpontos számot kell visszaadniuk.</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br></pre><code><span class="hl_k">FOR</span> <span class="hl_v">i</span> <span class="hl_o">=</span> (<span class="hl_n">1</span><span class="hl_o">+</span><span class="hl_n">2</span><span class="hl_o">+</span><span class="hl_v">a</span>)<span class="hl_o">*</span><span class="hl_n">3</span> <span class="hl_k">TO</span> <span class="hl_n">4</span><span class="hl_o">*</span>(<span class="hl_n">5</span><span class="hl_o">+</span><span class="hl_n">6</span>)<span class="hl_o">/</span><span class="hl_v">b</span><span class="hl_o">+</span><span class="hl_v">c</span> <span class="hl_k">STEP</span> <span class="hl_v">j</span>
-<span class="hl_v">...</span>
+<span class="hl_n">...</span>
 <span class="hl_k">NEXT</span> <span class="hl_v">i</span></code></div>
 <div class="warn"><p><span>FIGYELEM</span></p><p> A specifikációval ellentétben, ami több változót is megenged a <samp>NEXT</samp> után, a MEG-4 BASIC <i>csak egyet</i> fogad el. Ezért ha
 egymásbaágyazott ciklusaid vannak, akkor több <samp>NEXT</samp> parancsot kell használnod, pontosan annyit, mint ahány <samp>FOR</samp> utasításod van.</p></div>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br>4<br>5<br></pre><code><span class="hl_k">FOR</span> <span class="hl_v">y</span> <span class="hl_o">=</span> <span class="hl_n">1</span> <span class="hl_k">TO</span> <span class="hl_n">10</span>
  <span class="hl_k">FOR</span> <span class="hl_v">x</span> <span class="hl_o">=</span> <span class="hl_n">1</span> <span class="hl_k">TO</span> <span class="hl_n">100</span>
- <span class="hl_v">...</span>
+ <span class="hl_n">...</span>
  <span class="hl_k">NEXT</span> <span class="hl_v">x</span>
 <span class="hl_k">NEXT</span> <span class="hl_v">y</span></code></div>
 <p>A MEG-4 BASIC nem ismer többfajta ciklust mint például a C, de egy nem-számlálós elöltesztelős ciklus helyett írhatod ezt:</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br>4<br>5<br></pre><code><span class="hl_v">megint</span>:
 <span class="hl_k">IF</span> <span class="hl_v">a</span> <span class="hl_o">&gt;</span> <span class="hl_n">0</span> <span class="hl_k">THEN</span>
- <span class="hl_v">...</span>
+ <span class="hl_n">...</span>
  <span class="hl_k">GOTO</span> <span class="hl_v">megint</span>
 <span class="hl_k">END</span> <span class="hl_k">IF</span></code></div>
 <p>A hátultesztelős ciklus helyett pedig ezt:</p>
 <div class="pre"><pre class="lineno">1<br>2<br>3<br></pre><code><span class="hl_v">megint</span>:
- <span class="hl_v">...</span>
+ <span class="hl_n">...</span>
 <span class="hl_k">IF</span> <span class="hl_v">a</span> <span class="hl_o">&gt;</span> <span class="hl_n">0</span> <span class="hl_k">THEN</span> <span class="hl_v">megint</span></code></div>
 <h2 id="bas_funcs">Alrutinok és függvények<a href="#bas_funcs"></a></h2>
 <div class="info"><p><span>FONTOS</span></p><p> Azok az utasítások, amik nincsenek egyetlen alrutinban sem, úgy lesznek kezelve, mintha a <samp>setup</samp> alrutinban lennének.</p></div>
@@ -1523,24 +1523,24 @@ egészszám típus utótagot kap például, mivel fokokat ad vissza egészszámb
     <span class="hl_t">.code</span>
 <span class="hl_c">/* Induláskor lefuttatandó dolgok */</span>
 <span class="hl_v">setup</span>:
-    <span class="hl_c">/* lokális változó (igazából nem, csak helyet foglalunk a veremben) */</span>
-    <span class="hl_k">sp</span> <span class="hl_n">-4</span>
-    <span class="hl_k">ret</span>
+  <span class="hl_c">/* lokális változó (igazából nem, csak helyet foglalunk a veremben) */</span>
+  <span class="hl_k">sp</span> <span class="hl_n">-4</span>
+  <span class="hl_k">ret</span>
 
 <span class="hl_c">/* Minden képkockánál lefuttatandó dolgok, 60 FPS */</span>
 <span class="hl_v">loop</span>:
-    <span class="hl_c">/* MEG-4 stílusú kimenet */</span>
-    <span class="hl_k">pshci</span> <span class="hl_v">KEY_LSHIFT</span>
-    <span class="hl_k">scall</span> <span class="hl_v">getkey</span>
-    <span class="hl_k">sp</span> <span class="hl_n">4</span>
-    <span class="hl_k">pushi</span>
-    <span class="hl_k">ci</span> <span class="hl_v">számláló</span>
-    <span class="hl_k">ldi</span>
-    <span class="hl_k">pushi</span>
-    <span class="hl_k">pshci</span> <span class="hl_v">fmt</span>
-    <span class="hl_k">scall</span> <span class="hl_v">printf</span>
-    <span class="hl_k">sp</span> <span class="hl_n">12</span>
-    <span class="hl_k">ret</span></code></div>
+  <span class="hl_c">/* MEG-4 stílusú kimenet */</span>
+  <span class="hl_k">pshci</span> <span class="hl_v">KEY_LSHIFT</span>
+  <span class="hl_k">scall</span> <span class="hl_v">getkey</span>
+  <span class="hl_k">sp</span> <span class="hl_n">4</span>
+  <span class="hl_k">pushi</span>
+  <span class="hl_k">ci</span> <span class="hl_v">számláló</span>
+  <span class="hl_k">ldi</span>
+  <span class="hl_k">pushi</span>
+  <span class="hl_k">pshci</span> <span class="hl_v">fmt</span>
+  <span class="hl_k">scall</span> <span class="hl_v">printf</span>
+  <span class="hl_k">sp</span> <span class="hl_n">12</span>
+  <span class="hl_k">ret</span></code></div>
 <h2 id="asm_desc">Leírás<a href="#asm_desc"></a></h2>
 <p>Ez igazából nem egy programozási nyelv. Amikor valamelyik beépített nyelvet lefordítod, akkor a fordító olyan bájtkódot generál,
 amit aztán a CPU végrehajt. Az Assembly ezeknek a bájtkódoknak az egy-az-egybeni, ember számára is olvasható, szöveges mnemonik
@@ -1555,7 +1555,8 @@ opcionális paraméterrel.</p>
 adatfolyamba az utasítások elé rakhatsz címkéket, amik az adott adat címét fogják jelenteni. A betöltéshez a kód szekcióban,
 előbb be kell tölteni az akkumulátor regiszterbe egy ilyen címkét a <samp>ci</samp> utasítással, majd pedig kiadni a <samp>ldb</samp>
 (load, bájt betöltése), <samp>ldw</samp> (szó betöltése), <samp>ldi</samp> (egészszám betöltése) vagy <samp>ldf</samp> (lebegőpontos szám betöltése) utasítás
-valamelyikét.</p>
+valamelyikét. Ha az <samp>ldb</samp> vagy <samp>ldw</samp> betöltő utasításoknak num-nulla paramétert adunk, akkor előjelesen 32 bitre kiegészítik az
+értéket.</p>
 <h2 id="asm_flow">Vezérlésirányítás<a href="#asm_flow"></a></h2>
 <p>Minden, ami a <samp>.code</samp> kulcsszó után kerül, kód lesz. Nincs vezérlésirányítás, minden utasítás sorjában, egymás után kerül
 végrehajtásra; kézzel kell átállítanod a PC (program counter, programszámláló) regisztert, hogy befolyásold ezt. Ehhez a <samp>jmp</samp>
@@ -1575,7 +1576,6 @@ felelőssége a paraméterek eltávolítása a veremből az <samp>sp</samp>+para
 <p>Lerakod a paramétereket a verembe <i>fordított sorrendben</i>, majd az <samp>scall</samp> (system call, rendszerhívás) mnemoniknak az egyik MEG-4
 API funkció nevét adod paraméterül. Hívás után mindig a hívó fél felelőssége a paraméterek eltávolítása a veremből.</p>
 <h2 id="mnemonikok">Mnemonikok<a href="#mnemonikok"></a></h2>
-<div class="info"><p><span>MEGJEGYZÉS</span></p><p> Ha extra szószátyár <samp>meg4 -vvv</samp> módban indítottad, akkor minden éppen végrehajtott utasítás kiíródik a szabványos kimenetre.</p></div>
 <p>Mielőtt belemennénk a részletekbe, muszáj pár szót ejteni a MEG-4 CPU specifikációjáról.</p>
 <p>A MEG-4 CPU egy 32 bites, kicsi elöl (little endian) CPU. Minden érték a memóriában úgy van tárolva, hogy az alacsonyabb
 helyiérték van az alacsonyabb címen. Képes műveleteket végezni 8 bites, 16 bites és 32 bites egészszámokkal (integer, előjeles
@@ -1627,8 +1627,8 @@ bájtokra. A kódszegmensre a következő mnemonikokkal lehet utasításokat elh
 <tr><td><samp>popf</samp> </td><td></td><td>Kiveszi az adatverem legfelső elemét a lebegőpontos akkumulátorba </td></tr>
 <tr><td><samp>cnvi</samp> </td><td></td><td>Az adatverem legfelső elemét egészszámmá konvertálja </td></tr>
 <tr><td><samp>cnvf</samp> </td><td></td><td>Az adatverem legfelső elemét lebegőpontos számmá konvertálja </td></tr>
-<tr><td><samp>ldb</samp> </td><td></td><td>Az akkumulátor által mutatott adatcímről egy bájtot tölt be </td></tr>
-<tr><td><samp>ldw</samp> </td><td></td><td>Az akkumulátor által mutatott adatcímről egy szót tölt be </td></tr>
+<tr><td><samp>ldb</samp> </td><td>0/1 </td><td>Az akkumulátor által mutatott adatcímről egy bájtot tölt be (előjelesre egészít, ha nem-nulla a paraméter) </td></tr>
+<tr><td><samp>ldw</samp> </td><td>0/1 </td><td>Az akkumulátor által mutatott adatcímről egy szót tölt be (előjelesre egészít, ha nem-nulla a paraméter) </td></tr>
 <tr><td><samp>ldi</samp> </td><td></td><td>Az akkumulátor által mutatott adatcímről egy egészszámot tölt be </td></tr>
 <tr><td><samp>ldf</samp> </td><td></td><td>Az akkumulátor által mutatott adatcímről egy lebegőpontost tölt be </td></tr>
 <tr><td><samp>stb</samp> </td><td></td><td>Kiveszi a címet a veremből, és egy bájtot rak oda az akkumulátorból </td></tr>
@@ -1704,16 +1704,16 @@ sw (érték), (cimke ahová egyébként ugrik),
 
 <span class="hl_c">-- Induláskor lefuttatandó dolgok</span>
 <span class="hl_k">function</span> <span class="hl_f">setup</span>()
-    <span class="hl_c">-- lokális változók</span>
-    <span class="hl_v">lokalisvagyok</span> <span class="hl_o">=</span> <span class="hl_n">234</span>
+  <span class="hl_c">-- lokális változók</span>
+  <span class="hl_v">lokalisvagyok</span> <span class="hl_o">=</span> <span class="hl_n">234</span>
 <span class="hl_k">end</span>
 
 <span class="hl_c">-- Minden képkockánál lefuttatandó dolgok, 60 FPS</span>
 <span class="hl_k">function</span> <span class="hl_f">loop</span>()
-    <span class="hl_c">-- Lua stílusú print</span>
-    <span class="hl_f">print</span>(<span class="hl_s">&quot;Épp&quot;</span>, <span class="hl_s">&quot;futok&quot;</span>)
-    <span class="hl_c">-- MEG-4 stílusú kimenet</span>
-    <span class="hl_f">printf</span>(<span class="hl_s">&quot;a számláló %d, balshift %d\n&quot;</span>, <span class="hl_v">szamlalo</span>, <span class="hl_f">getkey</span>(<span class="hl_v">KEY_LSHIFT</span>))
+  <span class="hl_c">-- Lua stílusú print</span>
+  <span class="hl_f">print</span>(<span class="hl_s">&quot;Épp&quot;</span>, <span class="hl_s">&quot;futok&quot;</span>)
+  <span class="hl_c">-- MEG-4 stílusú kimenet</span>
+  <span class="hl_f">printf</span>(<span class="hl_s">&quot;a számláló %d, balshift %d\n&quot;</span>, <span class="hl_v">szamlalo</span>, <span class="hl_f">getkey</span>(<span class="hl_v">KEY_LSHIFT</span>))
 <span class="hl_k">end</span></code></div>
 <h2 id="tovabbi_informaciok">További információk<a href="#tovabbi_informaciok"></a></h2>
 <p>A többi nyelvvel ellentétben ez nem szerves része a MEG-4-nek, hanem egy külsős szoftver. Emiatt nincs (és nem is lehet)
@@ -1965,13 +1965,13 @@ gombnak felel meg, például:</p>
 <tr><td>00492 </td><td class="right">2 </td><td>teknős Y koordináta pixelben </td></tr>
 <tr><td>00494 </td><td class="right">2 </td><td>útvesztő haladási sebesség 1/128-ad csempében (lásd <a href="#maze" onclick="c('maze')">maze</a>) </td></tr>
 <tr><td>00496 </td><td class="right">2 </td><td>útvesztő forgási sebesség fokokban (1-től 90-ig) </td></tr>
-<tr><td>00498 </td><td class="right">2 </td><td>kamera X koordináta pixelben (lásd <a href="#tri3d" onclick="c('tri3d')">tri3d</a>) </td></tr>
-<tr><td>0049A </td><td class="right">2 </td><td>kamera Y koordináta pixelben </td></tr>
-<tr><td>0049C </td><td class="right">2 </td><td>kamera Z koordináta pixelben </td></tr>
-<tr><td>0049E </td><td class="right">1 </td><td>konzol betűszíne, paletta index 0-tól 255-ig (lásd <a href="#printf" onclick="c('printf')">printf</a>) </td></tr>
-<tr><td>0049F </td><td class="right">1 </td><td>konzol háttérszíne, paletta index 0-tól 255-ig </td></tr>
-<tr><td>004A0 </td><td class="right">2 </td><td>konzol X koordináta pixelben </td></tr>
-<tr><td>004A2 </td><td class="right">2 </td><td>konzol Y koordináta pixelben </td></tr>
+<tr><td>00498 </td><td class="right">1 </td><td>konzol betűszíne, paletta index 0-tól 255-ig (lásd <a href="#printf" onclick="c('printf')">printf</a>) </td></tr>
+<tr><td>00499 </td><td class="right">1 </td><td>konzol háttérszíne, paletta index 0-tól 255-ig </td></tr>
+<tr><td>0049A </td><td class="right">2 </td><td>konzol X koordináta pixelben </td></tr>
+<tr><td>0049C </td><td class="right">2 </td><td>konzol Y koordináta pixelben </td></tr>
+<tr><td>0049E </td><td class="right">2 </td><td>kamera X koordináta pixelben (lásd <a href="#tri3d" onclick="c('tri3d')">tri3d</a>) </td></tr>
+<tr><td>004A0 </td><td class="right">2 </td><td>kamera Y koordináta pixelben </td></tr>
+<tr><td>004A2 </td><td class="right">2 </td><td>kamera Z koordináta pixelben </td></tr>
 <tr><td>00600 </td><td class="right">64000 </td><td>térkép, 320 x 200 szprájt index (lásd <a href="#map" onclick="c('map')">map</a> és <a href="#maze" onclick="c('maze')">maze</a>) </td></tr>
 <tr><td>10000 </td><td class="right">65536 </td><td>szprájtok, 256 x 256 paletta index, 1024 8 x 8 pixel (lásd <a href="#spr" onclick="c('spr')">spr</a>) </td></tr>
 <tr><td>28000 </td><td class="right">32768 </td><td>csúszóablak 4096 betűglifhez (lásd 0007E, <a href="#width" onclick="c('width')">width</a> és <a href="#text" onclick="c('text')">text</a>) </td></tr></table></div>
@@ -2340,21 +2340,21 @@ Kirajzol egy kitöltött háromszöget színátmenetekkel.</dd>
     <span class="hl_t">uint8_t</span> <span class="hl_v">pi1</span>, <span class="hl_t">int16_t</span> <span class="hl_v">x1</span>, <span class="hl_t">int16_t</span> <span class="hl_v">y1</span>, <span class="hl_t">int16_t</span> <span class="hl_v">z1</span>,
     <span class="hl_t">uint8_t</span> <span class="hl_v">pi2</span>, <span class="hl_t">int16_t</span> <span class="hl_v">x2</span>, <span class="hl_t">int16_t</span> <span class="hl_v">y2</span>, <span class="hl_t">int16_t</span> <span class="hl_v">z2</span>)</code></div>
 <dt>Leírás</dt><dd>
-Kirajzol egy háromszöget színátmenetekkel 3D-s térben, a kamera szemszögéből (lásd <a href="#grafikus_feldolgozo_egyseg" onclick="c('grafikus_feldolgozo_egyseg')">Grafikus Feldolgozó Egység</a> 00498-as cím).</dd>
+Kirajzol egy háromszöget színátmenetekkel 3D-s térben, a kamera szemszögéből (lásd <a href="#grafikus_feldolgozo_egyseg" onclick="c('grafikus_feldolgozo_egyseg')">Grafikus Feldolgozó Egység</a> 0049E-as cím).</dd>
 <dt>Paraméterek</dt><dd>
 <div class="table"><table><tr><th>Paraméter </th><th>Leírás </th></tr>
 <tr><td>pi0 </td><td>első csúcs színe, paletta index 0-tól 255-ig </td></tr>
-<tr><td>x0 </td><td>első csúcs X koordináta pixelekben </td></tr>
-<tr><td>y0 </td><td>első csúcs Y koordináta pixelekben </td></tr>
-<tr><td>z0 </td><td>első csúcs Z koordináta pixelekben </td></tr>
+<tr><td>x0 </td><td>első csúcs X koordináta a térben </td></tr>
+<tr><td>y0 </td><td>első csúcs Y koordináta a térben </td></tr>
+<tr><td>z0 </td><td>első csúcs Z koordináta a térben </td></tr>
 <tr><td>pi1 </td><td>második csúcs színe, paletta index 0-tól 255-ig </td></tr>
-<tr><td>x1 </td><td>második csúcs X koordináta pixelekben </td></tr>
-<tr><td>y1 </td><td>második csúcs Y koordináta pixelekben </td></tr>
-<tr><td>z1 </td><td>második csúcs Z koordináta pixelekben </td></tr>
+<tr><td>x1 </td><td>második csúcs X koordináta a térben </td></tr>
+<tr><td>y1 </td><td>második csúcs Y koordináta a térben </td></tr>
+<tr><td>z1 </td><td>második csúcs Z koordináta a térben </td></tr>
 <tr><td>pi2 </td><td>harmadik csúcs színe, paletta index 0-tól 255-ig </td></tr>
-<tr><td>x2 </td><td>harmadik csúcs X koordináta pixelekben </td></tr>
-<tr><td>y2 </td><td>harmadik csúcs Y koordináta pixelekben </td></tr>
-<tr><td>z2 </td><td>harmadik csúcs Z koordináta pixelekben </td></tr></table></div></dd>
+<tr><td>x2 </td><td>harmadik csúcs X koordináta a térben </td></tr>
+<tr><td>y2 </td><td>harmadik csúcs Y koordináta a térben </td></tr>
+<tr><td>z2 </td><td>harmadik csúcs Z koordináta a térben </td></tr></table></div></dd>
 <dt>Lásd még</dt><dd>
 <a href="#tri" onclick="c('tri')">tri</a>, <a href="#ftri" onclick="c('ftri')">ftri</a>, <a href="#tri2d" onclick="c('tri2d')">tri2d</a></dd>
 <hr>

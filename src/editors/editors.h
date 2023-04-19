@@ -162,8 +162,10 @@ void visual_menu(uint32_t *dst, int dw, int dh, int dp);
 void visual_view(void);
 
 /* code.c */
+#define code_error(a,b) code_seterr(a,b)
+/*#define code_error(a,b) do{printf("(compiler %s:%u) ",__FILE__,__LINE__);code_seterr(a,b);}while(0)*/
 void code_setpos(int line, uint32_t pos);
-void code_error(uint32_t pos, const char *msg);
+void code_seterr(uint32_t pos, const char *msg);
 void code_init(void);
 void code_free(void);
 int  code_ctrl(void);

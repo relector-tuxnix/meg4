@@ -295,7 +295,7 @@ int meg4_api_getbtn(int btn)
  */
 int meg4_api_getclk(int btn)
 {
-    int ret = !((meg4.mmio.ptrbtn >> 8) & btn) && (meg4.mmio.ptrbtn & btn);
+    int ret = (btn < 0 || btn > 255) || ((meg4.mmio.ptrbtn >> 8) & btn) || !(meg4.mmio.ptrbtn & btn) ? 0 : meg4.mmio.ptrbtn & btn;
     meg4.mmio.ptrbtn &= (~(MEG4_SCR_U | MEG4_SCR_D | MEG4_SCR_L | MEG4_SCR_R) & 0xff);
     meg4.mmio.ptrbtn |= (meg4.mmio.ptrbtn << 8);
     return ret;
@@ -446,7 +446,7 @@ normal:
  */
 int meg4_api_getkey(int sc)
 {
-    if(sc < 1 || sc >= MEG4_NUM_KEY) return 0;
+    if(sc < 0 || sc >= MEG4_NUM_KEY) return 0;
     return meg4.mmio.kbdkeys[sc >> 3] & (1 << (sc & 7)) ? 1 : 0;
 }
 

@@ -218,7 +218,7 @@ static void dsp_note(int channel, uint8_t *note)
         case 0xEA: DSP_MEM(ch->fvsu, ch->ep); break;
         case 0xEB: DSP_MEM(ch->fvsd, ch->ep); break;
         case 0x9: if(period != 0 || note[1] != 0) { if(ch->ep) { ch->offs = ch->ep; } ch->position = ch->offs << 8; } break;
-        case 0xB: dsp->row = ch->ep > 15 || (int)(ch->ep << 6) >= (int)dsp->num ? 0 : ch->ep << 6; break;
+        case 0xB: dsp->row = (ch->ep > 15 || (int)(ch->ep << 6) >= (int)dsp->num ? 0 : ch->ep << 6) - 1; break;
         case 0xC: ch->volume = (int)ch->ep; ch->dirty |= 2; break;
         case 0xE4: ch->lfo_vib = ch->ep & 3; break;
         case 0xE5: ch->finetune = ch->ep & 0xf; ch->dirty |= 1; break;

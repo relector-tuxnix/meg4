@@ -18,15 +18,15 @@ uint32_t tömb[10];
 /* Induláskor lefuttatandó dolgok */
 void setup()
 {
-    /* lokális változók */
-    int lokálisvagyok = 123;
+  /* lokális változók */
+  int lokálisvagyok = 123;
 }
 
 /* Minden képkockánál lefuttatandó dolgok, 60 FPS */
 void loop()
 {
-    /* MEG-4 stílusú kimenet */
-    printf("a számláló %d, balshift %d\n", számláló, getkey(KEY_LSHIFT));
+  /* MEG-4 stílusú kimenet */
+  printf("a számláló %d, balshift %d\n", számláló, getkey(KEY_LSHIFT));
 }
 ```
 

@@ -501,19 +501,21 @@ void code_setpos(int line, uint32_t pos)
 /**
  * Set error message to be displayed
  */
-void code_error(uint32_t pos, const char *msg)
+void code_seterr(uint32_t pos, const char *msg)
 {
+    char *l = meg4.src;
     uint32_t i;
 
     if(!meg4.src || meg4.src_len < 1) { cursor = 0; errline = 1; return; }
     if(pos > meg4.src_len - 1) pos = meg4.src_len - 1;
-    for(errline = 1, i = 0; i < pos; i++) if(meg4.src[i] == '\n') errline++;
+    for(errline = 1, i = 0; i < pos; i++) if(meg4.src[i] == '\n') { errline++; l = meg4.src + i + 1; }
     code_goto(errline); errpos = pos; errmsg[0] = 0;
     /* we must copy this, because Lua strings might go missing any time... */
     if(msg && *msg) {
         meg4.mmio.ptrspr = MEG4_PTR_ERR;
         strncpy(errmsg, msg, sizeof(errmsg) - 1);
-        main_log(1, "error, line %u col %u msg '%s'", errline, pos - cursor + 1, errmsg);
+        for(col = 1; l < meg4.src + pos; col++) l = meg4_utf8(l, &i);
+        main_log(1, "error, line %u col %u msg '%s'", errline, col, errmsg);
     } else errline = 0;
     cursor = pos;
 }

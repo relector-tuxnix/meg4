@@ -17,16 +17,16 @@ DIM tömb(10)
 
 REM Induláskor lefuttatandó dolgok
 SUB setup
-    REM lokális változók
-    LET lokálisvagyok = 123
+  REM lokális változók
+  LET lokálisvagyok = 123
 END SUB
 
 REM Minden képkockánál lefuttatandó dolgok, 60 FPS
 SUB loop
-    REM BASIC stílusú print
-    PRINT "Épp"; " futok"
-    REM MEG-4 stílusú kimenet
-    GOSUB printf("a számláló %d, balshift %d\n", számláló%, getkey%(KEY_LSHIFT))
+  REM BASIC stílusú print
+  PRINT "Épp"; " futok"
+  REM MEG-4 stílusú kimenet
+  GOSUB printf("a számláló %d, balshift %d\n", számláló%, getkey%(KEY_LSHIFT))
 END SUB
 ```
 

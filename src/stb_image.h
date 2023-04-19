@@ -490,31 +490,10 @@ enum
 
 #if defined(STBI_NO_PNG)
 #else
-static void stbi__refill_buffer(stbi__context *s)
-{
-   int n = (s->io.read)(s->io_user_data,(char*)s->buffer_start,s->buflen);
-   s->callback_already_read += (int) (s->img_buffer - s->img_buffer_original);
-   if (n == 0) {
-
-
-      s->read_from_callbacks = 0;
-      s->img_buffer = s->buffer_start;
-      s->img_buffer_end = s->buffer_start+1;
-      *s->img_buffer = 0;
-   } else {
-      s->img_buffer = s->buffer_start;
-      s->img_buffer_end = s->buffer_start + n;
-   }
-}
-
 stbi_inline static stbi_uc stbi__get8(stbi__context *s)
 {
    if (s->img_buffer < s->img_buffer_end)
       return *s->img_buffer++;
-   if (s->read_from_callbacks) {
-      stbi__refill_buffer(s);
-      return *s->img_buffer++;
-   }
    return 0;
 }
 

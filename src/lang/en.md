@@ -263,13 +263,13 @@ The `△△▽▽◁▷◁▷ⒷⒶ` sequence makes the `KEY_CHEAT` "key" presse
 |  00492 |          2 | turtle Y offset in pixels                                          |
 |  00494 |          2 | maze walking speed in 1/128 tiles (see [maze])                     |
 |  00496 |          2 | maze rotating speed in degrees (1 to 90)                           |
-|  00498 |          2 | camera X offset in pixels (see [tri3d])                            |
-|  0049A |          2 | camera Y offset in pixels                                          |
-|  0049C |          2 | camera Z offset in pixels                                          |
-|  0049E |          1 | console foreground color, palette index 0 to 255 (see [printf])    |
-|  0049F |          1 | console background color, palette index 0 to 255                   |
-|  004A0 |          2 | console X offset in pixels                                         |
-|  004A2 |          2 | console Y offset in pixels                                         |
+|  00498 |          1 | console foreground color, palette index 0 to 255 (see [printf])    |
+|  00499 |          1 | console background color, palette index 0 to 255                   |
+|  0049A |          2 | console X offset in pixels                                         |
+|  0049C |          2 | console Y offset in pixels                                         |
+|  0049E |          2 | camera X offset in pixels (see [tri3d])                            |
+|  004A0 |          2 | camera Y offset in pixels                                          |
+|  004A2 |          2 | camera Z offset in pixels                                          |
 |  00600 |      64000 | map, 320 x 200 sprite indeces (see [map] and [maze])               |
 |  10000 |      65536 | sprites, 256 x 256 palette indeces, 1024 8 x 8 pixels (see [spr])  |
 |  28000 |       2048 | window for 4096 font glyphs (see 0007E, [width] and [text])        |
@@ -794,22 +794,22 @@ void tri3d(uint8_t pi0, int16_t x0, int16_t y0, int16_t z0,
     uint8_t pi2, int16_t x2, int16_t y2, int16_t z2)
 ```
 <dt>Description</dt><dd>
-Draws a filled triangle with color gradients in 3D space from the camera perspective (see [Graphics Processing Unit] address 00498).
+Draws a filled triangle with color gradients in 3D space from the camera perspective (see [Graphics Processing Unit] address 0049E).
 </dd>
 <dt>Parameters</dt><dd>
 | Argument | Description |
 | pi0 | first edge color, palette index 0 to 255 |
-| x0 | first edge X coordinate in pixels |
-| y0 | first edge Y coordinate in pixels |
-| z0 | first edge Z coordinate in pixels |
+| x0 | first edge X coordinate in space |
+| y0 | first edge Y coordinate in space |
+| z0 | first edge Z coordinate in space |
 | pi1 | second edge color, palette index 0 to 255 |
-| x1 | second edge X coordinate in pixels |
-| y1 | second edge Y coordinate in pixels |
-| z1 | second edge Z coordinate in pixels |
+| x1 | second edge X coordinate in space |
+| y1 | second edge Y coordinate in space |
+| z1 | second edge Z coordinate in space |
 | pi2 | third edge color, palette index 0 to 255 |
-| x2 | third edge X coordinate in pixels |
-| y2 | third edge Y coordinate in pixels |
-| z2 | third edge Z coordinate in pixels |
+| x2 | third edge X coordinate in space |
+| y2 | third edge Y coordinate in space |
+| z2 | third edge Z coordinate in space |
 </dd>
 <dt>See Also</dt><dd>
 [tri], [ftri], [tri2d]
@@ -1851,7 +1851,7 @@ Returns the value at that address.
 uint32_t ini(addr_t src)
 ```
 <dt>Description</dt><dd>
-Read in a long word (four bytes) from memory.
+Read in an integer (four bytes) from memory.
 </dd>
 <dt>Parameters</dt><dd>
 | Argument | Description |
@@ -1867,7 +1867,7 @@ Returns the value at that address.
 void outb(addr_t dst, uint8_t value)
 ```
 <dt>Description</dt><dd>
-Write one byte to memory.
+Write out one byte to memory.
 </dd>
 <dt>Parameters</dt><dd>
 | Argument | Description |
@@ -1881,7 +1881,7 @@ Write one byte to memory.
 void outw(addr_t dst, uint16_t value)
 ```
 <dt>Description</dt><dd>
-Write a word (two bytes) to memory.
+Write out a word (two bytes) to memory.
 </dd>
 <dt>Parameters</dt><dd>
 | Argument | Description |
@@ -1895,7 +1895,7 @@ Write a word (two bytes) to memory.
 void outi(addr_t dst, uint32_t value)
 ```
 <dt>Description</dt><dd>
-Write a long word (four bytes) to memory.
+Write out an integer (four bytes) to memory.
 </dd>
 <dt>Parameters</dt><dd>
 | Argument | Description |

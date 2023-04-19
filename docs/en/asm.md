@@ -20,24 +20,24 @@ fmt:        db "a counter %d, left shift %d\n"
     .code
 /* Things to do on startup */
 setup:
-    /* local variables (not really, just reserve space on the stack) */
-    sp -4
-    ret
+  /* local variables (not really, just reserve space on the stack) */
+  sp -4
+  ret
 
 /* Things to run for every frame, at 60 FPS */
 loop:
-    /* Get MEG-4 style outputs */
-    pshci KEY_LSHIFT
-    scall getkey
-    sp 4
-    pushi
-    ci acounter
-    ldi
-    pushi
-    pshci fmt
-    scall printf
-    sp 12
-    ret
+  /* Get MEG-4 style outputs */
+  pshci KEY_LSHIFT
+  scall getkey
+  sp 4
+  pushi
+  ci acounter
+  ldi
+  pushi
+  pshci fmt
+  scall printf
+  sp 12
+  ret
 ```
 
 <h2 asm_desc>Description</h2>
@@ -59,7 +59,8 @@ There's no such thing as a variable in Assembly. Instead you specify the data se
 one of the `db` (byte), `dw` (word), `di` (integer), `df` (float) instructions. In this stream of data, before the instruction,
 you can place labels which will hold the address of that data. To load a value in your code section, first you put that label in
 the accumulator register using `ci`, and then issue one of the `ldb` (load byte), `ldw` (load word), `ldi` (load integer)
-or `ldf` (load float) instructions.
+or `ldf` (load float) instructions. If the `ldb` or `ldw` instructions has a non-zero argument, then they sign-extend the value
+to 32 bit.
 
 <h2 asm_flow>Control Flow</h2>
 
@@ -87,8 +88,6 @@ function name as parameter. After the call it is the caller's responsibility to 
 
 Mnemonics
 ---------
-
-NOTE: If you start with `meg4 -vvv` extra verbose flags, then the instructions will be printed to stdout as they are executed.
 
 Before we go into the details, we must talk about the MEG-4 CPU specification.
 
@@ -150,20 +149,20 @@ these 32 bit units and not bytes.  The following mnemonics can be used to place 
 | `popf`   |                         | Pop a float value from the data stack into the accumulator                          |
 | `cnvi`   |                         | Convert the value on the top of the stack into an integer                           |
 | `cnvf`   |                         | Convert the value on the top of the stack into a float                              |
-| `ldb`    |                         | Loads a byte from the address in the accumulator                                    |
-| `ldw`    |                         | Loads a word from the address in the accumulator                                    |
+| `ldb`    | 0/1                     | Loads a byte from the address in the accumulator (sign extend if arg is non-zero)   |
+| `ldw`    | 0/1                     | Loads a word from the address in the accumulator (sign extend if arg is non-zero)   |
 | `ldi`    |                         | Loads an integer from the address in the accumulator                                |
 | `ldf`    |                         | Loads a float from the address in the accumulator                                   |
 | `stb`    |                         | Pops the address from stack and stores a byte from accumulator                      |
 | `stw`    |                         | Pops the address from stack and stores a word from accumulator                      |
 | `sti`    |                         | Pops the address from stack and stores an int from accumulator                      |
 | `stf`    |                         | Pops the address from stack and stores a float from accumulator                     |
-| `incb`   | number                  | Pops the address from stack and increase the byte at address                        |
-| `incw`   | number                  | Pops the address from stack and increase the word at address                        |
-| `inci`   | number                  | Pops the address from stack and increase the integer at address                     |
-| `decb`   | number                  | Pops the address from stack and decrease the byte at address                        |
-| `decw`   | number                  | Pops the address from stack and decrease the word at address                        |
-| `deci`   | number                  | Pops the address from stack and decrease the integer at address                     |
+| `incb`   | number                  | Pops the address from stack and increase the byte at address by number              |
+| `incw`   | number                  | Pops the address from stack and increase the word at address by number              |
+| `inci`   | number                  | Pops the address from stack and increase the integer at address by number           |
+| `decb`   | number                  | Pops the address from stack and decrease the byte at address by number              |
+| `decw`   | number                  | Pops the address from stack and decrease the word at address by number              |
+| `deci`   | number                  | Pops the address from stack and decrease the integer at address by number           |
 | `not`    |                         | Perform logical NOT on the accumulator                                              |
 | `neg`    |                         | Perform bitwise NOT on the accumulator                                              |
 | `or`     |                         | Pop a value from stack and perform bitwise OR on the accumulator                    |

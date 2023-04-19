@@ -159,7 +159,8 @@ doeval:                         if(!comp_eval(comp, s, s + 1, &i)) return 0;
         /********** code segment **********/
         if(tok[s].type == HL_K && comp->cf >= 0) {
             /* check number of arguments */
-            if((s + 1 != e && (tok[s].id < BC_SCALL || tok[s].id >= BC_PUSHI)) || (tok[s].id == BC_SW && s + 5 >= e) ||
+            if((s + 1 != e && (tok[s].id < BC_SCALL || tok[s].id >= BC_PUSHI) && tok[s].id != BC_LDB && tok[s].id != BC_LDW) ||
+               (tok[s].id == BC_SW && s + 5 >= e) ||
                (s + 2 != e && ((tok[s].id >= BC_SCALL && tok[s].id < BC_SW) || (tok[s].id >= BC_CI && tok[s].id < BC_PUSHI) ||
                (tok[s].id >= BC_INCB && tok[s].id <= BC_DECI))))
                 { code_error(tok[s].pos, lang[ERR_NUMARG]); return 0; }
@@ -237,6 +238,11 @@ doeval:                         if(!comp_eval(comp, s, s + 1, &i)) return 0;
                 }
                 /* patch the bytecode with opcode and number of cases */
                 comp->code[k] = (htole32(l) << 8) | BC_SW;
+            } else
+            /* optional integer argument */
+            if(tok[s].id == BC_LDB || tok[s].id == BC_LDW) {
+                i = 0; if(s + 1 < e && !comp_eval(comp, s, s + 1, &i)) return 0;
+                comp_gen(comp, ((!!i) << 8) | tok[s].id);
             } else
             /* mnemonics without any argument */
             if(tok[s].id < BC_SCALL || tok[s].id >= BC_PUSHI) comp_gen(comp, tok[s].id);

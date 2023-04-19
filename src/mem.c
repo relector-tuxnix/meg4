@@ -199,7 +199,7 @@ uint16_t meg4_api_inw(addr_t src)
 }
 
 /**
- * Read in a long word (four bytes) from memory.
+ * Read in an integer (four bytes) from memory.
  * @param src address, 0x00000 to 0xBFFFC
  * @return Returns the value at that address.
  */
@@ -209,7 +209,7 @@ uint32_t meg4_api_ini(addr_t src)
 }
 
 /**
- * Write one byte to memory.
+ * Write out one byte to memory.
  * @param dst address, 0x00000 to 0xBFFFF
  * @param value value to set, 0 to 255
  */
@@ -223,7 +223,7 @@ void meg4_api_outb(addr_t dst, uint8_t value)
 }
 
 /**
- * Write a word (two bytes) to memory.
+ * Write out a word (two bytes) to memory.
  * @param dst address, 0x00000 to 0xBFFFE
  * @param value value to set, 0 to 65535
  */
@@ -236,7 +236,7 @@ void meg4_api_outw(addr_t dst, uint16_t value)
 }
 
 /**
- * Write a long word (four bytes) to memory.
+ * Write out an integer (four bytes) to memory.
  * @param dst address, 0x00000 to 0xBFFFC
  * @param value value to set, 0 to 4294967295
  */
@@ -273,7 +273,8 @@ int meg4_api_memsave(uint8_t overlay, addr_t src, uint32_t size)
     }
     meg4.ovls[(int)overlay].data = (uint8_t*)realloc(meg4.ovls[(int)overlay].data, size);
     if(meg4.ovls[(int)overlay].data) {
-        for(i = 0; i < size; i++) meg4.ovls[(int)overlay].data[i] = meg4_api_inb(src + i);
+        if(src >= MEG4_MEM_USER) memcpy(meg4.ovls[(int)overlay].data, meg4.data + src - MEG4_MEM_USER, size);
+        else for(i = 0; i < size; i++) meg4.ovls[(int)overlay].data[i] = meg4_api_inb(src + i);
         meg4.ovls[(int)overlay].size = size;
     } else meg4.ovls[(int)overlay].size = 0;
     return meg4_title[0] ? main_cfgsave(tmp, meg4.ovls[(int)overlay].data, meg4.ovls[(int)overlay].size) : 1;
@@ -305,13 +306,15 @@ int meg4_api_memload(addr_t dst, uint8_t overlay, uint32_t maxsize)
     }
     if(buf) {
         if(len > maxsize) len = maxsize;
-        for(i = 0; i < len; i++) meg4_api_outb(dst + i, buf[i]);
+        if(dst >= MEG4_MEM_USER) memcpy(meg4.data + dst - MEG4_MEM_USER, buf, len);
+        else for(i = 0; i < len; i++) meg4_api_outb(dst + i, buf[i]);
         free(buf);
     } else
     if(meg4.ovls[(int)overlay].data && meg4.ovls[(int)overlay].size > 0) {
         len = meg4.ovls[(int)overlay].size;
         if(len > maxsize) len = maxsize;
-        for(i = 0; i < len; i++) meg4_api_outb(dst + i, meg4.ovls[(int)overlay].data[i]);
+        if(dst >= MEG4_MEM_USER) memcpy(meg4.data + dst - MEG4_MEM_USER, meg4.ovls[(int)overlay].data, len);
+        else for(i = 0; i < len; i++) meg4_api_outb(dst + i, meg4.ovls[(int)overlay].data[i]);
     } else len = 0;
     return (int)len;
 }
@@ -327,6 +330,13 @@ void meg4_api_memcpy(addr_t dst, addr_t src, uint32_t len)
     int i, l = len;
     if(src + l >= MEG4_MEM_LIMIT) l = MEG4_MEM_LIMIT - src;
     if(dst + l >= MEG4_MEM_LIMIT) l = MEG4_MEM_LIMIT - dst;
+    if(src >= 16 && dst >= 16 && src + l < sizeof(meg4.mmio) && dst + l < sizeof(meg4.mmio)) {
+        memmove((uint8_t*)&meg4.mmio + dst, (uint8_t*)&meg4.mmio + src, l);
+        if(dst <= 0x48C && dst + l >= 0x488) meg4_getscreen();
+    } else
+    if(src >= MEG4_MEM_USER && dst >= MEG4_MEM_USER)
+        memmove(meg4.data + dst - MEG4_MEM_USER, meg4.data + src - MEG4_MEM_USER, l);
+    else
     if(src <= dst && src + l > dst)
         for(i = l - 1; i >= 0; i--)
             meg4_api_outb(dst + i, meg4_api_inb(src + i));
@@ -345,8 +355,15 @@ void meg4_api_memset(addr_t dst, uint8_t value, uint32_t len)
 {
     int i, l = len;
     if(dst + l >= MEG4_MEM_LIMIT) l = MEG4_MEM_LIMIT - dst;
-    for(i = 0; i < l; i++)
-        meg4_api_outb(dst + i, value);
+    if(dst >= 16 && dst + l < sizeof(meg4.mmio)) {
+        memset((uint8_t*)&meg4.mmio + dst, value, l);
+        if(dst <= 0x48C && dst + l >= 0x488) meg4_getscreen();
+    } else
+    if(dst >= MEG4_MEM_USER)
+        memset(meg4.data + dst - MEG4_MEM_USER, value, l);
+    else
+        for(i = 0; i < l; i++)
+            meg4_api_outb(dst + i, value);
 }
 
 /**
@@ -362,11 +379,13 @@ int meg4_api_memcmp(addr_t addr0, addr_t addr1, uint32_t len)
     if(l > 0) {
         if(addr0 + l >= MEG4_MEM_LIMIT) l = MEG4_MEM_LIMIT - addr0;
         if(addr1 + l >= MEG4_MEM_LIMIT) l = MEG4_MEM_LIMIT - addr1;
-        if(i < l)
-            do {
-                ret = meg4_api_inb(addr0 + i) - meg4_api_inb(addr1 + i);
-                i++;
-            } while(!ret && i < l);
+        if(addr0 + l < sizeof(meg4.mmio) && addr1 +l < sizeof(meg4.mmio))
+            ret = memcmp((uint8_t*)&meg4.mmio + addr0, (uint8_t*)&meg4.mmio + addr1, l);
+        else
+        if(addr0 >= MEG4_MEM_USER && addr1 >= MEG4_MEM_USER)
+            ret = memcmp(meg4.data + addr0 - MEG4_MEM_USER, meg4.data + addr1 - MEG4_MEM_USER, l);
+        else
+            for(;!ret && i < l; i++) ret = meg4_api_inb(addr0 + i) - meg4_api_inb(addr1 + i);
     }
     return ret;
 }

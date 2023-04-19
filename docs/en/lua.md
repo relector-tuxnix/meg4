@@ -17,16 +17,16 @@ anarray = {}
 
 -- Things to do on startup
 function setup()
-    -- local variables
-    iamlocal = 234
+  -- local variables
+  iamlocal = 234
 end
 
 -- Things to run for every frame, at 60 FPS
 function loop()
-    -- Lua style print
-    print("I", "am", "running")
-    -- Get MEG-4 style outputs
-    printf("a counter %d, left shift %d\n", acounter, getkey(KEY_LSHIFT))
+  -- Lua style print
+  print("I", "am", "running")
+  -- Get MEG-4 style outputs
+  printf("a counter %d, left shift %d\n", acounter, getkey(KEY_LSHIFT))
 end
 ```
 

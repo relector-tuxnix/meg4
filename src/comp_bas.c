@@ -138,7 +138,7 @@ static int statement(compiler_t *comp, int s, int e)
             comp_cdbg(comp, s);
             end = 0;
             if(!comp_expr(comp, s, i, &k, &end, O_CND)) return 0;
-            j = comp->code[--comp->nc];
+            j = comp->code[--comp->nc] & 0xff;
             if(j < BC_LDB || j > BC_LDF || end) { code_error(tok[s].pos, lang[ERR_BADLVAL]); return 0; }
             comp_push(comp, T(T_SCALAR, T_I32));
             m = k;
@@ -200,7 +200,7 @@ static int statement(compiler_t *comp, int s, int e)
                             comp_cdbg(comp, s);
                             end = 0;
                             if(!(s = comp_expr(comp, s, l, &m, &end, O_CND))) return 0;
-                            j = comp->code[--comp->nc];
+                            j = comp->code[--comp->nc] & 0xff;
                             if(j < BC_LDB || j > BC_LDF || end) { code_error(tok[s].pos, lang[ERR_BADLVAL]); return 0; }
                             comp_gen(comp, j - BC_LDB + BC_RDB);
                         } else { code_error(tok[s].pos, lang[ERR_SYNTAX]); return 0; }
@@ -282,7 +282,7 @@ static int statement(compiler_t *comp, int s, int e)
                     i++;
                     comp_cdbg(comp, i); m = T(T_SCALAR, T_FLOAT); end = 0;
                     if(!comp_expr(comp, i, l, &m, &end, O_CND)) return 0;
-                    j = comp->code[--comp->nc];
+                    j = comp->code[--comp->nc] & 0xff;
                     if(j < BC_LDB || j > BC_LDF || end) { code_error(tok[i].pos, lang[ERR_BADARG]); return 0; }
                     comp_push(comp, T(T_SCALAR, T_I32));
                     /* convert the result */
