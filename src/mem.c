@@ -220,6 +220,7 @@ void meg4_api_outb(addr_t dst, uint8_t value)
     if(dst < 16 || (dst >= 0x4BA && dst < 0x500) || dst >= MEG4_MEM_LIMIT || !ptr) return;
     *ptr = value;
     if(dst >= 0x488 && dst < 0x48C) meg4_getscreen();
+    if(dst >= 0x49E && dst < 0x4A9) meg4_getview();
 }
 
 /**
@@ -333,6 +334,7 @@ void meg4_api_memcpy(addr_t dst, addr_t src, uint32_t len)
     if(src >= 16 && dst >= 16 && src + l < sizeof(meg4.mmio) && dst + l < sizeof(meg4.mmio)) {
         memmove((uint8_t*)&meg4.mmio + dst, (uint8_t*)&meg4.mmio + src, l);
         if(dst <= 0x48C && dst + l >= 0x488) meg4_getscreen();
+        if(dst <= 0x4A9 && dst + l >= 0x49E) meg4_getview();
     } else
     if(src >= MEG4_MEM_USER && dst >= MEG4_MEM_USER)
         memmove(meg4.data + dst - MEG4_MEM_USER, meg4.data + src - MEG4_MEM_USER, l);
@@ -358,6 +360,7 @@ void meg4_api_memset(addr_t dst, uint8_t value, uint32_t len)
     if(dst >= 16 && dst + l < sizeof(meg4.mmio)) {
         memset((uint8_t*)&meg4.mmio + dst, value, l);
         if(dst <= 0x48C && dst + l >= 0x488) meg4_getscreen();
+        if(dst <= 0x4A9 && dst + l >= 0x49E) meg4_getview();
     } else
     if(dst >= MEG4_MEM_USER)
         memset(meg4.data + dst - MEG4_MEM_USER, value, l);

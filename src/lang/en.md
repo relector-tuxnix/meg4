@@ -267,9 +267,15 @@ The `△△▽▽◁▷◁▷ⒷⒶ` sequence makes the `KEY_CHEAT` "key" presse
 |  00499 |          1 | console background color, palette index 0 to 255                   |
 |  0049A |          2 | console X offset in pixels                                         |
 |  0049C |          2 | console Y offset in pixels                                         |
-|  0049E |          2 | camera X offset in pixels (see [tri3d])                            |
-|  004A0 |          2 | camera Y offset in pixels                                          |
-|  004A2 |          2 | camera Z offset in pixels                                          |
+|  0049E |          2 | camera X offset in [3D space] (see [tri3d], [tritx], [mesh])       |
+|  004A0 |          2 | camera Y offset                                                    |
+|  004A2 |          2 | camera Z offset                                                    |
+|  004A4 |          2 | camera direction, pitch (0 up, 90 forward)                         |
+|  004A6 |          2 | camera direction, yaw (0 left, 90 forward)                         |
+|  004A8 |          1 | camera field of view in angles (45, negative gives orthographic)   |
+|  004AA |          2 | light source position X offset (see [tri3d], [tritx], [mesh])      |
+|  004AC |          2 | light source position Y offset                                     |
+|  004AE |          2 | light source position Z offset                                     |
 |  00600 |      64000 | map, 320 x 200 sprite indeces (see [map] and [maze])               |
 |  10000 |      65536 | sprites, 256 x 256 palette indeces, 1024 8 x 8 pixels (see [spr])  |
 |  28000 |       2048 | window for 4096 font glyphs (see 0007E, [width] and [text])        |
@@ -405,6 +411,33 @@ and to describe how to display them. These are:
 You can add padding by specifying the length between `%` and the code. If that starts with `0`, then value will be padded
 with zeros, otherwise with spaces. For example `%4d` will pad the value to the right with spaces, and `%04x` with zeros.
 The `f` accepts a number after a dot, which tells the number of digits in the fractional part (up to 8), eg. `%.6f`.
+
+## 3D Space
+
+In MEG-4, the 3 dimensional space is handled according to the right-hand rule: +X is on the right, +Y is up, and +Z is towards the
+viewer.
+
+```
+  +Y
+   |
+   |__ +X
+  /
++Z
+```
+
+Each point must be placed in the range -32767 to +32767. How this 3D world is projected to your 2D screen depends on how you
+configure the camera (see [Graphics Processing Unit] address 0049E). Of course, you have to place the camera in the world, with
+X, Y, Z coordinates. Then you have to tell where the camera is looking at, using pitch and yaw. Finally you also have to tell what
+kind of lens the camera has, by specifying the field of view angle. That latter normally should be between 30 (very narrow) and
+180 degrees (like fish and birds). MEG-4 supports up to 127 degrees, but there's a trick. Positive FOV values will be projected as
+perspective (the farther the object is, the smaller it is), but negative values also handled, just with orthographic projection
+(no matter the distance, the object's size will be the same). Perspective is used in FPS games, while the orthographic projection
+is mostly preferred by strategy games.
+
+You can display a set of triangles (a complete 3D model) using the [mesh] function efficiently. Because models probably have local
+coordinates, that would draw all models one on top of another around the origo. So if you want to dispay multiple models in the
+world, first you should translate them (place them) into world coordinates using [trns], and then use the translated vertex cloud
+with [mesh] (moving and rotating the model around won't change the triangles, just their vertex coordinates).
 
 # Console
 
@@ -735,7 +768,7 @@ Draws a triangle.
 | y2 | third edge Y coordinate in pixels |
 </dd>
 <dt>See Also</dt><dd>
-[ftri], [tri2d], [tri3d]
+[ftri], [tri2d], [tri3d], [tritx], [mesh], [trns]
 </dd>
 <hr>
 ## ftri
@@ -757,7 +790,7 @@ Draws a filled triangle.
 | y2 | third edge Y coordinate in pixels |
 </dd>
 <dt>See Also</dt><dd>
-[tri], [tri2d], [tri3d]
+[tri], [tri2d], [tri3d], [tritx], [mesh], [trns]
 </dd>
 <hr>
 ## tri2d
@@ -783,7 +816,7 @@ Draws a filled triangle with color gradients.
 | y2 | third edge Y coordinate in pixels |
 </dd>
 <dt>See Also</dt><dd>
-[tri], [ftri], [tri3d]
+[tri], [ftri], [tri3d], [tritx], [mesh], [trns]
 </dd>
 <hr>
 ## tri3d
@@ -794,7 +827,7 @@ void tri3d(uint8_t pi0, int16_t x0, int16_t y0, int16_t z0,
     uint8_t pi2, int16_t x2, int16_t y2, int16_t z2)
 ```
 <dt>Description</dt><dd>
-Draws a filled triangle with color gradients in 3D space from the camera perspective (see [Graphics Processing Unit] address 0049E).
+Draws a filled triangle with color gradients in [3D space].
 </dd>
 <dt>Parameters</dt><dd>
 | Argument | Description |
@@ -812,7 +845,58 @@ Draws a filled triangle with color gradients in 3D space from the camera perspec
 | z2 | third edge Z coordinate in space |
 </dd>
 <dt>See Also</dt><dd>
-[tri], [ftri], [tri2d]
+[tri], [ftri], [tri2d], [tritx], [mesh], [trns]
+</dd>
+<hr>
+## tritx
+
+```c
+void tritx(uint8_t u0, uint8_t v0, int16_t x0, int16_t y0, int16_t z0,
+    uint8_t u1, uint8_t v1, int16_t x1, int16_t y1, int16_t z1,
+    uint8_t u2, uint8_t v2, int16_t x2, int16_t y2, int16_t z2)
+```
+<dt>Description</dt><dd>
+Draws a textured triangle in [3D space].
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| u0 | first edge texture X coordinate 0 to 255 |
+| v0 | first edge texture Y coordinate 0 to 255 |
+| x0 | first edge X coordinate in space |
+| y0 | first edge Y coordinate in space |
+| z0 | first edge Z coordinate in space |
+| u1 | second edge texture X coordinate 0 to 255 |
+| v1 | second edge texture Y coordinate 0 to 255 |
+| x1 | second edge X coordinate in space |
+| y1 | second edge Y coordinate in space |
+| z1 | second edge Z coordinate in space |
+| u2 | third edge texture X coordinate 0 to 255 |
+| v2 | third edge texture Y coordinate 0 to 255 |
+| x2 | third edge X coordinate in space |
+| y2 | third edge Y coordinate in space |
+| z2 | third edge Z coordinate in space |
+</dd>
+<dt>See Also</dt><dd>
+[tri], [ftri], [tri2d], [tri3d], [mesh], [trns]
+</dd>
+<hr>
+## mesh
+
+```c
+void mesh(addr_t verts, addr_t uvs, uint16_t numtri, addr_t tris)
+```
+<dt>Description</dt><dd>
+Draws a mesh made of triangles in [3D space], using indeces to verticles and texture coordinates (or palette).
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| verts | address of vertices array, 3 x 2 bytes each, X, Y, Z |
+| uvs | address of UVs array (if 0, then palette is used), 2 x 1 bytes each, texture X, Y |
+| numtri | number of triangles |
+| tris | address of triangles array with indices, 6 x 1 bytes each, vi1, ui1/pi1, vi2, ui2/pi2, vi3, ui3/pi3 |
+</dd>
+<dt>See Also</dt><dd>
+[tri], [ftri], [tri2d], [tri3d], [tritx], [trns]
 </dd>
 <hr>
 ## rect
@@ -1665,6 +1749,45 @@ Reciprocal of the square root.
 [pow], [sqrt]
 </dd>
 <hr>
+## clamp
+
+```c
+float clamp(float val, float minv, float maxv)
+```
+<dt>Description</dt><dd>
+Clamps a value between the limits.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| val | value |
+| minv | minimum value |
+| maxv | maximum value |
+</dd>
+<dt>Return Value</dt><dd>
+Clamped value.
+</dd>
+<dt>See Also</dt><dd>
+[clampv2], [clampv3], [clampv4]
+</dd>
+<hr>
+## lerp
+
+```c
+float lerp(float a, float b, float t)
+```
+<dt>Description</dt><dd>
+Linear interpolates two numbers.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | first float number |
+| b | second float number |
+| t | interpolation value between 0.0 and 1.0 |
+</dd>
+<dt>See Also</dt><dd>
+[lerpv2], [lerpv3], [lerpv4], [lerpq], [slerpq]
+</dd>
+<hr>
 ## pi
 
 ```c
@@ -1809,6 +1932,1057 @@ Arcus tangent in degree, 0 to 359, 0 is up, 90 to the right.
 </dd>
 <dt>See Also</dt><dd>
 [cos], [sin], [tan], [acos], [asin]
+</dd>
+<hr>
+## dotv2
+
+```c
+float dotv2(addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Calculates dot product of two vectors with two elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of two floats |
+| b | address of two floats |
+</dd>
+<dt>Return Value</dt><dd>
+Dot product of the vectors.
+</dd>
+<dt>See Also</dt><dd>
+[lenv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## lenv2
+
+```c
+float lenv2(addr_t a)
+```
+<dt>Description</dt><dd>
+Calculates the length of a vector with two elements. This is slow, try to avoid (see [normv2]).
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of two floats |
+</dd>
+<dt>Return Value</dt><dd>
+Length of the vector.
+</dd>
+<dt>See Also</dt><dd>
+[dotv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## scalev2
+
+```c
+void scalev2(addr_t a, float s)
+```
+<dt>Description</dt><dd>
+Scales a vector with two elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of two floats |
+| b | scaler value |
+</dd>
+<dt>See Also</dt><dd>
+[dotv2], [lenv2], [negv2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## negv2
+
+```c
+void negv2(addr_t a)
+```
+<dt>Description</dt><dd>
+Negates a vector with two elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of two floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv2], [lenv2], [scalev2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## addv2
+
+```c
+void addv2(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Adds together vectors with two elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of two floats |
+| a | address of two floats |
+| b | address of two floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## subv2
+
+```c
+void subv2(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Subtracts vectors with two elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of two floats |
+| a | address of two floats |
+| b | address of two floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## mulv2
+
+```c
+void mulv2(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Multiplies vectors with two elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of two floats |
+| a | address of two floats |
+| b | address of two floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [subv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## divv2
+
+```c
+void divv2(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Divides vectors with two elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of two floats |
+| a | address of two floats |
+| b | address of two floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## clampv2
+
+```c
+void clampv2(addr_t dst, addr_t v, addr_t minv, addr_t maxv)
+```
+<dt>Description</dt><dd>
+Clamps vectors with two elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of two floats |
+| v | address of two floats, input |
+| minv | address of two floats, minimum |
+| maxv | address of two floats, maximum |
+</dd>
+<dt>See Also</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [divv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## lerpv2
+
+```c
+void lerpv2(addr_t dst, addr_t a, addr_t b, float t)
+```
+<dt>Description</dt><dd>
+Linear interpolates vectors with two elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of two floats |
+| a | address of two floats |
+| b | address of two floats |
+| t | interpolation value between 0.0 and 1.0 |
+</dd>
+<dt>See Also</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [normv2]
+</dd>
+<hr>
+## normv2
+
+```c
+void normv2(addr_t a)
+```
+<dt>Description</dt><dd>
+Normalizes a vector with two elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of two floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2]
+</dd>
+<hr>
+## dotv3
+
+```c
+float dotv3(addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Calculates dot product of two vectors with three elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of three floats |
+| b | address of three floats |
+</dd>
+<dt>Return Value</dt><dd>
+Dot product of the vectors.
+</dd>
+<dt>See Also</dt><dd>
+[lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## lenv3
+
+```c
+float lenv3(addr_t a)
+```
+<dt>Description</dt><dd>
+Calculates the length of a vector with three elements. This is slow, try to avoid (see [normv3]).
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of three floats |
+</dd>
+<dt>Return Value</dt><dd>
+Length of the vector.
+</dd>
+<dt>See Also</dt><dd>
+[dotv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## scalev3
+
+```c
+void scalev3(addr_t a, float s)
+```
+<dt>Description</dt><dd>
+Scales a vector with three elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of three floats |
+| b | scaler value |
+</dd>
+<dt>See Also</dt><dd>
+[dotv3], [lenv3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## negv3
+
+```c
+void negv3(addr_t a)
+```
+<dt>Description</dt><dd>
+Negates a vector with three elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of three floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv3], [lenv3], [scalev3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## addv3
+
+```c
+void addv3(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Adds together vectors with three elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of three floats |
+| a | address of three floats |
+| b | address of three floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## subv3
+
+```c
+void subv3(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Subtracts vectors with three elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of three floats |
+| a | address of three floats |
+| b | address of three floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## mulv3
+
+```c
+void mulv3(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Multiplies vectors with three elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of three floats |
+| a | address of three floats |
+| b | address of three floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## divv3
+
+```c
+void divv3(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Divides vectors with three elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of three floats |
+| a | address of three floats |
+| b | address of three floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## crossv3
+
+```c
+void crossv3(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Calculates cross product of vectors with three elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of three floats |
+| a | address of three floats |
+| b | address of three floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## clampv3
+
+```c
+void clampv3(addr_t dst, addr_t v, addr_t minv, addr_t maxv)
+```
+<dt>Description</dt><dd>
+Clamps vectors with three elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of three floats |
+| v | address of three floats, input |
+| minv | address of three floats, minimum |
+| maxv | address of three floats, maximum |
+</dd>
+<dt>See Also</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## lerpv3
+
+```c
+void lerpv3(addr_t dst, addr_t a, addr_t b, float t)
+```
+<dt>Description</dt><dd>
+Linear interpolates vectors with three elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of three floats |
+| a | address of three floats |
+| b | address of three floats |
+| t | interpolation value between 0.0 and 1.0 |
+</dd>
+<dt>See Also</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [normv3]
+</dd>
+<hr>
+## normv3
+
+```c
+void normv3(addr_t a)
+```
+<dt>Description</dt><dd>
+Normalizes a vector with three elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of three floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3]
+</dd>
+<hr>
+## dotv4
+
+```c
+float dotv4(addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Calculates dot product of two vectors with four elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of four floats |
+| b | address of four floats |
+</dd>
+<dt>Return Value</dt><dd>
+Dot product of the vectors.
+</dd>
+<dt>See Also</dt><dd>
+[lenv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## lenv4
+
+```c
+float lenv4(addr_t a)
+```
+<dt>Description</dt><dd>
+Calculates the length of a vector with four elements. This is slow, try to avoid (see [normv4]).
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of four floats |
+</dd>
+<dt>Return Value</dt><dd>
+Length of the vector.
+</dd>
+<dt>See Also</dt><dd>
+[dotv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## scalev4
+
+```c
+void scalev4(addr_t a, float s)
+```
+<dt>Description</dt><dd>
+Scales a vector with four elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of four floats |
+| b | scaler value |
+</dd>
+<dt>See Also</dt><dd>
+[dotv4], [lenv4], [negv4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## negv4
+
+```c
+void negv4(addr_t a)
+```
+<dt>Description</dt><dd>
+Negates a vector with four elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv4], [lenv4], [scalev4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## addv4
+
+```c
+void addv4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Adds together vectors with four elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| a | address of four floats |
+| b | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv4], [lenv4], [negv4], [scalev4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## subv4
+
+```c
+void subv4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Subtracts vectors with four elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| a | address of four floats |
+| b | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## mulv4
+
+```c
+void mulv4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Multiplies vectors with four elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| a | address of four floats |
+| b | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [subv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## divv4
+
+```c
+void divv4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Divides vectors with four elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| a | address of four floats |
+| b | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## clampv4
+
+```c
+void clampv4(addr_t dst, addr_t v, addr_t minv, addr_t maxv)
+```
+<dt>Description</dt><dd>
+Clamps vectors with four elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| v | address of four floats, input |
+| minv | address of four floats, minimum |
+| maxv | address of four floats, maximum |
+</dd>
+<dt>See Also</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [divv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## lerpv4
+
+```c
+void lerpv4(addr_t dst, addr_t a, addr_t b, float t)
+```
+<dt>Description</dt><dd>
+Linear interpolates vectors with four elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| a | address of four floats |
+| b | address of four floats |
+| t | interpolation value between 0.0 and 1.0 |
+</dd>
+<dt>See Also</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [normv4]
+</dd>
+<hr>
+## normv4
+
+```c
+void normv4(addr_t a)
+```
+<dt>Description</dt><dd>
+Normalizes a vector with four elements.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4]
+</dd>
+<hr>
+## idq
+
+```c
+void idq(addr_t a)
+```
+<dt>Description</dt><dd>
+Loads the identity quaternion.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## eulerq
+
+```c
+void eulerq(addr_t dst, uint16_t pitch, uint16_t yaw, uint16_t roll)
+```
+<dt>Description</dt><dd>
+Loads a quaternion using Euler angles.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| pitch | rotation around X axis in degress, 0 to 359 |
+| yaw | rotation around Y axis in degress, 0 to 359 |
+| roll | rotation around Z axis in degress, 0 to 359 |
+</dd>
+<dt>See Also</dt><dd>
+[idq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## dotq
+
+```c
+float dotq(addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Calculates dot product of a quaternion.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of four floats |
+| b | address of four floats |
+</dd>
+<dt>Return Value</dt><dd>
+Dot product of the quaternion.
+</dd>
+<dt>See Also</dt><dd>
+[idq], [eulerq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## lenq
+
+```c
+float lenq(addr_t a)
+```
+<dt>Description</dt><dd>
+Calculates the length of a quaternion.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of four floats |
+</dd>
+<dt>Return Value</dt><dd>
+Length of the quaternion.
+</dd>
+<dt>See Also</dt><dd>
+[idq], [eulerq], [dotq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## scaleq
+
+```c
+void scaleq(addr_t a, float s)
+```
+<dt>Description</dt><dd>
+Scales a quaternion.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of four floats |
+| b | scaler value |
+</dd>
+<dt>See Also</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## negq
+
+```c
+void negq(addr_t a)
+```
+<dt>Description</dt><dd>
+Negates a quaternion.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## addq
+
+```c
+void addq(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Adds together quaternions.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| a | address of four floats |
+| b | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## subq
+
+```c
+void subq(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Subtracts quaternions.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| a | address of four floats |
+| b | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## mulq
+
+```c
+void mulq(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Multiplies quaternions.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| a | address of four floats |
+| b | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## rotq
+
+```c
+void rotq(addr_t dst, addr_t q, addr_t v)
+```
+<dt>Description</dt><dd>
+Rotates a vector with three elements by a quaternion.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of three floats |
+| q | address of four floats |
+| v | address of three floats |
+</dd>
+<dt>See Also</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## lerpq
+
+```c
+void lerpq(addr_t dst, addr_t a, addr_t b, float t)
+```
+<dt>Description</dt><dd>
+Linear interpolates two quaternions.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| a | address of four floats |
+| b | address of four floats |
+| t | interpolation value between 0.0 and 1.0 |
+</dd>
+<dt>See Also</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [slerpq], [normq]
+</dd>
+<hr>
+## slerpq
+
+```c
+void slerpq(addr_t dst, addr_t a, addr_t b, float t)
+```
+<dt>Description</dt><dd>
+Spherical interpolates a quaternion.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| a | address of four floats |
+| b | address of four floats |
+| t | interpolation value between 0.0 and 1.0 |
+</dd>
+<dt>See Also</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [normq]
+</dd>
+<hr>
+## normq
+
+```c
+void normq(addr_t a)
+```
+<dt>Description</dt><dd>
+Normalizes a quaternion.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq]
+</dd>
+<hr>
+## idm4
+
+```c
+void idm4(addr_t a)
+```
+<dt>Description</dt><dd>
+Loads an 4 x 4 identity matrix.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of 16 floats |
+</dd>
+<dt>See Also</dt><dd>
+[trsm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## trsm4
+
+```c
+void trsm4(addr_t dst, addr_t t, addr_t r, addr_t s)
+```
+<dt>Description</dt><dd>
+Creates a 4 x 4 matrix with translation, rotation and scaling.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of 16 floats, destination matrix |
+| t | address of three floats, translation vector |
+| r | address of four floats, rotation quaternion |
+| s | address of three floats, scaling vector |
+</dd>
+<dt>See Also</dt><dd>
+[idm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## detm4
+
+```c
+float detm4(addr_t a)
+```
+<dt>Description</dt><dd>
+Returns the matrix's determinant.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| a | address of 16 floats |
+</dd>
+<dt>Return Value</dt><dd>
+The matrix's determinant.
+</dd>
+<dt>See Also</dt><dd>
+[idm4], [trsm4], [addm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## addm4
+
+```c
+void addm4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Adds matrices together.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of 16 floats |
+| a | address of 16 floats |
+| b | address of 16 floats |
+</dd>
+<dt>See Also</dt><dd>
+[idm4], [trsm4], [detm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## subm4
+
+```c
+void subm4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Subtracts matrices.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of 16 floats |
+| a | address of 16 floats |
+| b | address of 16 floats |
+</dd>
+<dt>See Also</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [mulm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## mulm4
+
+```c
+void mulm4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Description</dt><dd>
+Multiplies matrices.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of 16 floats |
+| a | address of 16 floats |
+| b | address of 16 floats |
+</dd>
+<dt>See Also</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [subm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## mulm4v3
+
+```c
+void mulm4v3(addr_t dst, addr_t m, addr_t v)
+```
+<dt>Description</dt><dd>
+Multiplies a vector with three elements by a matrix.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of three floats |
+| m | address of 16 floats |
+| v | address of three floats |
+</dd>
+<dt>See Also</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## mulm4v4
+
+```c
+void mulm4v4(addr_t dst, addr_t m, addr_t v)
+```
+<dt>Description</dt><dd>
+Multiplies a vector with four elements by a matrix.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of four floats |
+| m | address of 16 floats |
+| v | address of four floats |
+</dd>
+<dt>See Also</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v3], [invm4], [trpm4]
+</dd>
+<hr>
+## invm4
+
+```c
+void invm4(addr_t dst, addr_t a)
+```
+<dt>Description</dt><dd>
+Calculates inverse matrix.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of 16 floats |
+| a | address of 16 floats |
+</dd>
+<dt>See Also</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [trpm4]
+</dd>
+<hr>
+## trpm4
+
+```c
+void trpm4(addr_t dst, addr_t a)
+```
+<dt>Description</dt><dd>
+Transpose matrix.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | address of 16 floats |
+| a | address of 16 floats |
+</dd>
+<dt>See Also</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [invm4]
+</dd>
+<hr>
+## trns
+
+```c
+void trns(addr_t dst, addr_t src, uint8_t num,
+    int16_t x, int16_t y, int16_t z,
+    uint16_t pitch, uint16_t yaw, uint16_t roll,
+    float scale)
+```
+<dt>Description</dt><dd>
+Translate a vertex cloud, aka. place a 3D model in [3D space].
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| dst | destination vertices array, 3 x 2 bytes each, X, Y, Z |
+| src | source vertices array, 3 x 2 bytes each, X, Y, Z |
+| num | number of vertex coordinate triplets in the array |
+| x | world X coordinate, -32767 to 32767 |
+| y | world Y coordinate, -32767 to 32767 |
+| z | world Z coordinate, -32767 to 32767 |
+| pitch | rotation around X axis in degress, 0 to 359 |
+| yaw | rotation around Y axis in degress, 0 to 359 |
+| roll | rotation around Z axis in degress, 0 to 359 |
+| scale | scale, use 1.0 to keep original size |
+</dd>
+<dt>See Also</dt><dd>
+[mesh]
 </dd>
 
 # Memory

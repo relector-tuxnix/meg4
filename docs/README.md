@@ -37,7 +37,7 @@ If you have used a new writing system (or most notably any CJK), then in the [sr
 make langchk
 ```
 This will check if the default font has all the glyphs for the new translation. If it reports errors, then use
-[SFNEdit](https://gitlab.com/bztsrc/scalable-font2) on `src/misc/default.sfn` and add the missing glyphs.
+[SFNEdit](https://gitlab.com/bztsrc/scalable-font2#font-editor) on `src/misc/default.sfn` and add the missing glyphs.
 
 Finally, run `make distclean all` in the [src](../src) directory. This will parse the assets (including the new translation
 files) and regenerate `data.c` to be embedded in MEG-4 (a clean recompilation should take no more than a minute).

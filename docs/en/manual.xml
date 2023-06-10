@@ -58,6 +58,8 @@
 
 <cap>Tutorials</cap>
 <include tut_ball.md>
+<include tut_walk.md>
+<include tut_snd.md>
 
 <cap>Appendix</cap>
 <include license.md>

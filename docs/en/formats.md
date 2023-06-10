@@ -56,7 +56,7 @@ required 320 x 200 pixels. The palette in these images aren't used, except the s
 ### font.bdf
 
 The font, created with the [font editor], in a format that can be edited by many tools, like xmbdfed or gbdfed. Obviously I'd
-recommend my [SFNEdit](https://gitlab.com/bztsrc/scalable-font2) instead, and [FontForge](https://fontforge.org) works prefectly
+recommend my [SFNEdit](https://gitlab.com/bztsrc/scalable-font2#font-editor) instead, and [FontForge](https://fontforge.org) works prefectly
 too. On import, besides of [X11 Bitmap Distribution Format](https://www.x.org/docs/BDF/bdf.pdf) (.bdf),
 [PC Screen Font 2](https://www.win.tue.nl/~aeb/linux/kbd/font-formats-1.html) (.psfu, .psf2),
 [Scalable Screen Font](https://gitlab.com/bztsrc/scalable-font2/blob/master/docs/sfn_format.md) (.sfn) and FontForge's native

@@ -57,7 +57,7 @@ elemének (0-ás index) alfa csatornájában tárolódik.
 ### font.bdf
 
 A betűkészlet, amit a [betű szerkesztő]ben hoztál létre, olyan formátumban, amit sok program ismer, például xmbdfed vagy gbdfed.
-A módosításhoz nyilvánvalóan inkább a saját [SFNEdit](https://gitlab.com/bztsrc/scalable-font2) programomat ajánlom elsősorban, de
+A módosításhoz nyilvánvalóan inkább a saját [SFNEdit](https://gitlab.com/bztsrc/scalable-font2#font-editor) programomat ajánlom elsősorban, de
 a [FontForge](https://fontforge.org) is tökéletesen megfelel a célnak. Betöltésnél az
 [X11 Bitmap Distribution Format](https://www.x.org/docs/BDF/bdf.pdf) (.bdf) formátumon túl támogatott még a
 [PC Screen Font 2](https://www.win.tue.nl/~aeb/linux/kbd/font-formats-1.html) (.psfu, .psf2),

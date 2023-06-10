@@ -15,7 +15,7 @@ To compile statically, just add `glfw3` or `portaudio` directories with their re
 | `make static-pa`      | Download portaudio for static linking                      |
 | `make install`        | Install the compiled executable                            |
 | `make package`        | Create a package from the compiled executable              |
-| `make clean`          | Clean the platform, but do not touch libmega4              |
+| `make clean`          | Clean the platform, but do not touch libmeg4               |
 | `make distclean`      | Clean everything                                           |
 | `DEBUG=1 make`        | Compile with debug information                             |
 | `EMBED=1 make`        | Compile without OS modal support, no import / export       |

@@ -240,9 +240,10 @@ void meg4_reset(void)
     meg4.mmio.padkeys[5] = MEG4_KEY_C;
     meg4.mmio.padkeys[6] = MEG4_KEY_X;
     meg4.mmio.padkeys[7] = MEG4_KEY_Z;
-    meg4.screen.w = 320; meg4.screen.h = 200; meg4.screen.buf = meg4.vram;
+    meg4_getscreen();
     for(i = 0; i < 640 * 400; i++) meg4.vram[i] = htole32(0xff000000);
     memcpy(meg4.mmio.palette, default_pal, sizeof(meg4.mmio.palette));
+    meg4.mmio.camz = 256; meg4.mmio.campitch = 90; meg4.mmio.camfov = 45; meg4_getview();
     meg4.mmio.conf = 39; meg4_conrst();
     dsp_init();
     dsp_reset();

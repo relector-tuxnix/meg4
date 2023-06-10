@@ -24,7 +24,7 @@ innen érhetők el a súgó oldalai, habár ez is ugyancsak mindig behozható b�
 Súgó oldalak
 ------------
 
-A súgó oldalain a hivatkozások kattinthatók, és a <kbd>Backspace</kbd> leütésével visszalép egy oldalt a oldaltörténetben.
+A súgó oldalain a hivatkozások kattinthatók, és a <kbd>Backspace</kbd> leütésével visszalép egy oldalt az oldaltörténetben.
 Ha az oldaltörténet üres, akkor a Tartalomjegyzéket hozza be. A súgó kivétel a szabály alól, mert itt az <kbd>Esc</kbd> leütése
 nem a játékképernyőt hozza be, hanem visszavisz arra a képernyőre, ahonnan a súgót behoztad.
 

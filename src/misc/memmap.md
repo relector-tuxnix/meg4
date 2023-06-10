@@ -129,9 +129,15 @@ The `△△▽▽◁▷◁▷ⒷⒶ` sequence makes the `KEY_CHEAT` "key" presse
 |  00499 |          1 | console background color, palette index 0 to 255                   |
 |  0049A |          2 | console X offset in pixels                                         |
 |  0049C |          2 | console Y offset in pixels                                         |
-|  0049E |          2 | camera X offset in pixels (see [tri3d])                            |
-|  004A0 |          2 | camera Y offset in pixels                                          |
-|  004A2 |          2 | camera Z offset in pixels                                          |
+|  0049E |          2 | camera X offset in [3D space] (see [tri3d], [tritx], [mesh])       |
+|  004A0 |          2 | camera Y offset                                                    |
+|  004A2 |          2 | camera Z offset                                                    |
+|  004A4 |          2 | camera direction, pitch (0 up, 90 forward)                         |
+|  004A6 |          2 | camera direction, yaw (0 left, 90 forward)                         |
+|  004A8 |          1 | camera field of view in angles (45, negative gives orthographic)   |
+|  004AA |          2 | light source position X offset (see [tri3d], [tritx], [mesh])      |
+|  004AC |          2 | light source position Y offset                                     |
+|  004AE |          2 | light source position Z offset                                     |
 |  00600 |      64000 | map, 320 x 200 sprite indeces (see [map] and [maze])               |
 |  10000 |      65536 | sprites, 256 x 256 palette indeces, 1024 8 x 8 pixels (see [spr])  |
 |  28000 |       2048 | window for 4096 font glyphs (see 0007E, [width] and [text])        |
@@ -267,3 +273,30 @@ and to describe how to display them. These are:
 You can add padding by specifying the length between `%` and the code. If that starts with `0`, then value will be padded
 with zeros, otherwise with spaces. For example `%4d` will pad the value to the right with spaces, and `%04x` with zeros.
 The `f` accepts a number after a dot, which tells the number of digits in the fractional part (up to 8), eg. `%.6f`.
+
+## 3D Space
+
+In MEG-4, the 3 dimensional space is handled according to the right-hand rule: +X is on the right, +Y is up, and +Z is towards the
+viewer.
+
+```
+  +Y
+   |
+   |__ +X
+  /
++Z
+```
+
+Each point must be placed in the range -32767 to +32767. How this 3D world is projected to your 2D screen depends on how you
+configure the camera (see [Graphics Processing Unit] address 0049E). Of course, you have to place the camera in the world, with
+X, Y, Z coordinates. Then you have to tell where the camera is looking at, using pitch and yaw. Finally you also have to tell what
+kind of lens the camera has, by specifying the field of view angle. That latter normally should be between 30 (very narrow) and
+180 degrees (like fish and birds). MEG-4 supports up to 127 degrees, but there's a trick. Positive FOV values will be projected as
+perspective (the farther the object is, the smaller it is), but negative values also handled, just with orthographic projection
+(no matter the distance, the object's size will be the same). Perspective is used in FPS games, while the orthographic projection
+is mostly preferred by strategy games.
+
+You can display a set of triangles (a complete 3D model) using the [mesh] function efficiently. Because models probably have local
+coordinates, that would draw all models one on top of another around the origo. So if you want to dispay multiple models in the
+world, first you should translate them (place them) into world coordinates using [trns], and then use the translated vertex cloud
+with [mesh] (moving and rotating the model around won't change the triangles, just their vertex coordinates).

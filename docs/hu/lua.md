@@ -48,7 +48,7 @@ hivatalos [Programming in Lua](https://www.lua.org/pil) útmutató (angolul).
 API Eltérések
 -------------
 
-- [memsave] egyformán elfogad MEG-4 memória címet (integer) vagy Lua táblát integer számokkal (ami egy bájttömb akar lenni).
+- [memsave] egyformánt elfogad MEG-4 memória címet (integer) vagy Lua táblát integer számokkal (ami egy bájttömb akar lenni).
 - [memload] híváskor mindenképp egy érvényes MEG-4 memória címet vár, de aztán Lua táblát ad vissza. Ha nem speciális MMIO
     területre akarsz betölteni, akkor `MEM_USER`-t (0x30000-et) adj meg, és csak használd az adatokat a visszaadott Lua táblában.
 - [memcpy] paramétere lehet két MEG-4 memória cím, ahogy megszokott, de az egyik lehet Lua tábla is (de csak az egyik, mindkettő

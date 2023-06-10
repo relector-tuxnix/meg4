@@ -569,7 +569,7 @@ void help_view(void)
                     tr++;
                 continue;
                 case '|':
-                case RIGHT: dx = (dx > 16 ? ((dx + 63) & ~63) : dx) + (c == RIGHT ? *str++ : 0); continue;
+                case RIGHT: if(state != MONO) { dx = (dx > 16 ? ((dx + 63) & ~63) : dx) + (c == RIGHT ? *str++ : 0); continue; } break;
                 case MONO: state = MONO; sy = 0; bg = shadow = 0; fg = theme[THEME_HELP_MONO]; continue;
                 case SRC:
                     sy = 0; bg = theme[THEME_HL_BG]; shadow = 0; fg = theme[THEME_FG];

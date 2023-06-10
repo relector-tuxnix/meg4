@@ -16,7 +16,7 @@ To compile statically, just add a `SDL3` or `SDL2` directory with the SDL's repo
 | `make install`        | Install the compiled executable                            |
 | `make package`        | Create a package from the compiled executable              |
 | `make deb`            | Create a debian package from the compiled executable       |
-| `make clean`          | Clean the platform, but do not touch libmega4              |
+| `make clean`          | Clean the platform, but do not touch libmeg4               |
 | `make distclean`      | Clean everything                                           |
 | `DEBUG=1 make`        | Compile with debug information                             |
 | `EMBED=1 make`        | Compile without OS modal support, no import / export       |

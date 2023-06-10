@@ -375,6 +375,6 @@ As to comply with ECMA-55, two functions are renamed: `SQR` ([sqrt]) and `ATN%` 
 in this documentation, except they are properly suffixed according their return types (for example, [str] returns a string, so
 it is called `STR$`).
 
-Note that ECMA-55 expects that trigonometrical functions use redians by default (with an `OPTION` command to switch to degrees),
+Note that ECMA-55 expects that trigonometrical functions use radians by default (with an `OPTION` command to switch to degrees),
 however the MEG-4 API always uses degrees, 0 to 359, where 0 is up, and 90 is to the right. That's why the `ATN%` gets an
 integer type suffix for example, as it returns degrees in an integer.

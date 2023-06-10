@@ -58,6 +58,8 @@
 
 <cap>Példák</cap>
 <include tut_ball.md>
+<include tut_walk.md>
+<include tut_snd.md>
 
 <cap>Függelék</cap>
 <include license.md>

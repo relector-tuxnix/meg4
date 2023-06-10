@@ -26,6 +26,8 @@
  * Instead we use a reentrant mid-point method both for quad and cubic,
  * uncomparably faster and provides very good results in 8 iterations)
  *
+ * 3D triangle code inspired by https://bellarg.org/TinyGL
+ *
  */
 
 #include "meg4.h"
@@ -38,6 +40,7 @@
 #include <math.h>
 float cosf(float);
 float sinf(float);
+float tanf(float);
 float fabsf(float);
 extern char meg4_kbdtmpbuf[8], meg4_kbdtmpsht, *textinp_cur;
 extern uint32_t meg4_lasttick;
@@ -47,12 +50,551 @@ void textinp_view(uint32_t *dst, int dp);
 typedef struct { uint16_t d, o, id; float x, y; } maze_spr_t;
 static int mazecmp(const void *a, const void *b) { return ((maze_spr_t*)b)->d - ((maze_spr_t*)a)->d; }
 static float posX = 0.0, posY = 0.0;
+static float prj[16], cam[16], cami[16], camp[3] = { 0.0, 0.25, 1.0 };
+static float vpt[3], vps[3];
+static uint16_t zbuf[640*400];
+static int zclear = 0;
+
+#define clip_funcdef(name, sign, dir, dir1, dir2) \
+    static float name(float* c, float* a, float* b) { \
+        float t, d[4], den; \
+        d[0] = (b[0] - a[0]); \
+        d[1] = (b[1] - a[1]); \
+        d[2] = (b[2] - a[2]); \
+        d[3] = (b[3] - a[3]); \
+        den = -(sign d[dir]) + d[3]; \
+        if (den == 0) t = 0; else t = (sign a[dir] - a[3]) / den; \
+        c[dir1] = a[dir1] + t * d[dir1]; \
+        c[dir2] = a[dir2] + t * d[dir2]; \
+        c[3] = a[3] + t * d[3]; \
+        c[dir] = sign c[3]; \
+        return t; \
+    }
+clip_funcdef(clip_xmin, -, 0, 1, 2)
+clip_funcdef(clip_xmax, +, 0, 1, 2)
+clip_funcdef(clip_ymin, -, 1, 0, 2)
+clip_funcdef(clip_ymax, +, 1, 0, 2)
+clip_funcdef(clip_zmin, -, 2, 0, 1)
+clip_funcdef(clip_zmax, +, 2, 0, 1)
+static float (*clip_proc[6])(float*, float*, float*) = {clip_xmin, clip_xmax, clip_ymin, clip_ymax, clip_zmin, clip_zmax};
+
+typedef struct {
+    float pos[3], nor[3], tex[2], ec[4], pc[4], col[4], uz, vz;
+    int x, y, z, u, v, r, g, b, a, clip;
+} vert_t;
+
+static vert_t verts[256] = { 0 };
+static int nvert = 0;
+
+typedef struct {
+    int i[3], u[3], v[3], p[3];
+} face_t;
+
+static face_t faces[1024] = { 0 };
+static int nface = 0;
+
+/**
+ * Draw a 3D triangle with gradient
+ */
+static void draw_triangle_grd(vert_t* v0, vert_t* v1, vert_t* v2)
+{
+    vert_t *p0 = v0, *p1 = v1, *p2 = v2;
+    vert_t *pr1, *pr2, *l1, *l2;
+    float fdx1, fdx2, fdy1, fdy2, fz;
+    uint16_t* pz1;
+    uint32_t* pp1;
+    int part, dx1, dy1, dx2, dy2, error, derror, x1, dxdy_min, dxdy_max, x2=0, dx2dy2=0, x, y;
+    int z1, dzdx, dzdy, dzdl_min, dzdl_max;
+    int r1, drdx, drdy, drdl_min, drdl_max;
+    int g1, dgdx, dgdy, dgdl_min, dgdl_max;
+    int b1, dbdx, dbdy, dbdl_min, dbdl_max;
+    int a1, dadx, dady, dadl_min, dadl_max;
+    int X0 = le16toh(meg4.mmio.cropx0), X1 = le16toh(meg4.mmio.cropx1), Y0 = le16toh(meg4.mmio.cropy0), Y1 = le16toh(meg4.mmio.cropy1);
+
+    if(p1->y < p0->y) { p0 = v1; p1 = v0; }
+    if(p2->y < p0->y) { p2 = p1; p1 = p0; p0 = v2; } else
+    if(p2->y < p1->y) { v1 = p1; p2 = p1; p2 = v1; }
+
+    fdx1 = p1->x - p0->x; fdy1 = p1->y - p0->y; fdx2 = p2->x - p0->x; fdy2 = p2->y - p0->y;
+    fz = fdx1 * fdy2 - fdx2 * fdy1;
+    if(fz != 0.0 && fz != -0.0) fz = 1.0 / fz;
+    fdx1 *= fz; fdy1 *= fz; fdx2 *= fz; fdy2 *= fz;
+
+    {
+        float d1, d2;
+        {
+            d1 = p1->z - p0->z; d2 = p2->z - p0->z;
+            dzdx = (int)(fdy2 * d1 - fdy1 * d2);
+            dzdy = (int)(fdx1 * d2 - fdx2 * d1);
+        }
+        {
+            d1 = p1->r - p0->r; d2 = p2->r - p0->r;
+            drdx = (int)(fdy2 * d1 - fdy1 * d2);
+            drdy = (int)(fdx1 * d2 - fdx2 * d1);
+        }
+        {
+            d1 = p1->g - p0->g; d2 = p2->g - p0->g;
+            dgdx = (int)(fdy2 * d1 - fdy1 * d2);
+            dgdy = (int)(fdx1 * d2 - fdx2 * d1);
+        }
+        {
+            d1 = p1->b - p0->b; d2 = p2->b - p0->b;
+            dbdx = (int)(fdy2 * d1 - fdy1 * d2);
+            dbdy = (int)(fdx1 * d2 - fdx2 * d1);
+        }
+        {
+            d1 = p1->a - p0->a; d2 = p2->a - p0->a;
+            dadx = (int)(fdy2 * d1 - fdy1 * d2);
+            dady = (int)(fdx1 * d2 - fdx2 * d1);
+        }
+    }
+
+    y = p0->y;
+    part = 640 * y;
+    pp1 = meg4.screen.buf + part;
+    pz1 = zbuf + part;
+
+    for(part = 0; part < 2; part++) {
+        int nb_lines;
+        {
+            register int update_left, update_right;
+            if(part == 0) {
+                if (fz > 0) { update_left = 1; update_right = 1; l1 = p0; l2 = p2; pr1 = p0; pr2 = p1; }
+                else { update_left = 1; update_right = 1; l1 = p0; l2 = p1; pr1 = p0; pr2 = p2; }
+                nb_lines = p1->y - p0->y;
+            } else {
+                if (fz > 0) { update_left = 0; update_right = 1; pr1 = p1; pr2 = p2; }
+                else { update_left = 1; update_right = 0; l1 = p1; l2 = p2; }
+                nb_lines = p2->y - p1->y + 1;
+            }
+            if(update_left) {
+                {
+                    register int tmp;
+                    dy1 = l2->y - l1->y; dx1 = l2->x - l1->x;
+                    tmp = dy1 > 0 ? (dx1 << 16) / dy1 : 0;
+                    x1 = l1->x; error = 0; derror = tmp & 0x0000ffff; dxdy_min = tmp >> 16;
+                }
+                dxdy_max = dxdy_min + 1;
+                z1 = l1->z; dzdl_min = (dzdy + dzdx * dxdy_min); dzdl_max = dzdl_min + dzdx;
+                r1 = l1->r; drdl_min = (drdy + drdx * dxdy_min); drdl_max = drdl_min + drdx;
+                g1 = l1->g; dgdl_min = (dgdy + dgdx * dxdy_min); dgdl_max = dgdl_min + dgdx;
+                b1 = l1->b; dbdl_min = (dbdy + dbdx * dxdy_min); dbdl_max = dbdl_min + dbdx;
+                a1 = l1->b; dadl_min = (dady + dadx * dxdy_min); dadl_max = dadl_min + dadx;
+            }
+            if(update_right) {
+                dx2 = (pr2->x - pr1->x); dy2 = (pr2->y - pr1->y);
+                dx2dy2 = dy2 > 0 ? (dx2 << 16) / dy2 : 0;
+                x2 = pr1->x << 16;
+            }
+        }
+        if(p0->y + nb_lines > Y1) nb_lines = Y1 - p0->y;
+
+        while(nb_lines > 0) {
+            nb_lines--;
+            if(y >= Y0) {
+                register uint8_t* pp;
+                register int n;
+                register uint16_t* pz;
+                register uint32_t z;
+                register int or1, og1, ob1, oa1, da1;
+                n = (x2 >> 16); if(n > X1) { n = X1; } n -= x1; pp = (uint8_t*)(pp1 + x1); pz = pz1 + x1; z = z1;
+                or1 = r1; og1 = g1; ob1 = b1; oa1 = a1; x = x1;
+                while(n >= 0) {
+                    {
+                        register uint32_t zz = z >> 14;
+                        if(x >= X0 && zz >= pz[0]) {
+                            da1 = 255 - oa1;
+                            pp[2] = (ob1*oa1 + da1*pp[2]) >> 8;
+                            pp[1] = (og1*oa1 + da1*pp[1]) >> 8;
+                            pp[0] = (or1*oa1 + da1*pp[0]) >> 8;
+                            pz[0] = zz;
+                        }
+                    }
+                    z += dzdx; og1 += dgdx; or1 += drdx; ob1 += dbdx; oa1 += dadx; pz++; pp += 4; n--; x++;
+                }
+            }
+            error += derror;
+            if(error > 0) {
+                error -= 0x10000;
+                x1 += dxdy_max; z1 += dzdl_max; r1 += drdl_max; g1 += dgdl_max; b1 += dbdl_max; a1 += dadl_max;
+            } else {
+                x1 += dxdy_min; z1 += dzdl_min; r1 += drdl_min; g1 += dgdl_min; b1 += dbdl_min; a1 += dadl_min;
+            }
+            x2 += dx2dy2; pp1 += 640; pz1 += 640; y++;
+        }
+    }
+}
+
+/**
+ * Draw a 3D triangle with texture
+ */
+static void draw_triangle_tex(vert_t* v0, vert_t* v1, vert_t* v2)
+{
+    vert_t *p0 = v0, *p1 = v1, *p2 = v2;
+    vert_t *pr1, *pr2, *l1, *l2;
+    float fdx1, fdx2, fdy1, fdy2, fz;
+    uint16_t* pz1;
+    uint32_t* pp1;
+    int part, dx1, dy1, dx2, dy2, error, derror, x1, dxdy_min, dxdy_max, x2=0, dx2dy2=0, x, y;
+    int z1, dzdx, dzdy, dzdl_min, dzdl_max;
+    int r1, drdx, drdy, drdl_min, drdl_max;
+    int g1, dgdx, dgdy, dgdl_min, dgdl_max;
+    int b1, dbdx, dbdy, dbdl_min, dbdl_max;
+    int X0 = le16toh(meg4.mmio.cropx0), X1 = le16toh(meg4.mmio.cropx1), Y0 = le16toh(meg4.mmio.cropy0), Y1 = le16toh(meg4.mmio.cropy1);
+    float sz1, dszdx, dszdy, dszdl_min, dszdl_max;
+    float tz1, dtzdx, dtzdy, dtzdl_min, dtzdl_max;
+    float fdzdx;
+
+    if(p1->y < p0->y) { p0 = v1; p1 = v0; }
+    if(p2->y < p0->y) { p2 = p1; p1 = p0; p0 = v2; } else
+    if(p2->y < p1->y) { v1 = p1; p2 = p1; p2 = v1; }
+
+    fdx1 = p1->x - p0->x; fdy1 = p1->y - p0->y; fdx2 = p2->x - p0->x; fdy2 = p2->y - p0->y;
+    fz = fdx1 * fdy2 - fdx2 * fdy1;
+    if(fz != 0.0 && fz != -0.0) fz = 1.0 / fz;
+
+    {
+        float d1, d2;
+        {
+            d1 = p1->z - p0->z; d2 = p2->z - p0->z;
+            dzdx = (int)(fdy2 * d1 - fdy1 * d2);
+            dzdy = (int)(fdx1 * d2 - fdx2 * d1);
+        }
+        {
+            d1 = p1->r - p0->r; d2 = p2->r - p0->r;
+            drdx = (int)(fdy2 * d1 - fdy1 * d2);
+            drdy = (int)(fdx1 * d2 - fdx2 * d1);
+        }
+        {
+            d1 = p1->g - p0->g; d2 = p2->g - p0->g;
+            dgdx = (int)(fdy2 * d1 - fdy1 * d2);
+            dgdy = (int)(fdx1 * d2 - fdx2 * d1);
+        }
+        {
+            d1 = p1->b - p0->b; d2 = p2->b - p0->b;
+            dbdx = (int)(fdy2 * d1 - fdy1 * d2);
+            dbdy = (int)(fdx1 * d2 - fdx2 * d1);
+        }
+        {
+            float zedzed;
+            zedzed = (float)p0->z; p0->uz = (float)p0->u * zedzed; p0->vz = (float)p0->v * zedzed;
+            zedzed = (float)p1->z; p1->uz = (float)p1->u * zedzed; p1->vz = (float)p1->v * zedzed;
+            zedzed = (float)p2->z; p2->uz = (float)p2->u * zedzed; p2->vz = (float)p2->v * zedzed;
+        }
+        {
+            d1 = p1->uz - p0->uz; d2 = p2->uz - p0->uz;
+            dszdx = (fdy2 * d1 - fdy1 * d2); dszdy = (fdx1 * d2 - fdx2 * d1);
+        }
+        {
+            d1 = p1->vz - p0->vz; d2 = p2->vz - p0->vz;
+            dtzdx = (fdy2 * d1 - fdy1 * d2); dtzdy = (fdx1 * d2 - fdx2 * d1);
+        }
+    }
+
+    y = p0->y;
+    part = 640 * y;
+    pp1 = meg4.screen.buf + part;
+    pz1 = zbuf + part;
+    fdzdx = (float)dzdx;
+
+    for (part = 0; part < 2; part++) {
+        int nb_lines;
+        {
+            register int update_left, update_right;
+            if(part == 0) {
+                if (fz > 0) { update_left = 1; update_right = 1; l1 = p0; l2 = p2; pr1 = p0; pr2 = p1; }
+                else { update_left = 1; update_right = 1; l1 = p0; l2 = p1; pr1 = p0; pr2 = p2; }
+                nb_lines = p1->y - p0->y;
+            } else {
+                if (fz > 0) { update_left = 0; update_right = 1; pr1 = p1; pr2 = p2; }
+                else { update_left = 1; update_right = 0; l1 = p1; l2 = p2; }
+                nb_lines = p2->y - p1->y + 1;
+            }
+            if(update_left) {
+                {
+                    register int tmp;
+                    dy1 = l2->y - l1->y; dx1 = l2->x - l1->x;
+                    tmp = dy1 > 0 ? (dx1 << 16) / dy1 : 0;
+                    x1 = l1->x; error = 0; derror = tmp & 0x0000ffff; dxdy_min = tmp >> 16;
+                }
+                dxdy_max = dxdy_min + 1;
+                z1 = l1->z; dzdl_min = (dzdy + dzdx * dxdy_min); dzdl_max = dzdl_min + dzdx;
+                r1 = l1->r; drdl_min = (drdy + drdx * dxdy_min); drdl_max = drdl_min + drdx;
+                g1 = l1->g; dgdl_min = (dgdy + dgdx * dxdy_min); dgdl_max = dgdl_min + dgdx;
+                b1 = l1->b; dbdl_min = (dbdy + dbdx * dxdy_min); dbdl_max = dbdl_min + dbdx;
+                sz1 = l1->uz; dszdl_min = (dszdy + dszdx * dxdy_min); dszdl_max = dszdl_min + dszdx;
+                tz1 = l1->vz; dtzdl_min = (dtzdy + dtzdx * dxdy_min); dtzdl_max = dtzdl_min + dtzdx;
+            }
+            if(update_right) {
+                dx2 = (pr2->x - pr1->x); dy2 = (pr2->y - pr1->y);
+                dx2dy2 = dy2 > 0 ? (dx2 << 16) / dy2 : 0;
+                x2 = pr1->x << 16;
+            }
+        }
+        if(p0->y + nb_lines > Y1) nb_lines = Y1 - p0->y;
+
+        while(nb_lines > 0) {
+            nb_lines--;
+            if(y >= Y0) {
+                register uint16_t* pz;
+                register uint8_t* pp, *c;
+                register uint32_t s, t, z;
+                register int n;
+                register int or1, og1, ob1, da1;
+                float sz, tz, fzl, zinv;
+                or1 = r1; og1 = g1; ob1 = b1;
+                n = (x2 >> 16); if(n > X1) { n = X1; } n -= x1;
+                fzl = (float)z1; zinv = 1.0 / fzl;
+                pp = (uint8_t*)(pp1 + x1);
+                pz = pz1 + x1; z = z1; sz = sz1; tz = tz1; x = x1;
+                {
+                    register int dsdx, dtdx;
+                    {
+                        float ss, tt;
+                        ss = (sz * zinv); tt = (tz * zinv);
+                        s = (int)ss; t = (int)tt;
+                        dsdx = (int)((dszdx - ss * fdzdx) * zinv);
+                        dtdx = (int)((dtzdx - tt * fdzdx) * zinv);
+                    }
+                    while(n >= 0) {
+                        {
+                            register uint32_t zz = z >> 14;
+                            if(x >= X0 && zz >= pz[0]) {
+                                c = (uint8_t*)&meg4.mmio.palette[(int)meg4.mmio.sprites[(t << 8) | s]];
+                                da1 = 255 - c[3];
+                                pp[2] = (((c[2] * ob1) >> 8)*c[3] + da1*pp[2]) >> 8;
+                                pp[1] = (((c[1] * og1) >> 8)*c[3] + da1*pp[1]) >> 8;
+                                pp[0] = (((c[0] * or1) >> 8)*c[3] + da1*pp[0]) >> 8;
+                                pz[0] = zz;
+                            }
+                        }
+                        z += dzdx; s += dsdx; t += dtdx; og1 += dgdx; or1 += drdx; ob1 += dbdx; x++;
+                        pz += 1; pp += 4; n -= 1;
+                    }
+                }
+            }
+
+            error += derror;
+            if(error > 0) {
+                error -= 0x10000; x1 += dxdy_max; z1 += dzdl_max; r1 += drdl_max; g1 += dgdl_max; b1 += dbdl_max;
+                sz1 += dszdl_max; tz1 += dtzdl_max;
+            } else {
+                x1 += dxdy_min; z1 += dzdl_min; r1 += drdl_min; g1 += dgdl_min; b1 += dbdl_min;
+                sz1 += dszdl_min; tz1 += dtzdl_min;
+            }
+            x2 += dx2dy2; pp1 += 640; pz1 += 640; y++;
+        }
+    }
+}
+
+/**
+ * Translate a vertex point
+ */
+static void transvp(vert_t *v)
+{
+    float w = v->pc[3] * (1.0 + 1E-5);
+    if(!(v->clip = (v->pc[0] < -w) | ((v->pc[0] > w) << 1) | ((v->pc[1] < -w) << 2) | ((v->pc[1] > w) << 3) | ((v->pc[2] < -w) << 4) | ((v->pc[2] > w) << 5))) {
+        w = 1.0 / v->pc[3];
+        v->x = (int)(v->pc[0] * w * vps[0] + vpt[0]);
+        v->y = (int)(v->pc[1] * w * vps[1] + vpt[1]);
+        v->z = (int)(v->pc[2] * w * vps[2] + vpt[2]);
+    }
+    v->r = (int)(v->col[0] * 255.0f) & 0xff;
+    v->g = (int)(v->col[1] * 255.0f) & 0xff;
+    v->b = (int)(v->col[2] * 255.0f) & 0xff;
+    v->a = (int)(v->col[3] * 255.0f) & 0xff;
+    v->u = (int)(v->tex[0] * 255.0f) & 0xff;
+    v->v = (int)(v->tex[1] * 255.0f) & 0xff;
+}
+
+/**
+ * Update temporary clipped triangle points
+ */
+static void updateTmp(vert_t* q, vert_t* v0, vert_t* v1, float t)
+{
+    float r = 1.0f - t;
+    q->col[0] = r * v0->col[0] + t * v1->col[0];
+    q->col[1] = r * v0->col[1] + t * v1->col[1];
+    q->col[2] = r * v0->col[2] + t * v1->col[2];
+    q->col[3] = r * v0->col[3] + t * v1->col[3];
+    q->tex[0] = r * v0->tex[0] + t * v1->tex[0];
+    q->tex[1] = r * v0->tex[1] + t * v1->tex[1];
+    transvp(q);
+}
+
+/**
+ * Clip 3D triangle
+ */
+static void clip_triangle(vert_t* v0, vert_t* v1, vert_t* v2, int tex, int clip_bit)
+{
+    vert_t *q[3], tmp1, tmp2;
+    float n;
+    int co, co1, ca, cc[3], clip_mask;
+
+    cc[0] = v0->clip; cc[1] = v1->clip; cc[2] = v2->clip;
+    co = cc[0] | cc[1] | cc[2];
+    if (co == 0) {
+        n = (float)(v1->x - v0->x) * (float)(v2->y - v0->y) - (float)(v2->x - v0->x) * (float)(v1->y - v0->y);
+        if(n >= -0.0f) return;
+        tex ? draw_triangle_tex(v0, v1, v2) : draw_triangle_grd(v0, v1, v2);
+    } else {
+        ca = cc[0] & cc[1] & cc[2];
+        if(!ca) {
+            while (clip_bit < 6 && (co & (1 << clip_bit)) == 0) clip_bit++;
+            if (clip_bit == 6) return;
+            clip_mask = 1 << clip_bit;
+            co1 = (cc[0] ^ cc[1] ^ cc[2]) & clip_mask;
+            if (co1) {
+                if (cc[0] & clip_mask) { q[0] = v0; q[1] = v1; q[2] = v2; } else
+                if (cc[1] & clip_mask) { q[0] = v1; q[1] = v2; q[2] = v0; }
+                else { q[0] = v2; q[1] = v0; q[2] = v1; }
+                n = clip_proc[clip_bit](tmp1.pc, q[0]->pc, q[1]->pc);
+                updateTmp(&tmp1, q[0], q[1], n);
+                n = clip_proc[clip_bit](tmp2.pc, q[0]->pc, q[2]->pc);
+                updateTmp(&tmp2, q[0], q[2], n);
+                clip_triangle(&tmp1, q[1], q[2], tex, clip_bit + 1);
+                clip_triangle(&tmp2, &tmp1, q[2], tex, clip_bit + 1);
+            } else {
+                if ((cc[0] & clip_mask) == 0) { q[0] = v0; q[1] = v1; q[2] = v2; } else
+                if ((cc[1] & clip_mask) == 0) { q[0] = v1; q[1] = v2; q[2] = v0; }
+                else { q[0] = v2; q[1] = v0; q[2] = v1; }
+                n = clip_proc[clip_bit](tmp1.pc, q[0]->pc, q[1]->pc);
+                updateTmp(&tmp1, q[0], q[1], n);
+                n = clip_proc[clip_bit](tmp2.pc, q[0]->pc, q[2]->pc);
+                updateTmp(&tmp2, q[0], q[2], n);
+                clip_triangle(q[0], &tmp1, &tmp2, tex, clip_bit + 1);
+            }
+        }
+    }
+}
+
+/**
+ * Set light on 3D triangle vertices
+ */
+static void shader(vert_t *v)
+{
+    float R = 0, G = 0, B = 0, dot, d[3] = { 0 };
+    d[0] = ((float)((int16_t)le16toh(meg4.mmio.lspx))/32767.0) - v->ec[0];
+    d[1] = ((float)((int16_t)le16toh(meg4.mmio.lspy))/32767.0) - v->ec[1];
+    d[2] = ((float)((int16_t)le16toh(meg4.mmio.lspz))/32767.0) - v->ec[2];
+    meg4_normv3(d);
+    dot = d[0] * v->nor[0] + d[1] * v->nor[1] + d[2] * v->nor[2];
+    if (dot > 0) {
+        /* diffuse light */
+        R = dot * v->col[0];
+        G = dot * v->col[1];
+        B = dot * v->col[2];
+    }
+    v->col[0] = R < 0.0f ? 0.0f : (R > 1.0f ? 1.0f : R);
+    v->col[1] = G < 0.0f ? 0.0f : (G > 1.0f ? 1.0f : G);
+    v->col[2] = B < 0.0f ? 0.0f : (B > 1.0f ? 1.0f : B);
+}
+
+/**
+ * Add a vertex to the GPU buffer (VBO)
+ */
+static void vertex(float x, float y, float z)
+{
+    vert_t *v = &verts[nvert];
+    float fx, fy, fz;
+
+    if(nvert >= 256) return;
+    nvert++;
+    memset(v, 0, sizeof(vert_t));
+    /* world coordinates */
+    v->pos[0] = fx = x;
+    v->pos[1] = fy = y;
+    v->pos[2] = fz = z;
+    /* eye coordinates */
+    v->ec[0] = (fx * cam[0] + fy * cam[1] + fz * cam[2] + cam[3]);
+    v->ec[1] = (fx * cam[4] + fy * cam[5] + fz * cam[6] + cam[7]);
+    v->ec[2] = (fx * cam[8] + fy * cam[9] + fz * cam[10] + cam[11]);
+    v->ec[3] = (fx * cam[12] + fy * cam[13] + fz * cam[14] + cam[15]);
+    /* projection coordinates */
+    v->pc[0] = (v->ec[0] * prj[0] + v->ec[1] * prj[1] + v->ec[2] * prj[2] + v->ec[3] * prj[3]);
+    v->pc[1] = (v->ec[0] * prj[4] + v->ec[1] * prj[5] + v->ec[2] * prj[6] + v->ec[3] * prj[7]);
+    v->pc[2] = (v->ec[0] * prj[8] + v->ec[1] * prj[9] + v->ec[2] * prj[10] + v->ec[3] * prj[11]);
+    v->pc[3] = (v->ec[0] * prj[12] + v->ec[1] * prj[13] + v->ec[2] * prj[14] + v->ec[3] * prj[15]);
+}
+
+/**
+ * Add a triangle face to the GPU buffer (EBO)
+ */
+static void face(int i0, int p0, int u0, int v0, int i1, int p1, int u1, int v1, int i2, int p2, int u2, int v2)
+{
+    float a[3], b[3], n[3];
+    face_t *f = &faces[nface];
+
+    if(nface >= (int)(sizeof(faces)/sizeof(faces[0])) || i0 >= nvert || i1 >= nvert || i2 >= nvert) return;
+    nface++;
+    f->i[0] = i0; f->p[0] = p0; f->u[0] = u0; f->v[0] = v0;
+    f->i[1] = i1; f->p[1] = p1; f->u[1] = u1; f->v[1] = v1;
+    f->i[2] = i2; f->p[2] = p2; f->u[2] = u2; f->v[2] = v2;
+    /* calculate smooth normals */
+    a[0] = verts[i1].pos[0] - verts[i0].pos[0]; a[1] = verts[i1].pos[1] - verts[i0].pos[1]; a[2] = verts[i1].pos[2] - verts[i0].pos[2];
+    b[0] = verts[i2].pos[0] - verts[i0].pos[0]; b[1] = verts[i2].pos[1] - verts[i0].pos[1]; b[2] = verts[i2].pos[2] - verts[i0].pos[2];
+    n[0] = a[1] * b[2] - a[2] * b[1]; n[1] = a[2] * b[0] - a[0] * b[2]; n[2] = a[0] * b[1] - a[1] * b[0];
+    verts[i0].nor[0] += n[0]; verts[i0].nor[1] += n[1]; verts[i0].nor[2] += n[2];
+    verts[i1].nor[0] += n[0]; verts[i1].nor[1] += n[1]; verts[i1].nor[2] += n[2];
+    verts[i2].nor[0] += n[0]; verts[i2].nor[1] += n[1]; verts[i2].nor[2] += n[2];
+}
+
+/**
+ * Process triangles in VBO + EBO, clip and display them
+ */
+static void processtri(int tex)
+{
+    face_t *f;
+    vert_t *v0, *v1, *v2;
+    int i;
+    uint32_t col;
+
+    if(!nvert || !nface) return;
+    /* convert using inverse view matrix and normalize normal vectors */
+    for(i = 0, v0 = verts; i < nvert; i++, v0++) {
+        v0->nor[0] = (v0->nor[0] * cami[0] + v0->nor[1] * cami[1] + v0->nor[2] * cami[2]);
+        v0->nor[1] = (v0->nor[0] * cami[4] + v0->nor[1] * cami[5] + v0->nor[2] * cami[6]);
+        v0->nor[2] = (v0->nor[0] * cami[8] + v0->nor[1] * cami[9] + v0->nor[2] * cami[10]);
+        meg4_normv3(v0->nor);
+        transvp(v0);
+    }
+    for(i = 0, f = faces; i < nface; i++, f++) {
+        v0 = &verts[f->i[0]]; v1 = &verts[f->i[1]]; v2 = &verts[f->i[2]];
+        if(tex) {
+            v0->tex[0] = f->u[0]; v0->tex[1] = f->v[0]; v0->col[0] = v0->col[1] = v0->col[2] = v0->col[3] = 1.0f;
+            v1->tex[0] = f->u[1]; v1->tex[1] = f->v[1]; v1->col[0] = v1->col[1] = v1->col[2] = v1->col[3] = 1.0f;
+            v2->tex[0] = f->u[2]; v2->tex[1] = f->v[2]; v2->col[0] = v2->col[1] = v2->col[2] = v2->col[3] = 1.0f;
+        } else {
+            col = meg4.mmio.palette[f->p[0]];
+            v0->col[0] = (float)(col & 0xff) / 255.0f;
+            v0->col[1] = (float)((col >> 8) & 0xff) / 255.0f;
+            v0->col[2] = (float)((col >> 16) & 0xff) / 255.0f;
+            v0->col[3] = (float)((col >> 24) & 0xff) / 255.0f;
+
+            col = meg4.mmio.palette[f->p[1]];
+            v1->col[0] = (float)(col & 0xff) / 255.0f;
+            v1->col[1] = (float)((col >> 8) & 0xff) / 255.0f;
+            v1->col[2] = (float)((col >> 16) & 0xff) / 255.0f;
+            v1->col[3] = (float)((col >> 24) & 0xff) / 255.0f;
+
+            col = meg4.mmio.palette[f->p[2]];
+            v2->col[0] = (float)(col & 0xff) / 255.0f;
+            v2->col[1] = (float)((col >> 8) & 0xff) / 255.0f;
+            v2->col[2] = (float)((col >> 16) & 0xff) / 255.0f;
+            v2->col[3] = (float)((col >> 24) & 0xff) / 255.0f;
+        }
+        shader(v0); shader(v1); shader(v2);
+        clip_triangle(v0, v1, v2, tex, 0);
+    }
+}
 
 /**
  * Get screen
  */
 void meg4_getscreen(void)
 {
+    float zsize = (1 << (16 + 14));
+
     if(meg4.mode == MEG4_MODE_GAME) {
         if(meg4.mmio.scrx == 0xffff || meg4.mmio.scry == 0xffff) {
             meg4.screen.w = 640; meg4.screen.h = 400;
@@ -76,6 +618,66 @@ void meg4_getscreen(void)
         meg4.screen.buf = meg4.valt;
 #endif
     }
+    vpt[0] = (((float)meg4.screen.w - 0.5) / 2.0);
+    vpt[1] = (((float)meg4.screen.h - 0.5) / 2.0);
+    vpt[2] = ((zsize - 0.5) / 2.0) + ((1 << 14)) / 2;
+    vps[0] = ((float)meg4.screen.w - 0.5) / 2.0;
+    vps[1] = -((float)meg4.screen.h - 0.5) / 2.0;
+    vps[2] = -((zsize - 0.5) / 2.0);
+}
+
+/**
+ * Get projection, view and inverse view matrices
+ */
+void meg4_getview(void)
+{
+    float xaxis[3], yaxis[3], zaxis[3], camf[3], camr[3], camu[3], tmp[16];
+    float yaw = (float)((le16toh(meg4.mmio.camyaw) + 270) % 360) * MEG4_PI / 180.0f;
+    float pitch = (float)((le16toh(meg4.mmio.camyaw) + 270) % 360) * MEG4_PI / 180.0f, cosp = cosf(pitch);
+    float fov = (float)(le16toh(meg4.mmio.camfov)), x,y,A,B,C,D, n = 0.1f, f = 100.0f;
+
+    if(fov > 0) {
+        /* perspective projection */
+        y = 1.0/tanf(fov * MEG4_PI / 360.0); x = y/1.6; A = n-f; C = 2*f*n/A; A = (f+n)/A; B = -1; D = 0;
+    } else {
+        /* orthographic projection */
+        fov = -fov / 127.0; A = 2.0 * fov; B = A * 1.6;
+        x = 2.0 / B; y = 2.0 / A; A = -2.0 / (f-n); B = -(f+n) / (f-n); C = 0; D = 1;
+    }
+    prj[0]=x;   prj[1]=0;   prj[2]=0;   prj[3]=0;
+    prj[4]=0;   prj[5]=y;   prj[6]=0;   prj[7]=0;
+    prj[8]=0;   prj[9]=0;   prj[10]=A;  prj[11]=C;
+    prj[12]=0;  prj[13]=0;  prj[14]=B;  prj[15]=D;
+    /* calculate view matrix and its inverse from camera */
+    camf[0] = cosf(yaw) * cosp;
+    camf[1] = sinf(pitch);
+    camf[2] = sinf(yaw) * cosp;
+    meg4_normv3(camf);
+    camr[0] = -camf[2]; camr[1] = 0; camr[2] = camf[0];
+    meg4_normv3(camr);
+    camu[0] = camr[1] * camf[2] - camr[2] * camf[1];
+    camu[1] = camr[2] * camf[0] - camr[0] * camf[2];
+    camu[2] = camr[0] * camf[1] - camr[1] * camf[0];
+    meg4_normv3(camu);
+    xaxis[0] = camf[1] * camu[2] - camf[2] * camu[1];
+    xaxis[1] = camf[2] * camu[0] - camf[0] * camu[2];
+    xaxis[2] = camf[0] * camu[1] - camf[1] * camu[0];
+    yaxis[0] = xaxis[1] * camf[2] - xaxis[2] * camf[1];
+    yaxis[1] = xaxis[2] * camf[0] - xaxis[0] * camf[2];
+    yaxis[2] = xaxis[0] * camf[1] - xaxis[1] * camf[0];
+    zaxis[0] = -camf[0]; zaxis[1] = -camf[1]; zaxis[2] = -camf[2];
+    cam[0] = xaxis[0];  cam[1] = yaxis[0];  cam[2] = zaxis[0];  cam[3] = 0;
+    cam[4] = xaxis[1];  cam[5] = yaxis[1];  cam[6] = zaxis[1];  cam[7] = 0;
+    cam[8] = xaxis[2];  cam[9] = yaxis[2];  cam[10] = zaxis[2]; cam[11] = 0;
+    cam[12] = -(xaxis[0] * camp[0] + xaxis[1] * camp[1] + xaxis[2] * camp[2]);
+    cam[13] = -(yaxis[0] * camp[0] + yaxis[1] * camp[1] + yaxis[2] * camp[2]);
+    cam[14] = -(zaxis[0] * camp[0] + zaxis[1] * camp[1] + zaxis[2] * camp[2]);
+    cam[15] = 1;
+    meg4_invm4(tmp, cam);
+    cami[0] = tmp[0]; cami[1] = tmp[4]; cami[2] = tmp[8]; cami[3] = tmp[12];
+    cami[4] = tmp[1]; cami[5] = tmp[5]; cami[6] = tmp[9]; cami[7] = tmp[13];
+    cami[8] = tmp[2]; cami[9] = tmp[6]; cami[10] = tmp[10]; cami[11] = tmp[14];
+    cami[12] = tmp[3]; cami[13] = tmp[7]; cami[14] = tmp[11]; cami[15] = tmp[15];
 }
 
 /**
@@ -888,6 +1490,10 @@ void meg4_api_cls(uint8_t palidx)
         /* check if both background and foreground are bright */
         if(j >= 0x80) { c[0] = c[1] = c[2] = 0; meg4.mmio.conf = meg4_palidx(c); }
     }
+    if(zclear) {
+        zclear = 0;
+        memset(zbuf, 0, sizeof(zbuf));
+    }
 }
 
 /**
@@ -1056,7 +1662,7 @@ void meg4_api_cbez(uint8_t palidx, int16_t x0, int16_t y0, int16_t x1, int16_t y
  * @param y1 second edge Y coordinate in pixels
  * @param x2 third edge X coordinate in pixels
  * @param y2 third edge Y coordinate in pixels
- * @see [ftri], [tri2d], [tri3d]
+ * @see [ftri], [tri2d], [tri3d], [tritx], [mesh], [trns]
  */
 void meg4_api_tri(uint8_t palidx, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 {
@@ -1076,7 +1682,7 @@ void meg4_api_tri(uint8_t palidx, int16_t x0, int16_t y0, int16_t x1, int16_t y1
  * @param y1 second edge Y coordinate in pixels
  * @param x2 third edge X coordinate in pixels
  * @param y2 third edge Y coordinate in pixels
- * @see [tri], [tri2d], [tri3d]
+ * @see [tri], [tri2d], [tri3d], [tritx], [mesh], [trns]
  */
 void meg4_api_ftri(uint8_t palidx, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 {
@@ -1111,7 +1717,7 @@ void meg4_api_ftri(uint8_t palidx, int16_t x0, int16_t y0, int16_t x1, int16_t y
  * @param pi2 third edge color, palette index 0 to 255
  * @param x2 third edge X coordinate in pixels
  * @param y2 third edge Y coordinate in pixels
- * @see [tri], [ftri], [tri3d]
+ * @see [tri], [ftri], [tri3d], [tritx], [mesh], [trns]
  */
 void meg4_api_tri2d(uint8_t pi0, int16_t x0, int16_t y0,
     uint8_t pi1, int16_t x1, int16_t y1,
@@ -1154,7 +1760,7 @@ void meg4_api_tri2d(uint8_t pi0, int16_t x0, int16_t y0,
 }
 
 /**
- * Draws a filled triangle with color gradients in 3D space from the camera perspective (see [Graphics Processing Unit] address 0049E).
+ * Draws a filled triangle with color gradients in [3D space].
  * @param pi0 first edge color, palette index 0 to 255
  * @param x0 first edge X coordinate in space
  * @param y0 first edge Y coordinate in space
@@ -1167,29 +1773,95 @@ void meg4_api_tri2d(uint8_t pi0, int16_t x0, int16_t y0,
  * @param x2 third edge X coordinate in space
  * @param y2 third edge Y coordinate in space
  * @param z2 third edge Z coordinate in space
- * @see [tri], [ftri], [tri2d]
+ * @see [tri], [ftri], [tri2d], [tritx], [mesh], [trns]
  */
 void meg4_api_tri3d(uint8_t pi0, int16_t x0, int16_t y0, int16_t z0,
     uint8_t pi1, int16_t x1, int16_t y1, int16_t z1,
     uint8_t pi2, int16_t x2, int16_t y2, int16_t z2)
 {
-    int X0, Y0, X1, Y1, X2, Y2;
-    /* project 3D coordinates to 2D coordinates using the configured camera */
-    if(z0 >= le16toh(meg4.mmio.camz) || z1 >= le16toh(meg4.mmio.camz) || z2 >= le16toh(meg4.mmio.camz)) return;
-    if(z0) {
-        X0 = ((x0 - le16toh(meg4.mmio.camx)) * ((z0 - le16toh(meg4.mmio.camz)) / z0)) + le16toh(meg4.mmio.camx);
-        Y0 = ((y0 - le16toh(meg4.mmio.camy)) * ((z0 - le16toh(meg4.mmio.camz)) / z0)) + le16toh(meg4.mmio.camy);
-    } else { X0 = x0; Y0 = y0; }
-    if(z1) {
-        X1 = ((x1 - le16toh(meg4.mmio.camx)) * ((z1 - le16toh(meg4.mmio.camz)) / z1)) + le16toh(meg4.mmio.camx);
-        Y1 = ((y1 - le16toh(meg4.mmio.camy)) * ((z1 - le16toh(meg4.mmio.camz)) / z1)) + le16toh(meg4.mmio.camy);
-    } else { X1 = x1; Y1 = y1; }
-    if(z2) {
-        X2 = ((x2 - le16toh(meg4.mmio.camx)) * ((z2 - le16toh(meg4.mmio.camz)) / z2)) + le16toh(meg4.mmio.camx);
-        Y2 = ((y2 - le16toh(meg4.mmio.camy)) * ((z2 - le16toh(meg4.mmio.camz)) / z2)) + le16toh(meg4.mmio.camy);
-    } else { X2 = x2; Y2 = y2; }
-    /* then display a plain simple 2D triangle :-) */
-    meg4_api_tri2d(pi0, X0, Y0, pi1, X1, Y1, pi2, X2, Y2);
+    zclear = 1; nvert = nface = 0;
+    vertex(x0/32767.0f, y0/32767.0f, z0/32767.0f);
+    vertex(x1/32767.0f, y1/32767.0f, z1/32767.0f);
+    vertex(x2/32767.0f, y2/32767.0f, z2/32767.0f);
+    face(0, pi0, 0, 0, 1, pi1, 0, 0, 2, pi2, 0, 0);
+    processtri(0);
+}
+
+/**
+ * Draws a textured triangle in [3D space].
+ * @param u0 first edge texture X coordinate 0 to 255
+ * @param v0 first edge texture Y coordinate 0 to 255
+ * @param x0 first edge X coordinate in space
+ * @param y0 first edge Y coordinate in space
+ * @param z0 first edge Z coordinate in space
+ * @param u1 second edge texture X coordinate 0 to 255
+ * @param v1 second edge texture Y coordinate 0 to 255
+ * @param x1 second edge X coordinate in space
+ * @param y1 second edge Y coordinate in space
+ * @param z1 second edge Z coordinate in space
+ * @param u2 third edge texture X coordinate 0 to 255
+ * @param v2 third edge texture Y coordinate 0 to 255
+ * @param x2 third edge X coordinate in space
+ * @param y2 third edge Y coordinate in space
+ * @param z2 third edge Z coordinate in space
+ * @see [tri], [ftri], [tri2d], [tri3d], [mesh], [trns]
+ */
+void meg4_api_tritx(uint8_t u0, uint8_t v0, int16_t x0, int16_t y0, int16_t z0,
+    uint8_t u1, uint8_t v1, int16_t x1, int16_t y1, int16_t z1,
+    uint8_t u2, uint8_t v2, int16_t x2, int16_t y2, int16_t z2)
+{
+    zclear = 1; nvert = nface = 0;
+    vertex(x0/32767.0f, y0/32767.0f, z0/32767.0f);
+    vertex(x1/32767.0f, y1/32767.0f, z1/32767.0f);
+    vertex(x2/32767.0f, y2/32767.0f, z2/32767.0f);
+    face(0, 0, u0, v0, 1, 0, u1, v1, 2, 0, u2, v2);
+    processtri(1);
+}
+
+/**
+ * Draws a mesh made of triangles in [3D space], using indeces to verticles and texture coordinates (or palette).
+ * @param verts address of vertices array, 3 x 2 bytes each, X, Y, Z
+ * @param uvs address of UVs array (if 0, then palette is used), 2 x 1 bytes each, texture X, Y
+ * @param numtri number of triangles
+ * @param tris address of triangles array with indices, 6 x 1 bytes each, vi1, ui1/pi1, vi2, ui2/pi2, vi3, ui3/pi3
+ * @see [tri], [ftri], [tri2d], [tri3d], [tritx], [trns]
+ */
+void meg4_api_mesh(addr_t verts, addr_t uvs, uint16_t numtri, addr_t tris)
+{
+    int16_t *vs, *v;
+    uint8_t *uv, *tr, *ptr;
+    uint32_t i, mi;
+
+    zclear = 1; nvert = nface = 0;
+    if(numtri > sizeof(faces)/sizeof(faces[0])) numtri = sizeof(faces)/sizeof(faces[0]);
+    if(verts < MEG4_MEM_USER || verts + 6 * 256 >= MEG4_MEM_LIMIT ||
+      (uvs && (uvs < MEG4_MEM_USER || uvs + 512 >= MEG4_MEM_LIMIT)) ||
+      tris < MEG4_MEM_USER || !numtri || tris + numtri * 6 >= MEG4_MEM_LIMIT) return;
+
+    /* get number of vertices, maximum index */
+    tr = (uint8_t*)(meg4.data + tris - MEG4_MEM_USER);
+    for(i = mi = 0, ptr = tr; i < numtri; i++, ptr += 6) {
+        if(ptr[0] > mi) mi = ptr[0];
+        if(ptr[2] > mi) mi = ptr[2];
+        if(ptr[4] > mi) mi = ptr[4];
+    }
+    /* add vertices */
+    vs = (int16_t*)(meg4.data + verts - MEG4_MEM_USER);
+    for(i = 0, v = vs; i <= mi; i++, v += 3)
+        vertex(v[0]/32767.0f, v[1]/32767.0f, v[2]/32767.0f);
+    /* add triangle faces */
+    if(uvs) {
+        uv = (uint8_t*)(meg4.data + uvs - MEG4_MEM_USER);
+        for(i = 0, ptr = tr; i < numtri; i++, ptr += 6)
+            face(ptr[0], 0, uv[ptr[1] << 1], uv[(ptr[1] << 1) + 1],
+                 ptr[2], 0, uv[ptr[3] << 1], uv[(ptr[3] << 1) + 1],
+                 ptr[4], 0, uv[ptr[5] << 1], uv[(ptr[5] << 1) + 1]);
+        processtri(1);
+    } else {
+        for(i = 0, ptr = tr; i < numtri; i++, ptr += 6)
+            face(ptr[0], ptr[1], 0, 0, ptr[2], ptr[3], 0, 0, ptr[4], ptr[5], 0, 0);
+        processtri(0);
+    }
 }
 
 /**

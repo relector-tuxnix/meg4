@@ -77,8 +77,12 @@ typedef struct {
     uint16_t mazew, mazer;                  /* 00494 maze walking and rotating speed */
     uint8_t  conf, conb;                    /* 00498 console foreground and background (for print) */
     uint16_t conx, cony;                    /* 0049A console cursor position (for print) */
-    uint16_t camx, camy, camz;              /* 0049E camera position (for tri3d) */
-    uint8_t  mbz2[22];                      /* reserved for future GPU use */
+    int16_t  camx, camy, camz;              /* 0049E camera position (for tri3d, tritx and mesh) */
+    uint16_t campitch, camyaw;              /* 004A4 camera direction in Euler-angles */
+    int8_t   camfov;                        /* 004A8 camera field of view */
+    uint8_t  lsc;                           /* 004A9 light source color (palette index) */
+    int16_t  lspx, lspy, lspz;              /* 004AA light source position */
+    uint8_t  mbz2[10];                      /* reserved for future GPU use */
     /* DSP */
     uint8_t  dsp_ticks;                     /* 004BA current tempo */
     uint8_t  dsp_track;                     /* 004BB current track being played */
@@ -268,6 +272,7 @@ typedef struct {
     char *src;                              /* source code */
     uint32_t src_len, src_bm[42];           /* length and bookmarks */
     meg4_ovl_t ovls[256];                   /* overlays, MEG-4 "files" */
+    float vpt[3], vps[3];                   /* viewport translate and scale vectors */
     uint32_t numfmm, *fmm, numamm, *amm;    /* dynamically allocated, freed and allocated records, both addr+size pairs */
     uint8_t mipmap[128*128*4 + 64*64*4 + 32*32*4];
 } meg4_t;
@@ -414,6 +419,11 @@ float  cpu_topf(uint32_t offs);
 void   cpu_fetch(void);
 
 /* math.c - mathematical functions */
+void meg4_normv3(float *a);
+void meg4_mulm4(float *ret, float *a, float *b);
+void meg4_invm4(float *ret, float *m);
+void meg4_trpm4(float *ret, float *m);
+/* floating point stuff */
 uint32_t meg4_api_rand(void);
 float meg4_api_rnd(void);
 float meg4_api_float(int val);
@@ -427,6 +437,9 @@ float meg4_api_log(float val);
 float meg4_api_pow(float val, float exp);
 float meg4_api_sqrt(float val);
 float meg4_api_rsqrt(float val);
+float meg4_api_clamp(float val, float minv, float maxv);
+float meg4_api_lerp(float a, float b, float t);
+/* trigonometry */
 float meg4_api_pi(void);
 float meg4_api_cos(uint16_t deg);
 float meg4_api_sin(uint16_t deg);
@@ -435,6 +448,72 @@ uint16_t meg4_api_acos(float val);
 uint16_t meg4_api_asin(float val);
 uint16_t meg4_api_atan(float val);
 uint16_t meg4_api_atan2(float y, float x);
+/* two dimensional vectors */
+float meg4_api_dotv2(addr_t a, addr_t b);
+float meg4_api_lenv2(addr_t a);
+void  meg4_api_scalev2(addr_t a, float s);
+void  meg4_api_negv2(addr_t a);
+void  meg4_api_addv2(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_subv2(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_mulv2(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_divv2(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_clampv2(addr_t dst, addr_t v, addr_t minv, addr_t maxv);
+void  meg4_api_lerpv2(addr_t dst, addr_t a, addr_t b, float t);
+void  meg4_api_normv2(addr_t a);
+/* three dimensional vectors */
+float meg4_api_dotv3(addr_t a, addr_t b);
+float meg4_api_lenv3(addr_t a);
+void  meg4_api_scalev3(addr_t a, float s);
+void  meg4_api_negv3(addr_t a);
+void  meg4_api_addv3(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_subv3(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_mulv3(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_divv3(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_crossv3(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_clampv3(addr_t dst, addr_t v, addr_t minv, addr_t maxv);
+void  meg4_api_lerpv3(addr_t dst, addr_t a, addr_t b, float t);
+void  meg4_api_normv3(addr_t a);
+/* four dimensional vectors */
+float meg4_api_dotv4(addr_t a, addr_t b);
+float meg4_api_lenv4(addr_t a);
+void  meg4_api_scalev4(addr_t a, float s);
+void  meg4_api_negv4(addr_t a);
+void  meg4_api_addv4(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_subv4(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_mulv4(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_divv4(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_clampv4(addr_t dst, addr_t v, addr_t minv, addr_t maxv);
+void  meg4_api_lerpv4(addr_t dst, addr_t a, addr_t b, float t);
+void  meg4_api_normv4(addr_t a);
+/* rotation quaternions */
+void  meg4_api_idq(addr_t a);
+void  meg4_api_eulerq(addr_t dst, uint16_t pitch, uint16_t yaw, uint16_t roll);
+float meg4_api_dotq(addr_t a, addr_t b);
+float meg4_api_lenq(addr_t a);
+void  meg4_api_scaleq(addr_t a, float s);
+void  meg4_api_negq(addr_t a);
+void  meg4_api_addq(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_subq(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_mulq(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_rotq(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_lerpq(addr_t dst, addr_t a, addr_t b, float t);
+void  meg4_api_slerpq(addr_t dst, addr_t a, addr_t b, float t);
+void  meg4_api_normq(addr_t a);
+/* matrices */
+void  meg4_api_idm4(addr_t a);
+void  meg4_api_trsm4(addr_t dst, addr_t t, addr_t r, addr_t s);
+float meg4_api_detm4(addr_t a);
+void  meg4_api_addm4(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_subm4(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_mulm4(addr_t dst, addr_t a, addr_t b);
+void  meg4_api_mulm4v3(addr_t dst, addr_t m, addr_t v);
+void  meg4_api_mulm4v4(addr_t dst, addr_t m, addr_t v);
+void  meg4_api_invm4(addr_t dst, addr_t a);
+void  meg4_api_trpm4(addr_t dst, addr_t a);
+void  meg4_api_trns(addr_t dst, addr_t src, uint8_t num,
+    int16_t x, int16_t y, int16_t z,
+    uint16_t pitch, uint16_t yaw, uint16_t roll,
+    float scale);
 
 /* mem.c - memory management unit */
 int   meg4_snprintf(char *dst, int len, char *fmt);
@@ -511,6 +590,7 @@ void meg4_playnote(uint8_t *note, uint8_t volume);
 
 /* gpu.c - graphics and screen output */
 void meg4_getscreen(void);
+void meg4_getview(void);
 void meg4_redraw(uint32_t *dst, int dw, int dh, int dp);
 void meg4_screenshot(uint32_t *dst, int dx, int dy, int dp);
 void meg4_recalcfont(int s, int e);
@@ -543,6 +623,9 @@ void meg4_api_ftri(uint8_t palidx, int16_t x0, int16_t y0, int16_t x1, int16_t y
 void meg4_api_tri2d(uint8_t pi0, int16_t x0, int16_t y0, uint8_t pi1, int16_t x1, int16_t y1, uint8_t pi2, int16_t x2, int16_t y2);
 void meg4_api_tri3d(uint8_t pi0, int16_t x0, int16_t y0, int16_t z0, uint8_t pi1, int16_t x1, int16_t y1, int16_t z1,
     uint8_t pi2, int16_t x2, int16_t y2, int16_t z2);
+void meg4_api_tritx(uint8_t u0, uint8_t v0, int16_t x0, int16_t y0, int16_t z0, uint8_t u1, uint8_t v1, int16_t x1, int16_t y1, int16_t z1,
+    uint8_t u2, uint8_t v2, int16_t x2, int16_t y2, int16_t z2);
+void meg4_api_mesh(addr_t verts, addr_t uvs, uint16_t numtri, addr_t tris);
 void meg4_api_rect(uint8_t palidx, int16_t x0, int16_t y0, int16_t x1, int16_t y1);
 void meg4_api_frect(uint8_t palidx, int16_t x0, int16_t y0, int16_t x1, int16_t y1);
 void meg4_api_circ(uint8_t palidx, int16_t x, int16_t y, uint16_t r);

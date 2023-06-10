@@ -10,7 +10,7 @@ Compilation options
 |-----------------------|------------------------------------------------------------|
 | `make`                | Compile the `meg4` executable for this platform            |
 | `make package`        | Create a package from the compiled executable              |
-| `make clean`          | Clean the platform, but do not touch libmega4              |
+| `make clean`          | Clean the platform, but do not touch libmeg4               |
 | `make distclean`      | Clean everything                                           |
 | `DEBUG=1 make`        | Compile with debug information                             |
 | `NOEDITORS=1 make`    | Compile a bare emulator without the built-in editors       |

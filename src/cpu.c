@@ -359,8 +359,8 @@ void cpu_fetch(void)
         case BC_ADDF: meg4.af = cpu_popf() +  meg4.af; meg4.ac = (int)meg4.af; break;
         case BC_SUBF: meg4.af = cpu_popf() -  meg4.af; meg4.ac = (int)meg4.af; break;
         case BC_MULF: meg4.af = cpu_popf() *  meg4.af; meg4.ac = (int)meg4.af; break;
-        case BC_DIVF: meg4.af = cpu_popf() /  meg4.af; meg4.ac = (int)meg4.af; break;
-        case BC_MODF: fval = cpu_popf() / meg4.af; meg4.af = fval - (float)((int)fval); meg4.ac = (int)meg4.af; break;
+        case BC_DIVF: meg4.af = meg4.af == 0.0 || meg4.af == -0.0 ? meg4.af : cpu_popf() /  meg4.af; meg4.ac = (int)meg4.af; break;
+        case BC_MODF: fval = meg4.af == 0.0 || meg4.af == -0.0 ? meg4.af : cpu_popf() / meg4.af; meg4.af = fval - (float)((int)fval); meg4.ac = (int)meg4.af; break;
         case BC_POWF: meg4.af = powf(cpu_popf(), meg4.af); meg4.ac = (int)meg4.af; break;
     }
     /* if an error happened and mode switched to debug (or guru), then leave PC so that it points to the failed instruction */

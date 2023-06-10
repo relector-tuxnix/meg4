@@ -47,7 +47,7 @@ képek extra adatokkal, egy üres lemez például így néz ki:
 Egyéb formátumok is támogatottak, lásd a [fájlformátumok] fejezetet bővebb infóért, hogy mik. Amint a flopi betöltésre került,
 a képernyő automatikusan átvált a [játékképernyő]re.
 
-Alternívaként leütheted itt az <kbd>Esc</kbd> gombot, hogy behozd a [szerkesztő képernyők]et, és nulláról elkészíts egy saját
+Alternatívaként leütheted itt az <kbd>Esc</kbd> gombot, hogy behozd a [szerkesztő képernyők]et, és nulláról elkészíts egy saját
 játékot.
 
 ### Parancssori opciók

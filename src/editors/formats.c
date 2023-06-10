@@ -807,7 +807,7 @@ readuints:                  for(i = j = 0; j < h; data++) {
             tmp[0] = l & 0xff; tmp[1] = (l >> 8) & 0xff; tmp[7] = 64;
             /* if filename is "dspXX.wav", then load at XX, otherwise at first empty slot */
             if(name && strlen(name) == 9 && !memcmp(name, "dsp", 3) && name[5] == '.' && (i = gethex((uint8_t*)name + 3, 2)) > 0 && i < 32)
-                memcpy(&meg4.waveforms[i][0], tmp, sizeof(meg4.waveforms[0]));
+                memcpy(&meg4.waveforms[i - 1][0], tmp, sizeof(meg4.waveforms[0]));
             else
                 i = waveform((uint8_t*)tmp);
             if(i) main_log(1, "waveform %u (wav) detected", i);

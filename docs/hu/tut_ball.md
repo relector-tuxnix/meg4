@@ -60,7 +60,7 @@ Próbáljuk meg lefuttatni ezt a programot a <kbd>Ctrl</kbd>+<kbd>R</kbd> leüt�
 vétettél a begépeléskor, akkor alul a státuszsorban egy hibaüzenet fog megjelenni, és a kurzor a hibát kiváltó részre fog ugrani.
 
 Ha minden rendben volt, akkor a szerkesztőképernyő el fog tűnni, és helyette egy fekete képernyő, közepén a labdával fog
-megjelenni. Azonban a labdánk nem teljesen középre került, mivel elfelejtettük kivonni a szrpájt méretének felét a koordinátákból
+megjelenni. Azonban a labdánk nem teljesen középre került, mivel elfelejtettük kivonni a szprájt méretének felét a koordinátákból
 (egy szprájtot jelenítünk meg itt (sw = 1 és sh = 1), szóval 8 x 8 pixelt, aminek a fele 4). Üssük le az <kbd>F2</kbd>-őt, hogy
 visszatérjünk a szerkesztőbe, és javítsuk ki.
 

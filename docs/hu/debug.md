@@ -35,5 +35,5 @@ paraméterlistája, és minden ami ezalatt, de még az SP regiszter fölött tal
 Regiszterek
 -----------
 
-Függetlenül attól, hogy melyik nézet az aktív, a CPU regiszterei mindig látszanak alul. Harmadik fél által bitzosított nyelvek
+Függetlenül attól, hogy melyik nézet az aktív, a CPU regiszterei mindig látszanak alul. Harmadik fél által biztosított nyelvek
 esetén csak az FLG, TMR és a PC regiszter elérhető. Bővebb leírást az egyes regiszterekről a [mnemonikok] címszó alatt találsz.

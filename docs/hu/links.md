@@ -7,6 +7,7 @@ A MEG-4 megalkotásához felhasznált anyagok
 - [stb_image](https://github.com/nothings/stb)
 - [Bresenham](http://members.chello.at/%7Eeasyfilter/Bresenham.pdf)
 - [raycasting](https://lodev.org/cgtutor/raycasting.html)
+- [TinyGL](https://bellard.org/TinyGL)
 - [Lua](https://www.lua.org)
 - [SDL](https://libsdl.org)
 - [glfw](https://www.glfw.org)

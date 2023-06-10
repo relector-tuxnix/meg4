@@ -7,13 +7,13 @@
  *
  */
 
-#define MEG4_NUM_API 100
+#define MEG4_NUM_API 162
 #define MEG4_NUM_BDEF 260
 #ifndef API_IMPL
-extern meg4_api_t meg4_api[101];
+extern meg4_api_t meg4_api[163];
 extern bdef_t meg4_bdefs[261];
 #else
-meg4_api_t meg4_api[101] = {
+meg4_api_t meg4_api[163] = {
     { "putc", 0, 1, 0, 0x0, 0x0, 0x0, 0x1 },
     { "printf", 0, 2, 2, 0x1, 0x1, 0x0, 0x0 },
     { "getc", 1, 0, 0, 0x0, 0x0, 0x0, 0x0 },
@@ -36,6 +36,8 @@ meg4_api_t meg4_api[101] = {
     { "ftri", 0, 7, 0, 0x0, 0x0, 0x0, 0x1 },
     { "tri2d", 0, 9, 0, 0x0, 0x0, 0x0, 0x49 },
     { "tri3d", 0, 12, 0, 0x0, 0x0, 0x0, 0x111 },
+    { "tritx", 0, 15, 0, 0x0, 0x0, 0x0, 0xc63 },
+    { "mesh", 0, 4, 0, 0xb, 0x0, 0x0, 0x4 },
     { "rect", 0, 5, 0, 0x0, 0x0, 0x0, 0x1 },
     { "frect", 0, 5, 0, 0x0, 0x0, 0x0, 0x1 },
     { "circ", 0, 4, 0, 0x0, 0x0, 0x0, 0x9 },
@@ -81,6 +83,8 @@ meg4_api_t meg4_api[101] = {
     { "pow", 4, 2, 0, 0x0, 0x0, 0x3, 0x0 },
     { "sqrt", 4, 1, 0, 0x0, 0x0, 0x1, 0x0 },
     { "rsqrt", 4, 1, 0, 0x0, 0x0, 0x1, 0x0 },
+    { "clamp", 4, 3, 0, 0x0, 0x0, 0x7, 0x0 },
+    { "lerp", 4, 3, 0, 0x0, 0x0, 0x7, 0x0 },
     { "pi", 4, 0, 0, 0x0, 0x0, 0x0, 0x0 },
     { "cos", 4, 1, 0, 0x0, 0x0, 0x0, 0x1 },
     { "sin", 4, 1, 0, 0x0, 0x0, 0x0, 0x1 },
@@ -89,6 +93,64 @@ meg4_api_t meg4_api[101] = {
     { "asin", 1, 1, 0, 0x0, 0x0, 0x1, 0x0 },
     { "atan", 1, 1, 0, 0x0, 0x0, 0x1, 0x0 },
     { "atan2", 1, 2, 0, 0x0, 0x0, 0x3, 0x0 },
+    { "dotv2", 4, 2, 0, 0x3, 0x0, 0x0, 0x0 },
+    { "lenv2", 4, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "scalev2", 0, 2, 0, 0x1, 0x0, 0x2, 0x0 },
+    { "negv2", 0, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "addv2", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "subv2", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "mulv2", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "divv2", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "clampv2", 0, 4, 0, 0xf, 0x0, 0x0, 0x0 },
+    { "lerpv2", 0, 4, 0, 0x7, 0x0, 0x8, 0x0 },
+    { "normv2", 0, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "dotv3", 4, 2, 0, 0x3, 0x0, 0x0, 0x0 },
+    { "lenv3", 4, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "scalev3", 0, 2, 0, 0x1, 0x0, 0x2, 0x0 },
+    { "negv3", 0, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "addv3", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "subv3", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "mulv3", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "divv3", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "crossv3", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "clampv3", 0, 4, 0, 0xf, 0x0, 0x0, 0x0 },
+    { "lerpv3", 0, 4, 0, 0x7, 0x0, 0x8, 0x0 },
+    { "normv3", 0, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "dotv4", 4, 2, 0, 0x3, 0x0, 0x0, 0x0 },
+    { "lenv4", 4, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "scalev4", 0, 2, 0, 0x1, 0x0, 0x2, 0x0 },
+    { "negv4", 0, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "addv4", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "subv4", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "mulv4", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "divv4", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "clampv4", 0, 4, 0, 0xf, 0x0, 0x0, 0x0 },
+    { "lerpv4", 0, 4, 0, 0x7, 0x0, 0x8, 0x0 },
+    { "normv4", 0, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "idq", 0, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "eulerq", 0, 4, 0, 0x1, 0x0, 0x0, 0xe },
+    { "dotq", 4, 2, 0, 0x3, 0x0, 0x0, 0x0 },
+    { "lenq", 4, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "scaleq", 0, 2, 0, 0x1, 0x0, 0x2, 0x0 },
+    { "negq", 0, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "addq", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "subq", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "mulq", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "rotq", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "lerpq", 0, 4, 0, 0x7, 0x0, 0x8, 0x0 },
+    { "slerpq", 0, 4, 0, 0x7, 0x0, 0x8, 0x0 },
+    { "normq", 0, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "idm4", 0, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "trsm4", 0, 4, 0, 0xf, 0x0, 0x0, 0x0 },
+    { "detm4", 4, 1, 0, 0x1, 0x0, 0x0, 0x0 },
+    { "addm4", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "subm4", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "mulm4", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "mulm4v3", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "mulm4v4", 0, 3, 0, 0x7, 0x0, 0x0, 0x0 },
+    { "invm4", 0, 2, 0, 0x3, 0x0, 0x0, 0x0 },
+    { "trpm4", 0, 2, 0, 0x3, 0x0, 0x0, 0x0 },
+    { "trns", 0, 10, 0, 0x3, 0x0, 0x200, 0x1c4 },
     { "inb", 1, 1, 0, 0x1, 0x0, 0x0, 0x0 },
     { "inw", 1, 1, 0, 0x1, 0x0, 0x0, 0x0 },
     { "ini", 1, 1, 0, 0x1, 0x0, 0x0, 0x0 },
@@ -385,11 +447,11 @@ bdef_t meg4_bdefs[261] = {
 
 #define MEG4_PRINT 1
 #define MEG4_INPUT 3
-#define MEG4_OUTB 78
+#define MEG4_OUTB 140
 #define MEG4_EXIT 6
-#define MEG4_MEMCPY 83
-#define MEG4_ATOI 90
-#define MEG4_VAL 92
+#define MEG4_MEMCPY 145
+#define MEG4_ATOI 152
+#define MEG4_VAL 154
 #define MEG4_DISPATCH \
     case  0: meg4_api_putc((uint32_t)cpu_topi(0)); break; \
     case  1: meg4_api_printf((str_t)cpu_topi(0)); break; \
@@ -413,81 +475,143 @@ bdef_t meg4_bdefs[261] = {
     case 19: meg4_api_ftri((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(int16_t)cpu_topi(12),(int16_t)cpu_topi(16),(int16_t)cpu_topi(20),(int16_t)cpu_topi(24)); break; \
     case 20: meg4_api_tri2d((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(uint8_t)cpu_topi(12),(int16_t)cpu_topi(16),(int16_t)cpu_topi(20),(uint8_t)cpu_topi(24),(int16_t)cpu_topi(28),(int16_t)cpu_topi(32)); break; \
     case 21: meg4_api_tri3d((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(int16_t)cpu_topi(12),(uint8_t)cpu_topi(16),(int16_t)cpu_topi(20),(int16_t)cpu_topi(24),(int16_t)cpu_topi(28),(uint8_t)cpu_topi(32),(int16_t)cpu_topi(36),(int16_t)cpu_topi(40),(int16_t)cpu_topi(44)); break; \
-    case 22: meg4_api_rect((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(int16_t)cpu_topi(12),(int16_t)cpu_topi(16)); break; \
-    case 23: meg4_api_frect((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(int16_t)cpu_topi(12),(int16_t)cpu_topi(16)); break; \
-    case 24: meg4_api_circ((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(uint16_t)cpu_topi(12)); break; \
-    case 25: meg4_api_fcirc((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(uint16_t)cpu_topi(12)); break; \
-    case 26: meg4_api_ellip((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(int16_t)cpu_topi(12),(int16_t)cpu_topi(16)); break; \
-    case 27: meg4_api_fellip((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(int16_t)cpu_topi(12),(int16_t)cpu_topi(16)); break; \
-    case 28: meg4_api_move((int16_t)cpu_topi(0),(int16_t)cpu_topi(4),(uint16_t)cpu_topi(8)); break; \
-    case 29: meg4_api_left((uint16_t)cpu_topi(0)); break; \
-    case 30: meg4_api_right((uint16_t)cpu_topi(0)); break; \
-    case 31: meg4_api_up(); break; \
-    case 32: meg4_api_down(); break; \
-    case 33: meg4_api_color((uint8_t)cpu_topi(0)); break; \
-    case 34: meg4_api_forw((uint16_t)cpu_topi(0)); break; \
-    case 35: meg4_api_back((uint16_t)cpu_topi(0)); break; \
-    case 36: meg4_api_spr((int16_t)cpu_topi(0),(int16_t)cpu_topi(4),(uint16_t)cpu_topi(8),(uint8_t)cpu_topi(12),(uint8_t)cpu_topi(16),(int8_t)cpu_topi(20),(uint8_t)cpu_topi(24)); break; \
-    case 37: meg4_api_dlg((int16_t)cpu_topi(0),(int16_t)cpu_topi(4),(uint16_t)cpu_topi(8),(uint16_t)cpu_topi(12),(int8_t)cpu_topi(16),(uint16_t)cpu_topi(20),(uint16_t)cpu_topi(24),(uint16_t)cpu_topi(28),(uint16_t)cpu_topi(32),(uint16_t)cpu_topi(36),(uint16_t)cpu_topi(40),(uint16_t)cpu_topi(44),(uint16_t)cpu_topi(48),(uint16_t)cpu_topi(52)); break; \
-    case 38: meg4_api_stext((int16_t)cpu_topi(0),(int16_t)cpu_topi(4),(uint16_t)cpu_topi(8),(uint16_t)cpu_topi(12),(uint8_t)cpu_topi(16),(uint8_t)cpu_topi(20),(int8_t)cpu_topi(24),(str_t)cpu_topi(28)); break; \
-    case 39: meg4_api_remap((addr_t)cpu_topi(0)); break; \
-    case 40:  val = meg4_api_mget((uint16_t)cpu_topi(0),(uint16_t)cpu_topi(4)); break; \
-    case 41: meg4_api_mset((uint16_t)cpu_topi(0),(uint16_t)cpu_topi(4),(uint16_t)cpu_topi(8)); break; \
-    case 42: meg4_api_map((int16_t)cpu_topi(0),(int16_t)cpu_topi(4),(uint16_t)cpu_topi(8),(uint16_t)cpu_topi(12),(uint16_t)cpu_topi(16),(uint16_t)cpu_topi(20),(int8_t)cpu_topi(24)); break; \
-    case 43: meg4_api_maze((uint16_t)cpu_topi(0),(uint16_t)cpu_topi(4),(uint16_t)cpu_topi(8),(uint16_t)cpu_topi(12),(uint8_t)cpu_topi(16),(uint16_t)cpu_topi(20),(uint16_t)cpu_topi(24),(uint16_t)cpu_topi(28),(uint16_t)cpu_topi(32),(uint16_t)cpu_topi(36),(uint8_t)cpu_topi(40),(addr_t)cpu_topi(44)); break; \
-    case 44:  val = meg4_api_getpad((int)cpu_topi(0),(int)cpu_topi(4)); break; \
-    case 45:  val = meg4_api_prspad((int)cpu_topi(0),(int)cpu_topi(4)); break; \
-    case 46:  val = meg4_api_relpad((int)cpu_topi(0),(int)cpu_topi(4)); break; \
-    case 47:  val = meg4_api_getbtn((int)cpu_topi(0)); break; \
-    case 48:  val = meg4_api_getclk((int)cpu_topi(0)); break; \
-    case 49:  val = meg4_api_getkey((int)cpu_topi(0)); break; \
-    case 50:  val = meg4_api_popkey(); break; \
-    case 51:  val = meg4_api_pendkey(); break; \
-    case 52:  val = meg4_api_lenkey((uint32_t)cpu_topi(0)); break; \
-    case 53:  val = meg4_api_speckey((uint32_t)cpu_topi(0)); break; \
-    case 54:  val = meg4_api_rand(); break; \
-    case 55: fval = meg4_api_rnd(); break; \
-    case 56: fval = meg4_api_float((int)cpu_topi(0)); break; \
-    case 57:  val = meg4_api_int((float)cpu_topf(0)); break; \
-    case 58: fval = meg4_api_floor((float)cpu_topf(0)); break; \
-    case 59: fval = meg4_api_ceil((float)cpu_topf(0)); break; \
-    case 60: fval = meg4_api_sgn((float)cpu_topf(0)); break; \
-    case 61: fval = meg4_api_abs((float)cpu_topf(0)); break; \
-    case 62: fval = meg4_api_exp((float)cpu_topf(0)); break; \
-    case 63: fval = meg4_api_log((float)cpu_topf(0)); break; \
-    case 64: fval = meg4_api_pow((float)cpu_topf(0),(float)cpu_topf(4)); break; \
-    case 65: fval = meg4_api_sqrt((float)cpu_topf(0)); break; \
-    case 66: fval = meg4_api_rsqrt((float)cpu_topf(0)); break; \
-    case 67: fval = meg4_api_pi(); break; \
-    case 68: fval = meg4_api_cos((uint16_t)cpu_topi(0)); break; \
-    case 69: fval = meg4_api_sin((uint16_t)cpu_topi(0)); break; \
-    case 70: fval = meg4_api_tan((uint16_t)cpu_topi(0)); break; \
-    case 71:  val = meg4_api_acos((float)cpu_topf(0)); break; \
-    case 72:  val = meg4_api_asin((float)cpu_topf(0)); break; \
-    case 73:  val = meg4_api_atan((float)cpu_topf(0)); break; \
-    case 74:  val = meg4_api_atan2((float)cpu_topf(0),(float)cpu_topf(4)); break; \
-    case 75:  val = meg4_api_inb((addr_t)cpu_topi(0)); break; \
-    case 76:  val = meg4_api_inw((addr_t)cpu_topi(0)); break; \
-    case 77:  val = meg4_api_ini((addr_t)cpu_topi(0)); break; \
-    case 78: meg4_api_outb((addr_t)cpu_topi(0),(uint8_t)cpu_topi(4)); break; \
-    case 79: meg4_api_outw((addr_t)cpu_topi(0),(uint16_t)cpu_topi(4)); break; \
-    case 80: meg4_api_outi((addr_t)cpu_topi(0),(uint32_t)cpu_topi(4)); break; \
-    case 81:  val = meg4_api_memsave((uint8_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
-    case 82:  val = meg4_api_memload((addr_t)cpu_topi(0),(uint8_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
-    case 83: meg4_api_memcpy((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
-    case 84: meg4_api_memset((addr_t)cpu_topi(0),(uint8_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
-    case 85:  val = meg4_api_memcmp((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
-    case 86:  val = meg4_api_deflate((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
-    case 87:  val = meg4_api_inflate((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
-    case 88: fval = meg4_api_time(); break; \
-    case 89:  val = meg4_api_now(); break; \
-    case 90:  val = meg4_api_atoi((str_t)cpu_topi(0)); break; \
-    case 91:  val = meg4_api_itoa((int)cpu_topi(0)); break; \
-    case 92: fval = meg4_api_val((str_t)cpu_topi(0)); break; \
-    case 93:  val = meg4_api_str((float)cpu_topf(0)); break; \
-    case 94:  val = meg4_api_sprintf((str_t)cpu_topi(0)); break; \
-    case 95:  val = meg4_api_strlen((str_t)cpu_topi(0)); break; \
-    case 96:  val = meg4_api_mblen((str_t)cpu_topi(0)); break; \
-    case 97:  val = meg4_api_malloc((uint32_t)cpu_topi(0)); break; \
-    case 98:  val = meg4_api_realloc((addr_t)cpu_topi(0),(uint32_t)cpu_topi(4)); break; \
-    case 99:  val = meg4_api_free((addr_t)cpu_topi(0)); break; 
+    case 22: meg4_api_tritx((uint8_t)cpu_topi(0),(uint8_t)cpu_topi(4),(int16_t)cpu_topi(8),(int16_t)cpu_topi(12),(int16_t)cpu_topi(16),(uint8_t)cpu_topi(20),(uint8_t)cpu_topi(24),(int16_t)cpu_topi(28),(int16_t)cpu_topi(32),(int16_t)cpu_topi(36),(uint8_t)cpu_topi(40),(uint8_t)cpu_topi(44),(int16_t)cpu_topi(48),(int16_t)cpu_topi(52),(int16_t)cpu_topi(56)); break; \
+    case 23: meg4_api_mesh((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint16_t)cpu_topi(8),(addr_t)cpu_topi(12)); break; \
+    case 24: meg4_api_rect((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(int16_t)cpu_topi(12),(int16_t)cpu_topi(16)); break; \
+    case 25: meg4_api_frect((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(int16_t)cpu_topi(12),(int16_t)cpu_topi(16)); break; \
+    case 26: meg4_api_circ((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(uint16_t)cpu_topi(12)); break; \
+    case 27: meg4_api_fcirc((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(uint16_t)cpu_topi(12)); break; \
+    case 28: meg4_api_ellip((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(int16_t)cpu_topi(12),(int16_t)cpu_topi(16)); break; \
+    case 29: meg4_api_fellip((uint8_t)cpu_topi(0),(int16_t)cpu_topi(4),(int16_t)cpu_topi(8),(int16_t)cpu_topi(12),(int16_t)cpu_topi(16)); break; \
+    case 30: meg4_api_move((int16_t)cpu_topi(0),(int16_t)cpu_topi(4),(uint16_t)cpu_topi(8)); break; \
+    case 31: meg4_api_left((uint16_t)cpu_topi(0)); break; \
+    case 32: meg4_api_right((uint16_t)cpu_topi(0)); break; \
+    case 33: meg4_api_up(); break; \
+    case 34: meg4_api_down(); break; \
+    case 35: meg4_api_color((uint8_t)cpu_topi(0)); break; \
+    case 36: meg4_api_forw((uint16_t)cpu_topi(0)); break; \
+    case 37: meg4_api_back((uint16_t)cpu_topi(0)); break; \
+    case 38: meg4_api_spr((int16_t)cpu_topi(0),(int16_t)cpu_topi(4),(uint16_t)cpu_topi(8),(uint8_t)cpu_topi(12),(uint8_t)cpu_topi(16),(int8_t)cpu_topi(20),(uint8_t)cpu_topi(24)); break; \
+    case 39: meg4_api_dlg((int16_t)cpu_topi(0),(int16_t)cpu_topi(4),(uint16_t)cpu_topi(8),(uint16_t)cpu_topi(12),(int8_t)cpu_topi(16),(uint16_t)cpu_topi(20),(uint16_t)cpu_topi(24),(uint16_t)cpu_topi(28),(uint16_t)cpu_topi(32),(uint16_t)cpu_topi(36),(uint16_t)cpu_topi(40),(uint16_t)cpu_topi(44),(uint16_t)cpu_topi(48),(uint16_t)cpu_topi(52)); break; \
+    case 40: meg4_api_stext((int16_t)cpu_topi(0),(int16_t)cpu_topi(4),(uint16_t)cpu_topi(8),(uint16_t)cpu_topi(12),(uint8_t)cpu_topi(16),(uint8_t)cpu_topi(20),(int8_t)cpu_topi(24),(str_t)cpu_topi(28)); break; \
+    case 41: meg4_api_remap((addr_t)cpu_topi(0)); break; \
+    case 42:  val = meg4_api_mget((uint16_t)cpu_topi(0),(uint16_t)cpu_topi(4)); break; \
+    case 43: meg4_api_mset((uint16_t)cpu_topi(0),(uint16_t)cpu_topi(4),(uint16_t)cpu_topi(8)); break; \
+    case 44: meg4_api_map((int16_t)cpu_topi(0),(int16_t)cpu_topi(4),(uint16_t)cpu_topi(8),(uint16_t)cpu_topi(12),(uint16_t)cpu_topi(16),(uint16_t)cpu_topi(20),(int8_t)cpu_topi(24)); break; \
+    case 45: meg4_api_maze((uint16_t)cpu_topi(0),(uint16_t)cpu_topi(4),(uint16_t)cpu_topi(8),(uint16_t)cpu_topi(12),(uint8_t)cpu_topi(16),(uint16_t)cpu_topi(20),(uint16_t)cpu_topi(24),(uint16_t)cpu_topi(28),(uint16_t)cpu_topi(32),(uint16_t)cpu_topi(36),(uint8_t)cpu_topi(40),(addr_t)cpu_topi(44)); break; \
+    case 46:  val = meg4_api_getpad((int)cpu_topi(0),(int)cpu_topi(4)); break; \
+    case 47:  val = meg4_api_prspad((int)cpu_topi(0),(int)cpu_topi(4)); break; \
+    case 48:  val = meg4_api_relpad((int)cpu_topi(0),(int)cpu_topi(4)); break; \
+    case 49:  val = meg4_api_getbtn((int)cpu_topi(0)); break; \
+    case 50:  val = meg4_api_getclk((int)cpu_topi(0)); break; \
+    case 51:  val = meg4_api_getkey((int)cpu_topi(0)); break; \
+    case 52:  val = meg4_api_popkey(); break; \
+    case 53:  val = meg4_api_pendkey(); break; \
+    case 54:  val = meg4_api_lenkey((uint32_t)cpu_topi(0)); break; \
+    case 55:  val = meg4_api_speckey((uint32_t)cpu_topi(0)); break; \
+    case 56:  val = meg4_api_rand(); break; \
+    case 57: fval = meg4_api_rnd(); break; \
+    case 58: fval = meg4_api_float((int)cpu_topi(0)); break; \
+    case 59:  val = meg4_api_int((float)cpu_topf(0)); break; \
+    case 60: fval = meg4_api_floor((float)cpu_topf(0)); break; \
+    case 61: fval = meg4_api_ceil((float)cpu_topf(0)); break; \
+    case 62: fval = meg4_api_sgn((float)cpu_topf(0)); break; \
+    case 63: fval = meg4_api_abs((float)cpu_topf(0)); break; \
+    case 64: fval = meg4_api_exp((float)cpu_topf(0)); break; \
+    case 65: fval = meg4_api_log((float)cpu_topf(0)); break; \
+    case 66: fval = meg4_api_pow((float)cpu_topf(0),(float)cpu_topf(4)); break; \
+    case 67: fval = meg4_api_sqrt((float)cpu_topf(0)); break; \
+    case 68: fval = meg4_api_rsqrt((float)cpu_topf(0)); break; \
+    case 69: fval = meg4_api_clamp((float)cpu_topf(0),(float)cpu_topf(4),(float)cpu_topf(8)); break; \
+    case 70: fval = meg4_api_lerp((float)cpu_topf(0),(float)cpu_topf(4),(float)cpu_topf(8)); break; \
+    case 71: fval = meg4_api_pi(); break; \
+    case 72: fval = meg4_api_cos((uint16_t)cpu_topi(0)); break; \
+    case 73: fval = meg4_api_sin((uint16_t)cpu_topi(0)); break; \
+    case 74: fval = meg4_api_tan((uint16_t)cpu_topi(0)); break; \
+    case 75:  val = meg4_api_acos((float)cpu_topf(0)); break; \
+    case 76:  val = meg4_api_asin((float)cpu_topf(0)); break; \
+    case 77:  val = meg4_api_atan((float)cpu_topf(0)); break; \
+    case 78:  val = meg4_api_atan2((float)cpu_topf(0),(float)cpu_topf(4)); break; \
+    case 79: fval = meg4_api_dotv2((addr_t)cpu_topi(0),(addr_t)cpu_topi(4)); break; \
+    case 80: fval = meg4_api_lenv2((addr_t)cpu_topi(0)); break; \
+    case 81: meg4_api_scalev2((addr_t)cpu_topi(0),(float)cpu_topf(4)); break; \
+    case 82: meg4_api_negv2((addr_t)cpu_topi(0)); break; \
+    case 83: meg4_api_addv2((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 84: meg4_api_subv2((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 85: meg4_api_mulv2((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 86: meg4_api_divv2((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 87: meg4_api_clampv2((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8),(addr_t)cpu_topi(12)); break; \
+    case 88: meg4_api_lerpv2((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8),(float)cpu_topf(12)); break; \
+    case 89: meg4_api_normv2((addr_t)cpu_topi(0)); break; \
+    case 90: fval = meg4_api_dotv3((addr_t)cpu_topi(0),(addr_t)cpu_topi(4)); break; \
+    case 91: fval = meg4_api_lenv3((addr_t)cpu_topi(0)); break; \
+    case 92: meg4_api_scalev3((addr_t)cpu_topi(0),(float)cpu_topf(4)); break; \
+    case 93: meg4_api_negv3((addr_t)cpu_topi(0)); break; \
+    case 94: meg4_api_addv3((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 95: meg4_api_subv3((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 96: meg4_api_mulv3((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 97: meg4_api_divv3((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 98: meg4_api_crossv3((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 99: meg4_api_clampv3((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8),(addr_t)cpu_topi(12)); break; \
+    case 100: meg4_api_lerpv3((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8),(float)cpu_topf(12)); break; \
+    case 101: meg4_api_normv3((addr_t)cpu_topi(0)); break; \
+    case 102: fval = meg4_api_dotv4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4)); break; \
+    case 103: fval = meg4_api_lenv4((addr_t)cpu_topi(0)); break; \
+    case 104: meg4_api_scalev4((addr_t)cpu_topi(0),(float)cpu_topf(4)); break; \
+    case 105: meg4_api_negv4((addr_t)cpu_topi(0)); break; \
+    case 106: meg4_api_addv4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 107: meg4_api_subv4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 108: meg4_api_mulv4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 109: meg4_api_divv4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 110: meg4_api_clampv4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8),(addr_t)cpu_topi(12)); break; \
+    case 111: meg4_api_lerpv4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8),(float)cpu_topf(12)); break; \
+    case 112: meg4_api_normv4((addr_t)cpu_topi(0)); break; \
+    case 113: meg4_api_idq((addr_t)cpu_topi(0)); break; \
+    case 114: meg4_api_eulerq((addr_t)cpu_topi(0),(uint16_t)cpu_topi(4),(uint16_t)cpu_topi(8),(uint16_t)cpu_topi(12)); break; \
+    case 115: fval = meg4_api_dotq((addr_t)cpu_topi(0),(addr_t)cpu_topi(4)); break; \
+    case 116: fval = meg4_api_lenq((addr_t)cpu_topi(0)); break; \
+    case 117: meg4_api_scaleq((addr_t)cpu_topi(0),(float)cpu_topf(4)); break; \
+    case 118: meg4_api_negq((addr_t)cpu_topi(0)); break; \
+    case 119: meg4_api_addq((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 120: meg4_api_subq((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 121: meg4_api_mulq((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 122: meg4_api_rotq((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 123: meg4_api_lerpq((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8),(float)cpu_topf(12)); break; \
+    case 124: meg4_api_slerpq((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8),(float)cpu_topf(12)); break; \
+    case 125: meg4_api_normq((addr_t)cpu_topi(0)); break; \
+    case 126: meg4_api_idm4((addr_t)cpu_topi(0)); break; \
+    case 127: meg4_api_trsm4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8),(addr_t)cpu_topi(12)); break; \
+    case 128: fval = meg4_api_detm4((addr_t)cpu_topi(0)); break; \
+    case 129: meg4_api_addm4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 130: meg4_api_subm4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 131: meg4_api_mulm4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 132: meg4_api_mulm4v3((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 133: meg4_api_mulm4v4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(addr_t)cpu_topi(8)); break; \
+    case 134: meg4_api_invm4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4)); break; \
+    case 135: meg4_api_trpm4((addr_t)cpu_topi(0),(addr_t)cpu_topi(4)); break; \
+    case 136: meg4_api_trns((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint8_t)cpu_topi(8),(int16_t)cpu_topi(12),(int16_t)cpu_topi(16),(int16_t)cpu_topi(20),(uint16_t)cpu_topi(24),(uint16_t)cpu_topi(28),(uint16_t)cpu_topi(32),(float)cpu_topf(36)); break; \
+    case 137:  val = meg4_api_inb((addr_t)cpu_topi(0)); break; \
+    case 138:  val = meg4_api_inw((addr_t)cpu_topi(0)); break; \
+    case 139:  val = meg4_api_ini((addr_t)cpu_topi(0)); break; \
+    case 140: meg4_api_outb((addr_t)cpu_topi(0),(uint8_t)cpu_topi(4)); break; \
+    case 141: meg4_api_outw((addr_t)cpu_topi(0),(uint16_t)cpu_topi(4)); break; \
+    case 142: meg4_api_outi((addr_t)cpu_topi(0),(uint32_t)cpu_topi(4)); break; \
+    case 143:  val = meg4_api_memsave((uint8_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
+    case 144:  val = meg4_api_memload((addr_t)cpu_topi(0),(uint8_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
+    case 145: meg4_api_memcpy((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
+    case 146: meg4_api_memset((addr_t)cpu_topi(0),(uint8_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
+    case 147:  val = meg4_api_memcmp((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
+    case 148:  val = meg4_api_deflate((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
+    case 149:  val = meg4_api_inflate((addr_t)cpu_topi(0),(addr_t)cpu_topi(4),(uint32_t)cpu_topi(8)); break; \
+    case 150: fval = meg4_api_time(); break; \
+    case 151:  val = meg4_api_now(); break; \
+    case 152:  val = meg4_api_atoi((str_t)cpu_topi(0)); break; \
+    case 153:  val = meg4_api_itoa((int)cpu_topi(0)); break; \
+    case 154: fval = meg4_api_val((str_t)cpu_topi(0)); break; \
+    case 155:  val = meg4_api_str((float)cpu_topf(0)); break; \
+    case 156:  val = meg4_api_sprintf((str_t)cpu_topi(0)); break; \
+    case 157:  val = meg4_api_strlen((str_t)cpu_topi(0)); break; \
+    case 158:  val = meg4_api_mblen((str_t)cpu_topi(0)); break; \
+    case 159:  val = meg4_api_malloc((uint32_t)cpu_topi(0)); break; \
+    case 160:  val = meg4_api_realloc((addr_t)cpu_topi(0),(uint32_t)cpu_topi(4)); break; \
+    case 161:  val = meg4_api_free((addr_t)cpu_topi(0)); break; 

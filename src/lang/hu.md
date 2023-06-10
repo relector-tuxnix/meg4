@@ -10,7 +10,7 @@ Minden érték kicsi elöl (little endian), azaz a kissebb helyiértékű bájt 
 |  00001 |          1 | MEG-4 förmver verzió minor (alverzió)                              |
 |  00002 |          1 | MEG-4 förmver verzió bugfix (hibajavító verzió)                    |
 |  00003 |          1 | performancia számláló, eltöltetlen idő 1/1000 másodpercekben       |
-|  00004 |          4 | bekapcsolás óta eltelt idő 1/1000 másodpercekben                   |
+|  00004 |          4 | tikkszámláló, bekapcsolás óta eltelt idő 1/1000 másodpercekben     |
 |  00008 |          8 | UTC unix időbélyeg                                                 |
 |  00010 |          2 | kiválaszott lokál, nyelvkód                                        |
 
@@ -266,9 +266,15 @@ A `△△▽▽◁▷◁▷ⒷⒶ` sorozat a `KEY_CHEAT` "gombot" jelzi lenyomot
 |  00499 |          1 | konzol háttérszíne, paletta index 0-tól 255-ig                     |
 |  0049A |          2 | konzol X koordináta pixelben                                       |
 |  0049C |          2 | konzol Y koordináta pixelben                                       |
-|  0049E |          2 | kamera X koordináta pixelben (lásd [tri3d])                        |
-|  004A0 |          2 | kamera Y koordináta pixelben                                       |
-|  004A2 |          2 | kamera Z koordináta pixelben                                       |
+|  0049E |          2 | kamera X koordináta [3D-s tér]ben (lásd [tri3d], [tritx], [mesh])  |
+|  004A0 |          2 | kamera Y koordináta                                                |
+|  004A2 |          2 | kamera Z koordináta                                                |
+|  004A4 |          2 | kamera iránya, dőlésszög (0 fel, 90 előre)                         |
+|  004A6 |          2 | kamera iránya, forgásszög (0 balra, 90 előre)                      |
+|  004A8 |          1 | kamera látószög (45 alapból, negatív ortografikus projekció)       |
+|  004AA |          2 | fényforrás pozíció X koordináta (lásd [tri3d], [tritx], [mesh])    |
+|  004AC |          2 | fényforrás pozíció Y koordináta                                    |
+|  004AE |          2 | fényforrás pozíció Z koordináta                                    |
 |  00600 |      64000 | térkép, 320 x 200 szprájt index (lásd [map] és [maze])             |
 |  10000 |      65536 | szprájtok, 256 x 256 paletta index, 1024 8 x 8 pixel (lásd [spr])  |
 |  28000 |      32768 | csúszóablak 4096 betűglifhez (lásd 0007E, [width] és [text])       |
@@ -404,6 +410,32 @@ hivatkoznak és előírják, hogyan kell azokat megjeleníteni. Ezek a következ
 Megadható kitöltés a `%` és a kód közötti méret megadásával. Ha ez `0`-val kezdődik, akkor nullával tölt ki, egyébként szóközzel.
 Például a `%4d` jobbra fogja igazítani az értéket szóközökkel, míg a `%04x` nullákkal teszi ezt. Az `f` elfogad pontot és egy számot
 utána, ami a tizedesjegyek számát adja meg (egészen 8-ig), például `%.6f`.
+
+## 3D-s Tér
+
+MEG-4 alatt a 3 dimenziós tér a jobbkéz szabály szerint van értelmezve: +X van jobbra, +Y felfelé, és a +Z pedig a néző felé.
+
+```
+  +Y
+   |
+   |__ +X
+  /
++Z
+```
+
+Minden pont a -32767 és +32767 közé esik. Hogy ez a 3D-s világ hogyan képeződik le a 2D-s képernyődre, az azon múlik, hogy
+hogyan állítottad be a kamerát (lásd [Grafikus Feldolgozó Egység] 0049E-as cím). Természetesen meg kell mondanod az X, Y és Z
+koordináták megadásával, hol van a kamera a világban. Aztán meg kell azt is adni, merre néz, a dőlésszöggel és a fordulási szöggel.
+Végezetül meg kell adni a lencse típusát a látószöggel (field of view, FOV). Ez utóbbi általában 30 (nagyon szűk) és 180 fok (mint
+a halak vagy madarak) közé esik. A MEG-4 127 fokig kezeli ezt, de van egy trükk. A pozitív FOV értékek perspektivikusan lesznek
+leképezve (minnél távolabbi egy tárgy, annál kissebb), de negatív értéket is elfogad, ami viszont ortografikus leképezést jelent
+(nem számít a távolság, a tárgy mindig ugyanakkora). A perspektívát az FPS játékok használják, míg az ortografikus leképezést
+általában a stratégiai játékok részesítik előnyben.
+
+Több háromszög együtt (teljes 3D-s modell) hatékonyan jeleníthető meg a [mesh] funkcióval. Mivel a modellek valószínűleg lokális
+koordinátákban vannak megadva, ezért ez minden modellt egymásra rajzol az origó körül. Ha több modellt is szeretnél megjeleníteni a
+világban, ezért azokat először transzformálni kell (el kell helyezni) a világ koordinátáira a [trns] hívásával, és a transzformált
+vertex halmazt kell a [mesh]-nek megadni (a forgatás és az áthelyezés nem változtatja meg a háromszögeket, csak a koordinátáikat).
 
 # Konzol
 
@@ -734,7 +766,7 @@ Kirajzol egy háromszöget.
 | y2 | harmadik csúcs Y koordináta pixelekben |
 </dd>
 <dt>Lásd még</dt><dd>
-[ftri], [tri2d], [tri3d]
+[ftri], [tri2d], [tri3d], [tritx], [mesh], [trns]
 </dd>
 <hr>
 ## ftri
@@ -756,7 +788,7 @@ Kirajzol egy kitöltött háromszöget.
 | y2 | harmadik csúcs Y koordináta pixelekben |
 </dd>
 <dt>Lásd még</dt><dd>
-[tri], [tri2d], [tri3d]
+[tri], [tri2d], [tri3d], [tritx], [mesh], [trns]
 </dd>
 <hr>
 ## tri2d
@@ -782,7 +814,7 @@ Kirajzol egy kitöltött háromszöget színátmenetekkel.
 | y2 | harmadik csúcs Y koordináta pixelekben |
 </dd>
 <dt>Lásd még</dt><dd>
-[tri], [ftri], [tri3d]
+[tri], [ftri], [tri3d], [tritx], [mesh], [trns]
 </dd>
 <hr>
 ## tri3d
@@ -793,7 +825,7 @@ void tri3d(uint8_t pi0, int16_t x0, int16_t y0, int16_t z0,
     uint8_t pi2, int16_t x2, int16_t y2, int16_t z2)
 ```
 <dt>Leírás</dt><dd>
-Kirajzol egy háromszöget színátmenetekkel 3D-s térben, a kamera szemszögéből (lásd [Grafikus Feldolgozó Egység] 0049E-as cím).
+Kirajzol egy háromszöget színátmenetekkel [3D-s tér]ben.
 </dd>
 <dt>Paraméterek</dt><dd>
 | Paraméter | Leírás |
@@ -811,7 +843,58 @@ Kirajzol egy háromszöget színátmenetekkel 3D-s térben, a kamera szemszögé
 | z2 | harmadik csúcs Z koordináta a térben |
 </dd>
 <dt>Lásd még</dt><dd>
-[tri], [ftri], [tri2d]
+[tri], [ftri], [tri2d], [tritx], [mesh], [trns]
+</dd>
+<hr>
+## tritx
+
+```c
+void tritx(uint8_t u0, uint8_t v0, int16_t x0, int16_t y0, int16_t z0,
+    uint8_t u1, uint8_t v1, int16_t x1, int16_t y1, int16_t z1,
+    uint8_t u2, uint8_t v2, int16_t x2, int16_t y2, int16_t z2)
+```
+<dt>Leírás</dt><dd>
+Kirajzol egy textúrázott háromszöget [3D-s tér]ben.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| u0 | első csúcs textúra X koordináta, 0-tól 255-ig |
+| v0 | első csúcs textúra Y koordináta, 0-tól 255-ig |
+| x0 | első csúcs X koordináta a térben |
+| y0 | első csúcs Y koordináta a térben |
+| z0 | első csúcs Z koordináta a térben |
+| u0 | második csúcs textúra X koordináta, 0-tól 255-ig |
+| v0 | második csúcs textúra Y koordináta, 0-tól 255-ig |
+| x1 | második csúcs X koordináta a térben |
+| y1 | második csúcs Y koordináta a térben |
+| z1 | második csúcs Z koordináta a térben |
+| u0 | harmadik csúcs textúra X koordináta, 0-tól 255-ig |
+| v0 | harmadik csúcs textúra Y koordináta, 0-tól 255-ig |
+| x2 | harmadik csúcs X koordináta a térben |
+| y2 | harmadik csúcs Y koordináta a térben |
+| z2 | harmadik csúcs Z koordináta a térben |
+</dd>
+<dt>Lásd még</dt><dd>
+[tri], [ftri], [tri2d], [tri3d], [mesh], [trns]
+</dd>
+<hr>
+## mesh
+
+```c
+void mesh(addr_t verts, addr_t uvs, uint16_t numtri, addr_t tris)
+```
+<dt>Leírás</dt><dd>
+Kirajzol egy modellt a [3D-s tér]ben háromszögekből, indexált pontok és textúra koordináták (vagy paletta) használatával.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| verts | vertex pontok tömbjének címe, egyenként 3 x 2 bájt, X, Y, Z |
+| uvs | UV pontok tömbjének címe (ha 0, akkor palettát használ), egyenként 2 x 1 bájt, textúra X, Y |
+| numtri | háromszögek száma |
+| tris | háromszögek, indexeket tartalmazó tömb címe, egyenként 6 x 1 bájt, vi1, ui1/pi1, vi2, ui2/pi2, vi3, ui3/pi3 |
+</dd>
+<dt>Lásd még</dt><dd>
+[tri], [ftri], [tri2d], [tri3d], [tritx], [trns]
 </dd>
 <hr>
 ## rect
@@ -1664,6 +1747,45 @@ Az érték négyzetgyökének reciproka.
 [pow], [sqrt]
 </dd>
 <hr>
+## clamp
+
+```c
+float clamp(float val, float minv, float maxv)
+```
+<dt>Leírás</dt><dd>
+Lecsípi (klimpeli) a megadott értéket két határérték közé.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| val | érték |
+| minv | minimum érték |
+| maxv | maximum érték |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+Klimpelt érték.
+</dd>
+<dt>Lásd még</dt><dd>
+[clampv2], [clampv3], [clampv4]
+</dd>
+<hr>
+## lerp
+
+```c
+float lerp(float a, float b, float t)
+```
+<dt>Leírás</dt><dd>
+Lineárisan interpolál két érték között.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | első lebegőpontos érték |
+| b | második lebegőpontos érték |
+| t | interpoláció értéke 0.0 és 1.0 között |
+</dd>
+<dt>Lásd még</dt><dd>
+[lerpv2], [lerpv3], [lerpv4], [lerpq], [slerpq]
+</dd>
+<hr>
 ## pi
 
 ```c
@@ -1809,6 +1931,1057 @@ Arkusztangens fokokban, 0-tól 359-ig, 0 felfele, 90 jobbra.
 <dt>Lásd még</dt><dd>
 [cos], [sin], [tan], [acos], [asin]
 </dd>
+<hr>
+## dotv2
+
+```c
+float dotv2(addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Kiszámolja a kételemű vektorok skaláris szorzatát (dot product).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | két float címe |
+| b | két float címe |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+A vektorok skaláris szorzata.
+</dd>
+<dt>Lásd még</dt><dd>
+[lenv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## lenv2
+
+```c
+float lenv2(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Kiszámítja a kételemű vektor hosszát. Ez nagyon lassú, próbáld elkerülni a használatát (lásd [normv2]).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | két float címe |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+A vektor hossza.
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## scalev2
+
+```c
+void scalev2(addr_t a, float s)
+```
+<dt>Leírás</dt><dd>
+Atméretezi a kételemű vektort (skálázás, skalárral szorzás).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | két float címe |
+| b | skálázó érték |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv2], [lenv2], [negv2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## negv2
+
+```c
+void negv2(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Negálja a kételemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | két float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv2], [lenv2], [scalev2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## addv2
+
+```c
+void addv2(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Összead két kételemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | két float címe (kimenet) |
+| a | két float címe |
+| b | két float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## subv2
+
+```c
+void subv2(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Kivon két kételemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | két float címe (kimenet) |
+| a | két float címe |
+| b | két float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [mulv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## mulv2
+
+```c
+void mulv2(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Összeszoroz két kételemű vektort (lineáris kombináció).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | két float címe (kimenet) |
+| a | két float címe |
+| b | két float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [subv2], [divv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## divv2
+
+```c
+void divv2(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Eloszt két kételemű vektort (lineáris kombináció).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | két float címe (kimenet) |
+| a | két float címe |
+| b | két float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [clampv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## clampv2
+
+```c
+void clampv2(addr_t dst, addr_t v, addr_t minv, addr_t maxv)
+```
+<dt>Leírás</dt><dd>
+Lecsípi (klimpeli) a megadott kételemű vektort két határérték közé.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | két float címe (kimenet) |
+| v | két float címe, bemeneti érték |
+| minv | két float címe, minimum |
+| maxv | két float címe, maximum |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [divv2], [lerpv2], [normv2]
+</dd>
+<hr>
+## lerpv2
+
+```c
+void lerpv2(addr_t dst, addr_t a, addr_t b, float t)
+```
+<dt>Leírás</dt><dd>
+Lineárisan interpolál két kételemű vektor között.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | két float címe (kimenet) |
+| a | két float címe |
+| b | két float címe |
+| t | interpoláció értéke 0.0 és 1.0 között |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [normv2]
+</dd>
+<hr>
+## normv2
+
+```c
+void normv2(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Normalizálja a kételemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | két float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv2], [lenv2], [scalev2], [negv2], [addv2], [subv2], [mulv2], [divv2], [clampv2], [lerpv2]
+</dd>
+<hr>
+## dotv3
+
+```c
+float dotv3(addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Kiszámolja a háromelemű vektorok skaláris szorzatát (dot product).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | három float címe |
+| b | három float címe |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+A vektorok skaláris szorzata.
+</dd>
+<dt>Lásd még</dt><dd>
+[lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## lenv3
+
+```c
+float lenv3(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Kiszámítja a háromelemű vektor hosszát. Ez nagyon lassú, próbáld elkerülni a használatát (lásd [normv3]).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | három float címe |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+A vektor hossza.
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## scalev3
+
+```c
+void scalev3(addr_t a, float s)
+```
+<dt>Leírás</dt><dd>
+Atméretezi a háromelemű vektort (skálázás, skalárral szorzás).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | három float címe |
+| b | skálázó érték |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv3], [lenv3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## negv3
+
+```c
+void negv3(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Negálja a háromelemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | három float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv3], [lenv3], [scalev3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## addv3
+
+```c
+void addv3(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Összead két háromelemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | három float címe (kimenet) |
+| a | három float címe |
+| b | három float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## subv3
+
+```c
+void subv3(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Kivon két háromelemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | három float címe (kimenet) |
+| a | három float címe |
+| b | három float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## mulv3
+
+```c
+void mulv3(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Összeszoroz két háromelemű vektort (lineáris kombináció).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | három float címe (kimenet) |
+| a | három float címe |
+| b | három float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [divv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## divv3
+
+```c
+void divv3(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Eloszt két háromelemű vektort (lineáris kombináció).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | három float címe (kimenet) |
+| a | három float címe |
+| b | három float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [crossv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## crossv3
+
+```c
+void crossv3(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Összeszoroz két háromelemű vektort (cross product, keresztszorzat, vektoriális szorzat).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | három float címe (kimenet) |
+| a | három float címe |
+| b | három float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [clampv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## clampv3
+
+```c
+void clampv3(addr_t dst, addr_t v, addr_t minv, addr_t maxv)
+```
+<dt>Leírás</dt><dd>
+Lecsípi (klimpeli) a megadott háromelemű vektort két határérték közé.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | három float címe (kimenet) |
+| v | három float címe, bemeneti érték |
+| minv | három float címe, minimum |
+| maxv | három float címe, maximum |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [lerpv3], [normv3]
+</dd>
+<hr>
+## lerpv3
+
+```c
+void lerpv3(addr_t dst, addr_t a, addr_t b, float t)
+```
+<dt>Leírás</dt><dd>
+Lineárisan interpolál két háromelemű vektor között.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | három float címe (kimenet) |
+| a | három float címe |
+| b | három float címe |
+| t | interpoláció értéke 0.0 és 1.0 között |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [normv3]
+</dd>
+<hr>
+## normv3
+
+```c
+void normv3(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Normalizálja a háromelemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | három float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv3], [lenv3], [scalev3], [negv3], [addv3], [subv3], [mulv3], [divv3], [crossv3], [clampv3], [lerpv3]
+</dd>
+<hr>
+## dotv4
+
+```c
+float dotv4(addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Kiszámolja a négyelemű vektorok skaláris szorzatát (dot product).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | négy float címe |
+| b | négy float címe |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+A vektorok skaláris szorzata.
+</dd>
+<dt>Lásd még</dt><dd>
+[lenv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## lenv4
+
+```c
+float lenv4(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Kiszámítja a négyelemű vektor hosszát. Ez nagyon lassú, próbáld elkerülni a használatát (lásd [normv4]).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | négy float címe |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+A vektor hossza.
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## scalev4
+
+```c
+void scalev4(addr_t a, float s)
+```
+<dt>Leírás</dt><dd>
+Atméretezi a négyelemű vektort (skálázás, skalárral szorzás).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | négy float címe |
+| b | skálázó érték |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv4], [lenv4], [negv4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## negv4
+
+```c
+void negv4(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Negálja a négyelemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv4], [lenv4], [scalev4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## addv4
+
+```c
+void addv4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Összead két négyelemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| a | négy float címe |
+| b | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## subv4
+
+```c
+void subv4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Kivon két négyelemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| a | négy float címe |
+| b | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [mulv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## mulv4
+
+```c
+void mulv4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Összeszoroz két négyelemű vektort (lineáris kombináció).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| a | négy float címe |
+| b | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [subv4], [divv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## divv4
+
+```c
+void divv4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Eloszt két négyelemű vektort (lineáris kombináció).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| a | négy float címe |
+| b | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [clampv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## clampv4
+
+```c
+void clampv4(addr_t dst, addr_t v, addr_t minv, addr_t maxv)
+```
+<dt>Leírás</dt><dd>
+Lecsípi (klimpeli) a megadott négyelemű vektort két határérték közé.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| v | négy float címe, bemeneti érték |
+| minv | négy float címe, minimum |
+| maxv | négy float címe, maximum |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [divv4], [lerpv4], [normv4]
+</dd>
+<hr>
+## lerpv4
+
+```c
+void lerpv4(addr_t dst, addr_t a, addr_t b, float t)
+```
+<dt>Leírás</dt><dd>
+Lineárisan interpolál két négyelemű vektor között.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| a | négy float címe |
+| b | négy float címe |
+| t | interpoláció értéke 0.0 és 1.0 között |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [normv4]
+</dd>
+<hr>
+## normv4
+
+```c
+void normv4(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Normalizálja a négyelemű vektort.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[dotv4], [lenv4], [scalev4], [negv4], [addv4], [subv4], [mulv4], [divv4], [clampv4], [lerpv4]
+</dd>
+<hr>
+## idq
+
+```c
+void idq(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Betölti az identitás kvaterniót.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## eulerq
+
+```c
+void eulerq(addr_t dst, uint16_t pitch, uint16_t yaw, uint16_t roll)
+```
+<dt>Leírás</dt><dd>
+Betölt egy Euler-szögekkel megadott kvaterniót.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| pitch | dőlésszög, X tengely körüli forgatás fokokban, 0-tól 359-ig |
+| yaw | forgásszög, Y tengely körüli forgatás fokokban, 0-tól 359-ig |
+| roll | pörgésszög, Z tengely körüli forgatás fokokban, 0-tól 359-ig |
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## dotq
+
+```c
+float dotq(addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Kiszámolja a kvaternió skaláris szorzatát (dot product).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | négy float címe |
+| b | négy float címe |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+A kvaternió skaláris szorzata.
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [eulerq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## lenq
+
+```c
+float lenq(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Kiszámítja a kvaternió hosszát. Ez nagyon lassú, próbáld elkerülni a használatát (lásd [normq]).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | négy float címe |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+A kvaternió hossza.
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [eulerq], [dotq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## scaleq
+
+```c
+void scaleq(addr_t a, float s)
+```
+<dt>Leírás</dt><dd>
+Atméretezi a kvaterniót (skálázás, skalárral szorzás).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | négy float címe |
+| b | skálázó érték |
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## negq
+
+```c
+void negq(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Negálja a kvaterniót.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## addq
+
+```c
+void addq(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Összead két kvaterniót.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| a | négy float címe |
+| b | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [subq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## subq
+
+```c
+void subq(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Kivon két kvaterniót.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| a | négy float címe |
+| b | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [mulq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## mulq
+
+```c
+void mulq(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Összeszoroz két kvaterniót (vektoriális szorzat).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| a | négy float címe |
+| b | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [rotq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## rotq
+
+```c
+void rotq(addr_t dst, addr_t q, addr_t v)
+```
+<dt>Leírás</dt><dd>
+Összeszoroz egy kvaterniót egy háromelemű forgatási vektorral.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| q | négy float címe |
+| v | három float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [lerpq], [slerpq], [normq]
+</dd>
+<hr>
+## lerpq
+
+```c
+void lerpq(addr_t dst, addr_t a, addr_t b, float t)
+```
+<dt>Leírás</dt><dd>
+Lineárisan interpolál két kvaternió között.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| a | négy float címe |
+| b | négy float címe |
+| t | interpoláció értéke 0.0 és 1.0 között |
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [slerpq], [normq]
+</dd>
+<hr>
+## slerpq
+
+```c
+void slerpq(addr_t dst, addr_t a, addr_t b, float t)
+```
+<dt>Leírás</dt><dd>
+Gömbfelületen interpolál két kvaternió között (spherical).
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| a | négy float címe |
+| b | négy float címe |
+| t | interpoláció értéke 0.0 és 1.0 között |
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [normq]
+</dd>
+<hr>
+## normq
+
+```c
+void normq(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Normalizálja a kvaterniót.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idq], [eulerq], [dotq], [lenq], [scaleq], [negq], [addq], [subq], [mulq], [rotq], [lerpq], [slerpq]
+</dd>
+<hr>
+## idm4
+
+```c
+void idm4(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Betölti a 4 x 4-es identitás mátrixot.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | 16 float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[trsm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## trsm4
+
+```c
+void trsm4(addr_t dst, addr_t t, addr_t r, addr_t s)
+```
+<dt>Leírás</dt><dd>
+Létrehoz egy 4 x 4-es transzformációs mátrixot eltolás, forgatás és nagyítás adatokból.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | 16 float címe, a kimeneti mátrix |
+| t | három float címe, az eltolás vektor (translation) |
+| r | négy float címe, a forgatási kvaternió (rotation) |
+| s | három float címe, a nagyítási vektor (scaling) |
+</dd>
+<dt>Lásd még</dt><dd>
+[idm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## detm4
+
+```c
+float detm4(addr_t a)
+```
+<dt>Leírás</dt><dd>
+Visszaadja a mátrix determinánsát.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| a | 16 float címe |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+A mátrix determinánsa.
+</dd>
+<dt>Lásd még</dt><dd>
+[idm4], [trsm4], [addm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## addm4
+
+```c
+void addm4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Összead két mátrixot.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | 16 float címe (kimenet) |
+| a | 16 float címe |
+| b | 16 float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idm4], [trsm4], [detm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## subm4
+
+```c
+void subm4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Kivon két mátrixot.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | 16 float címe (kimenet) |
+| a | 16 float címe |
+| b | 16 float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [mulm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## mulm4
+
+```c
+void mulm4(addr_t dst, addr_t a, addr_t b)
+```
+<dt>Leírás</dt><dd>
+Összeszoroz két mátrixot.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | 16 float címe (kimenet) |
+| a | 16 float címe |
+| b | 16 float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [subm4], [mulm4v3], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## mulm4v3
+
+```c
+void mulm4v3(addr_t dst, addr_t m, addr_t v)
+```
+<dt>Leírás</dt><dd>
+Összeszoroz egy háromelemű vektort egy mátrixszal.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | három float címe (kimenet) |
+| m | 16 float címe |
+| v | három float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v4], [invm4], [trpm4]
+</dd>
+<hr>
+## mulm4v4
+
+```c
+void mulm4v4(addr_t dst, addr_t m, addr_t v)
+```
+<dt>Leírás</dt><dd>
+Összeszoroz egy négyelemű vektort egy mátrixszal.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | négy float címe (kimenet) |
+| m | 16 float címe |
+| v | négy float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v3], [invm4], [trpm4]
+</dd>
+<hr>
+## invm4
+
+```c
+void invm4(addr_t dst, addr_t a)
+```
+<dt>Leírás</dt><dd>
+Kiszámítja a mátrix inverzét.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | 16 float címe (kimenet) |
+| a | 16 float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [trpm4]
+</dd>
+<hr>
+## trpm4
+
+```c
+void trpm4(addr_t dst, addr_t a)
+```
+<dt>Leírás</dt><dd>
+Transzponálja a mátrixot.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | 16 float címe (kimenet) |
+| a | 16 float címe |
+</dd>
+<dt>Lásd még</dt><dd>
+[idm4], [trsm4], [detm4], [addm4], [subm4], [mulm4], [mulm4v3], [mulm4v4], [invm4]
+</dd>
+<hr>
+## trns
+
+```c
+void trns(addr_t dst, addr_t src, uint8_t num,
+    int16_t x, int16_t y, int16_t z,
+    uint16_t pitch, uint16_t yaw, uint16_t roll,
+    float scale)
+```
+<dt>Leírás</dt><dd>
+Transzformálja a vertex halmazt, azaz elhelyezi a 3D-s modellt a [3D-s tér]ben.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| dst | cél vertex pontok tömbjének címe, egyenként 3 x 2 bájt, X, Y, Z |
+| src | forrás vertex pontok tömbjének címe, egyenként 3 x 2 bájt, X, Y, Z |
+| num | vertex koordinátahármasok száma a tömbben |
+| x | világ X koordináta, -32767-tól 32767-ig |
+| y | világ Y koordináta, -32767-tól 32767-ig |
+| z | világ Z koordináta, -32767-tól 32767-ig |
+| pitch | dőlésszög, X tengely körüli forgatás fokokban, 0-tól 359-ig |
+| yaw | forgásszög, Y tengely körüli forgatás fokokban, 0-tól 359-ig |
+| roll | pörgésszög, Z tengely körüli forgatás fokokban, 0-tól 359-ig |
+| scale | átméretezés, használj 1.0-t az eredeti méret megtartásához |
+</dd>
+<dt>Lásd még</dt><dd>
+[mesh]
+</dd>
 
 # Memória
 
@@ -1888,7 +3061,7 @@ Kiír egy szót (word, 2 bájt) a memóriába.
 | value | beállítandó érték, 0-tól 65536-ig |
 </dd>
 <hr>
-## outl
+## outi
 
 ```c
 void outi(addr_t dst, uint32_t value)
