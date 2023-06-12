@@ -30,6 +30,10 @@
 #include <math.h>
 float powf(float, float);
 uint32_t debug_disasm(uint32_t pc, char *out);
+#if DEBUG
+#include <stdio.h>
+extern int strace;
+#endif
 
 /* cpu_compile() is in its own compilation unit, in comp.c */
 
@@ -201,6 +205,9 @@ void cpu_fetch(void)
 #if !defined(NOEDITORS) && defined(DEBUG)
     char tmp[256];
 #endif
+#if DEBUG
+    int j;
+#endif
     uint32_t pc, sp;
     int i, val;
     float fval;
@@ -229,6 +236,19 @@ void cpu_fetch(void)
         case BC_SCALL:
             i = val;
             if(i < 0 || i >= MEG4_NUM_API) { MEG4_DEBUGGER(ERR_BADSYS); } else {
+#if DEBUG
+                if(strace) {
+                    printf("meg4: SCALL: %s(", meg4_api[i].name);
+                    for(j = 0, val = 1; j < meg4_api[i].narg; j++, val <<= 1) {
+                        if(j) printf(", ");
+                        if(meg4_api[i].fmsk & val) printf("%f", cpu_topf(j * 4)); else
+                        if((meg4_api[i].amsk & val) || (meg4_api[i].smsk & val)) printf("0x%x", cpu_topi(j * 4)); else
+                        if(meg4_api[i].umsk & val) printf("%u", cpu_topi(j * 4)); else printf("%d", cpu_topi(j * 4));
+                    }
+                    if(meg4_api[i].varg && j == meg4_api[i].varg) printf(", ...");
+                    printf(")\r\n");
+                }
+#endif
                 val = 0; fval = 0; sp = meg4.sp;
                 /* call the MEG-4 API */
                 switch(i) {

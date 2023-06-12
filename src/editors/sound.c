@@ -112,7 +112,8 @@ int sound_ctrl(void)
             if(loop && px >= 11 && px <= 11+512 && py >= 23 && py <= 23+256) {
                 i = (px - 11) * (((uint8_t)ptr[1]<<8)|(uint8_t)ptr[0]) / 512;
                 j = ((uint8_t)ptr[3]<<8)|(uint8_t)ptr[2];
-                if(j < i) { i -= j; ptr[4] = i & 0xff; ptr[5] = (i >> 8) & 0xff; }
+                if(loop == 2) { loop = 1; ptr[2] = i & 0xff; ptr[3] = (i >> 8) & 0xff; ptr[4] = 1; ptr[5] = 0; } else
+                if(j <= i) { i -= (j - 1); ptr[4] = i & 0xff; ptr[5] = (i >> 8) & 0xff; }
             } else
             if(wave && ptr && px >= 11 && px < 11+512 && py >= 23 && py < 23+256) {
                 l = ((uint8_t)ptr[1]<<8)|(uint8_t)ptr[0];
@@ -161,7 +162,7 @@ int sound_ctrl(void)
                 if(px >= 88 && px < 100) { if((uint8_t)ptr[7] > 0) ptr[7]--; } else
                 if(px >= 116 && px < 128) { if((uint8_t)ptr[7] < 64) ptr[7]++; } else
                 /* set loop */
-                if(px >= 136 && px < 148) { loop = 1; } else
+                if(px >= 136 && px < 148) { loop = 2; ptr[2] = ptr[3] = ptr[4] = ptr[5] = 0; } else
                 /* generate default waves */
                 if(px >= 180 && px < 192) { dsp_genwave(meg4.mmio.sounds[(idx << 2) + 1], 0); } else
                 if(px >= 196 && px < 208) { dsp_genwave(meg4.mmio.sounds[(idx << 2) + 1], 1); } else
@@ -345,7 +346,7 @@ void sound_view(void)
     meg4.mmio.cropy0 = 0; meg4.mmio.cropy1 = htole16(388);
 
     /* waveform editor */
-    meg4_box(meg4.valt, 640, 388, 2560, 10, 10, 512+2, 256+2, theme[THEME_D], theme[THEME_BG], theme[THEME_L], 0, 0, 0, 1, 0);
+    meg4_box(meg4.valt, 640, 388, 2560, 10, 10, 512+3, 256+2, theme[THEME_D], theme[THEME_BG], theme[THEME_L], 0, 0, 0, 1, 0);
     if(!meg4.mmio.sounds[(idx << 2) + 1]) {
         meg4_text(meg4.valt, 10 + (514 - unaw) / 2, 130, 2560, theme[THEME_D], theme[THEME_L], 1, meg4_font, lang[MENU_UNAVAIL]);
     } else {
@@ -434,6 +435,10 @@ void sound_view(void)
             }
         }
     } else {
+        /* legnth of wave indicators */
+        meg4_text(meg4.valt, 8, 267, 2560, fg, 0, 1, meg4_font, "0");
+        sprintf(tmp, "%u", ptr ? ((uint8_t)ptr[1]<<8)|(uint8_t)ptr[0] : 0);
+        meg4_text(meg4.valt, 526 - meg4_width(meg4_font, 1, tmp, NULL), 267, 2560, fg, 0, 1, meg4_font, tmp);
         /* display wave editor toolbar */
         toolbox_btn(36, 276, 0x11, 0);
         toolbox_btn(60, 276, 0x10, 0);

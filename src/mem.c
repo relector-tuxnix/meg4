@@ -264,7 +264,7 @@ int meg4_api_memsave(uint8_t overlay, addr_t src, uint32_t size)
     uint32_t i, l;
     char tmp[sizeof meg4_title + 32];
 
-    if(!size || src >= MEG4_MEM_LIMIT) { MEG4_DEBUGGER(ERR_BADARG); return 0; }
+    if(!size || src >= MEG4_MEM_LIMIT) { MEG4_DEBUGGER(ERR_BADADR); return 0; }
     if(src + size > MEG4_MEM_LIMIT) size = MEG4_MEM_LIMIT - src;
     if(meg4_title[0]) {
         strcpy(tmp, "overlays/"); strcat(tmp, meg4_title); strcat(tmp, "/mem"); l = strlen(tmp);
@@ -295,7 +295,7 @@ int meg4_api_memload(addr_t dst, uint8_t overlay, uint32_t maxsize)
     uint32_t i, l, len = 0;
     char tmp[sizeof meg4_title + 32];
 
-    if(dst >= MEG4_MEM_LIMIT) { MEG4_DEBUGGER(ERR_BADARG); return 0; }
+    if(dst >= MEG4_MEM_LIMIT) { MEG4_DEBUGGER(ERR_BADADR); return 0; }
     if(dst + maxsize > MEG4_MEM_LIMIT) maxsize = MEG4_MEM_LIMIT - dst;
     meg4_api_memset(dst, 0, maxsize);
     if(meg4_title[0]) {
@@ -329,6 +329,7 @@ int meg4_api_memload(addr_t dst, uint8_t overlay, uint32_t maxsize)
 void meg4_api_memcpy(addr_t dst, addr_t src, uint32_t len)
 {
     int i, l = len;
+    if(src >= MEG4_MEM_LIMIT || dst >= MEG4_MEM_LIMIT) { MEG4_DEBUGGER(ERR_BADADR); return; }
     if(src + l >= MEG4_MEM_LIMIT) l = MEG4_MEM_LIMIT - src;
     if(dst + l >= MEG4_MEM_LIMIT) l = MEG4_MEM_LIMIT - dst;
     if(src >= 16 && dst >= 16 && src + l < sizeof(meg4.mmio) && dst + l < sizeof(meg4.mmio)) {
@@ -356,6 +357,7 @@ void meg4_api_memcpy(addr_t dst, addr_t src, uint32_t len)
 void meg4_api_memset(addr_t dst, uint8_t value, uint32_t len)
 {
     int i, l = len;
+    if(dst >= MEG4_MEM_LIMIT) { MEG4_DEBUGGER(ERR_BADADR); return; }
     if(dst + l >= MEG4_MEM_LIMIT) l = MEG4_MEM_LIMIT - dst;
     if(dst >= 16 && dst + l < sizeof(meg4.mmio)) {
         memset((uint8_t*)&meg4.mmio + dst, value, l);
@@ -380,6 +382,7 @@ int meg4_api_memcmp(addr_t addr0, addr_t addr1, uint32_t len)
 {
     int ret = 0, i = 0, l = len;
     if(l > 0) {
+        if(addr0 >= MEG4_MEM_LIMIT || addr1 >= MEG4_MEM_LIMIT) { MEG4_DEBUGGER(ERR_BADADR); return -1; }
         if(addr0 + l >= MEG4_MEM_LIMIT) l = MEG4_MEM_LIMIT - addr0;
         if(addr1 + l >= MEG4_MEM_LIMIT) l = MEG4_MEM_LIMIT - addr1;
         if(addr0 + l < sizeof(meg4.mmio) && addr1 +l < sizeof(meg4.mmio))
@@ -406,7 +409,7 @@ int meg4_api_deflate(addr_t dst, addr_t src, uint32_t len)
     uint8_t *buf;
     int s;
 
-    if(len > sizeof(meg4.data) || dst < MEG4_MEM_USER || src < MEG4_MEM_USER || src + len >= MEG4_MEM_LIMIT) { MEG4_DEBUGGER(ERR_BADARG); return 0; }
+    if(len > sizeof(meg4.data) || dst < MEG4_MEM_USER || src < MEG4_MEM_USER || src + len >= MEG4_MEM_LIMIT) { MEG4_DEBUGGER(ERR_BADADR); return 0; }
     buf = stbi_zlib_compress(meg4.data + src - MEG4_MEM_USER, (int)len, &s, 9);
     if(buf) {
         if(s > 2 && dst + s - 2 < meg4.sp) { s -= 2; memcpy(meg4.data + dst - MEG4_MEM_USER, buf + 2, s); } else s = 0;
@@ -428,7 +431,7 @@ int meg4_api_inflate(addr_t dst, addr_t src, uint32_t len)
     uint8_t *buf;
     uint32_t i, k;
 
-    if(len > sizeof(meg4.data) || dst < MEG4_MEM_USER || src < MEG4_MEM_USER || src + len >= MEG4_MEM_LIMIT) { MEG4_DEBUGGER(ERR_BADARG); return 0; }
+    if(len > sizeof(meg4.data) || dst < MEG4_MEM_USER || src < MEG4_MEM_USER || src + len >= MEG4_MEM_LIMIT) { MEG4_DEBUGGER(ERR_BADADR); return 0; }
     buf = meg4.data + src - MEG4_MEM_USER;
     /* skip over zlib header (if any) */
     if(buf[0] == 0x78 && (buf[1] == 0x01 || buf[1] == 0x5E || buf[1] == 0x9C || buf[1] == 0xDA)) { buf += 2; len -= 2; } else

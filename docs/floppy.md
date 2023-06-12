@@ -7,7 +7,7 @@ compressed. Once uncompressed, it contains a series of further blocks (MEG-4 chu
 
 | Offset | Size  | Description                                            |
 |-------:|------:|--------------------------------------------------------|
-|      0 |     1 | Magic byte                                             |
+|      0 |     1 | Magic byte, MEG-4 chunk type                           |
 |      1 |     3 | Little endian size of the chunk, including this header |
 
 Single chunks may occur zero or one time, while multiple chunks may occur zero or multiple times. Multiple chunks have an
@@ -29,8 +29,8 @@ This is a mandatory single chunk and it always must be the very first.
 |     72 |    64 | Zero terminated, UTF-8 author                          |
 
 Checking this chunk's size is part of the magic, because further info might be added in the future, however that alone won't
-change the format. For now, firmware version is useless, always zero, but will be useful for backward compatibility if / when
-the floppy format changes.
+change the format. For now, firmware version is useless, but will be useful for backward compatibility if / when the floppy
+format changes in the future.
 
 The author is only saved by the MEG-4 PRO, otherwise it's all zeros.
 
@@ -59,7 +59,7 @@ This is an optional single chunk.
 |      1 |     3 | at least 5                                             |
 |      4 |     x | program's source code                                  |
 
-The MEG-4 PRO version saves a zero byte and compiled bytecode in this chunk when it exports standalone WebAssembly games.
+The MEG-4 PRO version saves a language type byte and compiled bytecode in this chunk when it exports standalone WebAssembly games.
 
 Otherwise it's plain text source code, which always starts with a shebang `#!(language)` line.
 
@@ -86,7 +86,7 @@ This is an optional single chunk.
 |      4 |     x | RLE compressed palette indexes of a 256 x 256 image    |
 
 RLE packets start with a header byte, which encodes N (= header & 0x7F). If header bit 7 is set, then next byte should be
-repeated N+1 times, if not, then the next N+1 bytes are all different indeces.
+repeated N+1 times, if not, then the next N+1 bytes are all different indeces. Indeces refer to colors in the palette.
 
 Map
 ---
@@ -100,7 +100,7 @@ This is an optional single chunk.
 |      4 |     1 | map sprite selector (valid values 0 - 3)               |
 |      5 |     x | RLE compressed sprite indexes of a 320 x 200 image     |
 
-RLE packets start with a header byte, same encoding as with sprites.
+RLE packets start with a header byte, same encoding as with sprites. Indeces refer to sprites (map selector * 256 + index).
 
 Font
 ----
@@ -115,6 +115,8 @@ This is an optional single chunk.
 
 The font data contains packets, each with a signed byte header. If the header is positive (0 - 127), then (header + 1) * 8
 bytes follow, the bitmap data. If it's negative, then no data follows, and -header many codepoints skipped.
+
+Each 8 bytes block is a bitmap, with 1 byte per row (giving the total of 8 x 8 pixels per glyph).
 
 Waveform
 --------
@@ -134,7 +136,7 @@ This is an optional multiple chunk.
 |     13 |     1 | volume                                                 |
 |     14 |     x | interleaved waveform data                              |
 
-Note that waveform index 0 is reserved.
+Note that waveform index 0 is reserved (on music tracks, that means keep using the currently selected waveform).
 
 Sounds
 ------
@@ -145,7 +147,7 @@ This is an optional single chunk.
 |-------:|------:|--------------------------------------------------------|
 |      0 |     1 | Magic 8, `MEG4_CHUNK_SFX`                              |
 |      1 |     3 | 4 to 260                                               |
-|      4 |     x | sound data, 4 bytes for each 64 bank                   |
+|      4 |     x | sound data, 4 bytes for each 64 bank (see below)       |
 
 Music Tracks
 ------------
@@ -159,6 +161,18 @@ This is an optional multiple chunk.
 |      4 |     1 | track index (valid values 0 - 7)                       |
 |      5 |     x | row data, 4 x 4 bytes each                             |
 
+Both sounds and music tracks encode notes on 4 bytes as
+
+| Offset | Size  | Description                                            |
+|-------:|------:|--------------------------------------------------------|
+|      0 |     1 | pitch, valid values 0 (C-0) - 96 (B-7)                 |
+|      1 |     1 | waveform index, 0 - 31                                 |
+|      2 |     1 | effect type, 0 - 255                                   |
+|      3 |     1 | effect parameter                                       |
+
+Sounds chunk has one note per row, music tracks have 4 notes per row. Waveform index 0 and some effects are only valid for music
+tracks. The full list of effect type codes can be found in the memory map documentation, under section Digital Signal Processor.
+
 Overlays
 --------
 
@@ -171,4 +185,5 @@ This is an optional multiple chunk.
 |      4 |     1 | overlay index (valid values 0 - 255)                   |
 |      5 |     x | overlay data                                           |
 
-Overlays are very similar to `MEG4_CHUNK_DATA`, but programs can load them to arbitrary positions dynamically in run-time.
+Overlays are very similar to `MEG4_CHUNK_DATA`, but programs can load them to arbitrary positions dynamically in run-time using
+the `memload` function.

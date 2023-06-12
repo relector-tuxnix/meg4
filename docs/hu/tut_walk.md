@@ -43,6 +43,7 @@ void loop()
   spr(144, 84, 0, 4, 4, 0, 0);</hm>
 }
 ```
+
 A képernyő közepe 160, 100-nál van, de a karakterünk 4 x 4 szprájtból áll (32 x 32 pixeles), így ennek a felét le kell vonni.
 Ezt követő 0 a `sprite`, ami az első szprájtot jelenti, 4, 4-el folytatva, mivel összesen ennyi szprájtot akarunk kirakni. Az
 utolsó két paraméter 0, 0, mivel nem akarunk sem nagyítani, sem transzformációt használni. Úgy akarjuk a szprájtokat megjeleníteni,
@@ -87,7 +88,7 @@ void loop()
 }
 ```
 
-Leütheted az <kbd>F3</kbd>-at és a szprájtválasztóban a karakter bal felső szprátjára kattintva kiírja az adott irányhoz
+Leütheted az <kbd>F3</kbd>-at és a szprájtválasztóban a karakter bal felső szprájtjára kattintva kiírja az adott irányhoz
 tartozó szprájt sorszámát. Ezt az `irány` változóban fogjuk tárolni, és ezt a változót használjuk a `sprite` paraméter helyén.
 
 Próbáljuk ki! Látni fogjuk, hogy a kurzornyilak lenyomására irányt vált a karakterünk.

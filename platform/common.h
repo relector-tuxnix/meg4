@@ -31,7 +31,7 @@
 #endif
 
 /* command line flags */
-int verbose = 0, zenity = 0, nearest = 0;
+int verbose = 0, zenity = 0, nearest = 0, strace = 0;
 char *main_floppydir = NULL;
 void main_hdr(void);
 void meg4_export(char *name, int binary);
@@ -916,6 +916,9 @@ void main_parsecommandline(int argc, char **argv, char **lng, char **infile)
                     case 'L': if(j == 1 && argv[i + 1]) { *lng = argv[++i]; j = 16; } else goto usage; break;
                     case 'd': if(j == 1 && argv[i + 1]) { main_floppydir = argv[++i]; j = 16; } else goto usage; break;
                     case 'v': verbose++; break;
+#ifdef DEBUG
+                    case 's': strace++; break;
+#endif
 #ifndef __WIN32__
                     case 'z': zenity++; break;
 #endif
@@ -927,6 +930,9 @@ usage:                  main_hdr();
                             "[" CLIFLAG "z] "
 #endif
                             "[" CLIFLAG "n] [" CLIFLAG "v|" CLIFLAG "vv|" CLIFLAG "vvv] "
+#ifdef DEBUG
+                            "[" CLIFLAG "s]"
+#endif
 #ifndef EMBED
                             "["
 #endif

@@ -416,13 +416,14 @@ A megjelenő ablakban, a <i>Cél</i> mezőben tudod állítani a parancssori opc
 program helyett erre a parancsikonra kattints, és az adott opciókkal fog elinduli a program. Ha szeretnéd, akár több parancsikonod
 is lehet, különböző opciókkal.</p>
 <div class="pre"><pre>
-meg4 [-L &lt;xx&gt;] [-z] [-n] [-v|-vv] [-d &lt;mappa&gt;] [flopi]
+meg4 [-L &lt;xx&gt;] [-z] [-n] [-v|-vv] [-s] [-d &lt;mappa&gt;] [flopi]
 </pre></div>
 <div class="table"><table><tr><th>Opció </th><th>Leírás </th></tr>
 <tr><td><samp>-L &lt;xx&gt;</samp> </td><td>A kapcsoló paramétere "en", "es", "de", "fr" stb. lehet. A megadásával egy adott szótárat használ az emulátor, és nem detektálja a nyelvet. Ha nincs a megadott szótár, akkor angolra vált. </td></tr>
 <tr><td><samp>-z</samp> </td><td>Linux alatt alapból a GTK függvénykönyvtárakat futáskor linkeli, hogy a fájlválasztót megnyissa. Ennek a kapcsolónak a hatására inkább a <samp>zenity</samp> programot fogja meghívni (a zenitynek telepítve kell lennie a gépeden). </td></tr>
 <tr><td><samp>-n</samp> </td><td>Mindenképp a "nearest" (legközelebbi pixel) interpolációs metódust használja. Alapból csak akkor használatos, ha az emulátor ablakmérete a 320 x 200 egész többszöröse. </td></tr>
 <tr><td><samp>-v, -vv</samp> </td><td>Szószátyár mód. <samp>meg4</samp> részletes infókat fog kiírni a szabvány kimenetre (valamint a programod <a href="#trace" onclick="c('trace')">trace</a> hívásai is itt jelennek meg), ezért ez a kapcsoló terminálból hívandó. </td></tr>
+<tr><td><samp>-s</samp> </td><td>Strace mód, rendszerhívások listázása (csak ha DEBUG támogatással lett fordítva). </td></tr>
 <tr><td><samp>-d &lt;mappa&gt;</samp> </td><td>Opcionális, ha meg van adva, akkor a flopikat ebben a könyvtárban fogja tárolni, és nem használ fájlválasztót. </td></tr>
 <tr><td><samp>flopi</samp> </td><td>Ha meg van adva, akkor automatikusan betölti az itt megadott flopit (vagy bármilyen más támogatott formátumú fájlt) induláskor. </td></tr></table></div><br style="clear:both;"><label class="btn prev" accesskey="p" for="_">Előző</label><label class="btn next" accesskey="n" for="_fajlformatumok" title="Fájlformátumok">Következő</label></div>
 <div class="page" rel="fajlformatumok"><div><ul class="breadcrumbs"><li><label class="home" for="_" title="Főoldal"></label>&nbsp;»</li><li>&nbsp;Fájlformátumok</li></ul><hr></div>
@@ -1801,7 +1802,7 @@ lényegtelen eltéréssel a jobb integráció kedvéért ugyanúgy használható
 <p>Amennyiben érdekel ez a nyelv, magyarul <a href="http://nyelvek.inf.elte.hu/leirasok/Lua" target="new">itt találsz</a> róla bővebb információt, illetve a
 hivatalos <a href="https://www.lua.org/pil" target="new">Programming in Lua</a> útmutató (angolul).</p>
 <h2 id="api_elteresek">API Eltérések<a href="#api_elteresek"></a></h2>
-<ul><li><a href="#memsave" onclick="c('memsave')">memsave</a> egyformánt elfogad MEG-4 memória címet (integer) vagy Lua táblát integer számokkal (ami egy bájttömb akar lenni).</li>
+<ul><li><a href="#memsave" onclick="c('memsave')">memsave</a> egyformán elfogad MEG-4 memória címet (integer) vagy Lua táblát integer számokkal (ami egy bájttömb akar lenni).</li>
 <li><a href="#memload" onclick="c('memload')">memload</a> híváskor mindenképp egy érvényes MEG-4 memória címet vár, de aztán Lua táblát ad vissza. Ha nem speciális MMIO
 területre akarsz betölteni, akkor <samp>MEM_USER</samp>-t (0x30000-et) adj meg, és csak használd az adatokat a visszaadott Lua táblában.</li>
 <li><a href="#memcpy" onclick="c('memcpy')">memcpy</a> paramétere lehet két MEG-4 memória cím, ahogy megszokott, de az egyik lehet Lua tábla is (de csak az egyik, mindkettő
@@ -4532,10 +4533,10 @@ Indítsd el a <samp>meg4</samp>-et, és húzd rá az ablakára ezt a 256 x 256 p
   <span class="hl_c">/* Minden képkockánál lefuttatandó dolgok, 60 FPS */</span>
 <span class="hl_h hl_b">  <span class="hl_f">cls</span>(<span class="hl_n">0</span>);
   <span class="hl_f">spr</span>(<span class="hl_n">144</span>, <span class="hl_n">84</span>, <span class="hl_n">0</span>, <span class="hl_n">4</span>, <span class="hl_n">4</span>, <span class="hl_n">0</span>, <span class="hl_n">0</span>);</span>}</code></div>
-A képernyő közepe 160, 100-nál van, de a karakterünk 4 x 4 szprájtból áll (32 x 32 pixeles), így ennek a felét le kell vonni.
+<p>A képernyő közepe 160, 100-nál van, de a karakterünk 4 x 4 szprájtból áll (32 x 32 pixeles), így ennek a felét le kell vonni.
 Ezt követő 0 a <samp>sprite</samp>, ami az első szprájtot jelenti, 4, 4-el folytatva, mivel összesen ennyi szprájtot akarunk kirakni. Az
 utolsó két paraméter 0, 0, mivel nem akarunk sem nagyítani, sem transzformációt használni. Úgy akarjuk a szprájtokat megjeleníteni,
-ahogy azok a szprájtszerkesztőben látszanak.
+ahogy azok a szprájtszerkesztőben látszanak.</p>
 <h2 id="iranyvaltoztatas">Irányváltoztatás<a href="#iranyvaltoztatas"></a></h2>
 <p>Tegyük lehetővé, hogy megváltoztatható legyen, merre néz a karakter. Ehhez a <a href="#getpad" onclick="c('getpad')">getpad</a> hívást fogjuk használni, ami visszaadja a
 játékpad állapotát. Mivel az elsődleges játékpad a billentyűzetre is le van képezve, ezért ez a kurzornyilakkal is működni fog.
@@ -4568,7 +4569,7 @@ megjelenítenünk.</p>
   <span class="hl_f">cls</span>(<span class="hl_n">0</span>);
   <span class="hl_f">spr</span>(<span class="hl_n">144</span>, <span class="hl_n">84</span>, <span class="hl_h"><span class="hl_v">irány</span></span>, <span class="hl_n">4</span>, <span class="hl_n">4</span>, <span class="hl_n">0</span>, <span class="hl_n">0</span>);
 }</code></div>
-<p>Leütheted az <kbd>F3</kbd>-at és a szprájtválasztóban a karakter bal felső szprátjára kattintva kiírja az adott irányhoz
+<p>Leütheted az <kbd>F3</kbd>-at és a szprájtválasztóban a karakter bal felső szprájtjára kattintva kiírja az adott irányhoz
 tartozó szprájt sorszámát. Ezt az <samp>irány</samp> változóban fogjuk tárolni, és ezt a változót használjuk a <samp>sprite</samp> paraméter helyén.</p>
 <p>Próbáljuk ki! Látni fogjuk, hogy a kurzornyilak lenyomására irányt vált a karakterünk.</p>
 <h2 id="animalas_hozzaadasa">Animálás hozzáadása<a href="#animalas_hozzaadasa"></a></h2>

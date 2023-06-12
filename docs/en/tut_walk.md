@@ -22,7 +22,7 @@ window to import.
 
 As you can see, one character sprite is made up of 4 x 4 sprites. Let's display that! Press <kbd>F2</kbd> to go to the code editor.
 
-Display character
+Display Character
 -----------------
 
 We start with the usual skeleton. We know from the previous tutorial that we'll have to clear the screen and display the sprites
@@ -49,7 +49,7 @@ half of that. Then comes 0 for `sprite`, meaning the first sprite, followed by 4
 The last two parameters are 0, 0 because we don't want to scale nor transform. We want the sprites to be display exactly as they
 appear in the sprite editor.
 
-Changing directions
+Changing Directions
 -------------------
 
 Next, let's allow changing the direction in which the character is pointing to. For that, we'll use [getpad], which returns the
@@ -92,7 +92,7 @@ direction. We set these in the `dir` variable, and we'll use this variable in pl
 
 Try it out! You'll see that by pressing the arrows our character will change directions.
 
-Adding animation
+Adding Animation
 ----------------
 
 Our character doesn't walk yet. Let's fix it! We want our character to walk when a button (or arrow key) is pressed, and stop

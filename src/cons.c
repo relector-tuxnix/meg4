@@ -62,10 +62,9 @@ void meg4_putc(uint32_t c)
     if(!c) return;
     if(c == '\r') { meg4.mmio.conx = 0; meg4_conrst(); return; }
     if(c == '\n') { meg4.mmio.conx = 0; meg4.mmio.cony += 8; meg4_conrst(); if(meg4.mmio.cony + 8 > meg4.screen.h) { meg4.mmio.cony = 0; } return; }
-    if(c == '\t') { m = meg4.mmio.conx; meg4.mmio.conx = (meg4.mmio.conx + 32) & 31; m -= meg4.mmio.conx; cache[numcache++] = m; }
+    if(c == '\t') { m = meg4.mmio.conx; meg4.mmio.conx = (meg4.mmio.conx + 32) & ~31; cache[numcache++] = meg4.mmio.conx - m; }
     if(meg4.mmio.conx + 8 > meg4.screen.w || numcache + 1 >= (int)sizeof(cache)) { meg4.mmio.conx = 0; meg4.mmio.cony += 8; meg4_conrst(); }
     if(meg4.mmio.cony + 8 > meg4.screen.h) { meg4.mmio.conx = meg4.mmio.cony = 0; meg4_conrst(); }
-    if(c < 32) return;
     dx = (meg4.mmio.scrx > 320 ? 0 : meg4.mmio.scrx) + meg4.mmio.conx;
     dy = (meg4.mmio.scry > 200 ? 0 : meg4.mmio.scry) + meg4.mmio.cony;
     dst = &meg4.vram[dy * p + dx];
@@ -99,7 +98,7 @@ void meg4_putc(uint32_t c)
         cache[numcache++] = 9; meg4.mmio.conx += 9;
         return;
     } else
-    if(c > 0xffff) return;
+    if(c < 32 || c > 0xffff) return;
     fnt = meg4_font + 8 * c;
     l = meg4_font[8 * 65536 + c] & 0xf; r = meg4_font[8 * 65536 + c] >> 4;
     m = r - l + 1; cache[numcache++] = m + 1; meg4.mmio.conx += m + 1;
