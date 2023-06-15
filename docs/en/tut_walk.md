@@ -99,8 +99,8 @@ Our character doesn't walk yet. Let's fix it! We want our character to walk when
 when that's released. For that, we'll need a variable to keep track if the button is currently pressed. We'll also need a variable
 to tell which animation frame to display. We could have used some funky expression to get the sprite id for the frame, but it
 is a lot easier to use an array instead. Because our character sprite is 4 x 4 sprites big, we can also precalculate these sprite
-id offsets in this array. One more thing, we have three animation sprites, but we'll have to display the sprite in the middle twice
-to get a proper back and forth aimation for moving the legs.
+id offsets in this array. One more thing, we have three animation sprites, but we'll have to display four frames, the sprite in the
+middle needs to be displayed twice to get a proper back and forth animation for moving the legs.
 
 ```c
 #!c

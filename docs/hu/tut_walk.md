@@ -8,7 +8,7 @@ Szprájtlap beszerzése
 
 Meg is rajzolhattuk volna magunk, de az egyszerűség kedvéért letöltöttem egy szabadon felhasználható lapot az internetről.
 Ez három animációs fázist tartalmaz minden sorban, és mind a négy irányhoz van egy-egy sor. Rengeteg ilyen szprájtlapot találsz
-a neten, mivel ez a népszerű RPG Maker szprájt elrendezése.
+a neten, mivel ez a népszerű RPG Maker szprájtlap elrendezése.
 
 WARN: Mindig ellenőrizd az internetről letöltött kellékek licenszfeltételeit. Ne használd a kelléket, ha nem vagy teljesen
 biztos a felhasználás feltételeiben.
@@ -100,8 +100,9 @@ A karakterünk még nem sétál. Javítsuk ki! Azt szeretnénk, hogy a gomb (vag
 megálljon, amikor felengedjük azt. Ehhez szükségünk lesz egy változóra, ami tárolja, hogy épp van-e lenyomva gomb. Kelleni fog
 mégegy változó, ami pedig azt mondja meg, melyik képkockát kell épp kirajzolni. Használhatnánk valami vicces képletet is, de
 egyszerűbb egy tömbben letárolni, hogy melyik képkockához melyik szprájt tartozik. Mivel a karakterünk 4 x 4 szprájtból áll, ezért
-eleve fel is szorozhatjuk ezeket a szprájt azonosító eltolásokat a tömbben. Még egy valami, csak három szprájtunk van, így a
-középső szprájtot kétszer is meg kell jelenítenünk, hogy rendes oda-vissza lábmozgást animációt kapjunk.
+eleve fel is szorozhatjuk ezeket a szprájt azonosító eltolásokat a tömbben. Még egy valami, csak három szprájtunk van, viszont
+négy képkockára van szükségünk, így a középső szprájtot kétszer is meg kell jelenítenünk, hogy rendes oda-vissza lábmozgás
+animációt kapjunk.
 
 ```c
 #!c

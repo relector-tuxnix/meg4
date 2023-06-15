@@ -39,7 +39,7 @@ MEG-4 supports no more than 16376 samples per waves. Under the waveform you'll s
 
 <imgc ../img/tut_snd5.png><fig>Changing the unit</fig>
 
-In our example that's more than the allowed maximum. The number of samples is calculated as the value under "Project Rate (Hz)" multiplied by the the length. So to lower the
+In our example that's more than the allowed maximum. The number of samples is calculated as the value under "Project Rate (Hz)" multiplied by the length. So to lower the
 number of samples, either we lower the rate or we cut off the end of the wave. In this tutorial we'll do both.
 
 Select everything after 1.0, and press <kbd>Del</kbd> to delete. This does the trick, but makes the ending sound harsh. To fix that, select a reasonable portion at the end
