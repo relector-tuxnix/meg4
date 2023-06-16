@@ -5,358 +5,358 @@
   <meta name="generator" content="gendoc 1.0.0: https://gitlab.com/bztsrc/gendoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MEG-4 Kézikönyv</title>
-  <style rel="logic">*{box-sizing:border-box;font-family:inherit;}body {background:rgba(0,0,0,0.05);font-weight:400;font-size:16px;}hr{display:block;height:1px;border:0;border-top:1px solid #e1e4e5;margin:26px 0;padding:0;border-top:1px solid;}br:after,br:before{display:table;content:""}br{clear:both;}h1,h2,h3,h4,h5,h6{clear:both;margin:0px 0px 20px 0px;padding-top:4px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}p{margin:0 0 24px}a{cursor:pointer;}h1{font-size:175%}h2{font-size:150%}h3{font-size:125%}h4{font-size:115%}h5{font-size:110%}h6{font-size:100%}pre,samp,code,var,kbd{font-family:Monaco,Consolas,Liberation Mono,Courier,monospace;}pre,code{display:block;overflow:auto;white-space:pre;font-size:14px;line-height:16px!important;}pre{padding:12px;margin:0px;}code{padding:0 0 12px 0;margin:12px 12px 0px 2px;background:url(data:type/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAgCAYAAADT5RIaAAAAFklEQVQI12NgYGDgZWJgYGCgDkFtAAAWnAAsyj4TxgAAAABJRU5ErkJggg==) 0 0 repeat;}.lineno{display:block;padding:0px 4px 0px 4px;margin:12px 0px 0px 0px;opacity:.4;text-align:right;float:left;white-space:pre;font-size:12px;line-height:16px!important;}pre .hl_b,samp .hl_b,code .hl_b{display:block;}blockquote{margin:0px;padding:12px;}blockquote>span:first-child::before{content:url(data:type/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAYAAABU1PscAAABRElEQVRYw+3WTytEURjH8c/4l1JTpKxsyEbYWFkpG+UVKOWFeAts7eytbJSysLLVxIKNFAslwhSlUQabUdM0xm0e967Ot+7inPN8z+13z73nXBKJRCIRoJSxbggrmMMInlHBIWoF+KEAQ9jAaJuxe2zhJUe/Iz0ZahZ/uTmMYT1nPxxg/I/xWQzn6IcD1IIha//wkEIBKhlq+nP0wwHOsYuvDjWvOfod6c1Yd9O4ZjDQZvwAbzn6oRVofpKbqLf0P+GxAD8cAO7w0NJ3WqAfDlBCuan9gaMC/XCA+cbJ+sMRqgX6oQCTWGtqX2O/QL8tfRlqyljGUlPgW2y3+SDz8Lv6mRvEQmPbm25ZqQvs/LHtRf3wCkxgtaWvij2cZJg36ocD/Pw91nGJY5zhM+O8UT/8Ck01TswrvHcxb9RPJBKJRDF8AyNbWk4WFTIzAAAAAElFTkSuQmCC);float:left;vertical-align:top;}.ui1,.ui2,.ui3,.ui4,.ui5,.ui6{display:inline-block;height:24px!important;line-height:24px!important;padding:0px 4px;margin:-2px 0px -2px;}kbd{display:inline-block;font-weight:700;border:1px solid #888;height:24px!important;padding:0px 4px;margin:-2px 0px -2px;border-radius:4px;background-image:linear-gradient(#ddd 0%,#eee 10%,#bbb 10%,#ccc 30%,#fff 85%,#eee 85%,#888 100%);}.mouseleft,.mouseright,.mousewheel{display:inline-block;min-width:16px;height:24px!important;padding:0px;margin:-2px 0px 0px 0px;vertical-align:middle;}.mouseleft::before{content:url(data:type/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAMAAADEfo0+AAAAe1BMVEUAAACoqKj9/f2zs7O1tbWRkZGlpaWsrKybm5u2traNjY2Wlpanp6empqaYmJiPj4+3t7f5+fmjo6P19fXu7u6ZmZnx8fHi4uLm5ube3t7q6uqwsLC0tLS7u7u4uLi/v7/W1tbDw8PLy8vPz8/T09Pa2trHx8eIiIhERkShhqFGAAAAAXRSTlMAQObYZgAAAI5JREFUGNNV0EcCwjAMRFEB6R2DKSGQUBLp/idEjsG23m7+cgAMIsJWwR8Z235pumDTnkUbv+lg7CIfTqvSbTquxsGFfjWXLlwsdOFs+XC1EHAWOEwCh4/A4S1weAkcFoHDU0CI8zGQx1Cpe0BVAO0j0PIfiR4cnZjLdHP7abQ9VRVZnaZ1VvjfO42o7edfH3EoHZS6XE4AAAAASUVORK5CYII=);}.mouseright::before{content:url(data:type/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAMAAADEfo0+AAAAe1BMVEUAAACoqKj9/f2zs7O1tbWRkZGlpaWsrKybm5u2traNjY2Wlpanp6empqaYmJiPj4+3t7f5+fmjo6P19fXu7u6ZmZnx8fHi4uLm5ube3t7q6uqwsLC0tLS7u7u4uLi/v7/W1tbDw8PLy8vPz8/T09Pa2trHx8eIiIhERkShhqFGAAAAAXRSTlMAQObYZgAAAI9JREFUGNNV0NkWgjAMRdGozFOxWgdEcYLk/7/Q0EpL9tNd5/ECzLRCIoJF20zdlsinTbRn5Eu0O8zIl/Jk+dAPR4uWUo6d5QNenBDOTghXJ4RRQMCnwOErcPgIHN4Ch0ng8BIQ4nxYyWOo9H1FVwDqsaL4j8T0nknmy0xz+2uMO1UXWZ2mdVbo8LtBNK2dP/2+KB2shyfVAAAAAElFTkSuQmCC);}.mousewheel::before{content:url(data:type/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAMAAADEfo0+AAAAe1BMVEUAAACzs7OoqKisrKyRkZGlpaX9/f22trabm5uNjY2mpqanp6ePj4+1tbWYmJi3t7eWlpajo6OZmZmwsLD5+fnu7u7x8fHi4uLW1tbm5ube3t7T09Pq6ur19fW4uLi7u7u0tLTa2trPz8+/v7/Dw8PLy8vHx8eIiIhERkS4354xAAAAAXRSTlMAQObYZgAAAKdJREFUGNNV0NkagiAUhdHjPAECzWWlWdL7P2Fno/nJumHzXx4iMMI5YeivVVOX592k2vkfy/1CxvjL6L6KJAd9ZF+GVxP144Eh4B170kPHEPAOmtwFEPxw5E6A4AeHKyD4wWEABD84nAHBDw43QPCDwyvA4RPgMAU4vAOO0mLcKFJqzHPDNETisSH4HpntVzbDyazaLZSdj2qqsk6Suqw2d7fO2fnmP7kAJW9a/HbiAAAAAElFTkSuQmCC);}footer{width:100%;padding:0 3.236em;}footer p{opacity:0.6;}footer small{opacity:0.5;}footer a{text-decoration:none;color:inherit;}footer a:hover{text-decoration:underline;}dl{margin:0 0 24px 0;padding:0px;}dt{font-weight:700;margin-bottom:12px;}dd{margin:0 0 12px 24px;}.table table{margin:0px;border-collapse:collapse;border-spacing:0;empty-cells:show;border:1px solid;width:100%;}th{font-weight:700;padding:8px 16px;overflow:visible;vertical-align:middle;white-space:nowrap;border:1px solid;}th.wide{width:100%;}td{padding:8px 16px;overflow:visible;vertical-align:middle;font-size:90%;border:1px solid;}td.right{text-align:right;}table.grid{margin:0px;padding:0px;border:none!important;background:none!important;border-spacing:0;border:0px!important;empty-cells:show;width:100%;}table.grid tr, table.grid td{margin:0px;padding:0px;overflow:hidden;vertical-align:top;background:none!important;border:0px!important;font-size:90%;}div.frame{position:absolute;width:100%;min-height:100%;margin:0px;padding:0px;max-width:1100px;top:0px;left:0px;}#_m{margin-left:300px;min-height:100%;}div.title{display:block;width:300px;padding-top:.809em;padding-bottom:.809em;margin-bottom:.809em;text-align:center;font-weight:700;}div.title>a{padding:4px 6px;margin-bottom:.809em;font-size:150%;}div.title>a:hover{background:transparent;}div.title>a>img{max-width:280px;border:0px;padding:0px;margin:0px;}div.title input{display:none;width:270px;border-radius:50px;padding:6px 12px;font-size:80%;box-shadow:inset 0 1px 3px #ddd;transition:border .3s linear;}div.title input:required:invalid{background:#fcfcfc url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAASFBMVEUAAAC6urq7u7y7vLy8vL3Dw8TLzM67urq8vL29vr69vr/AwMK5ubm5ubm4uLi5t7fAwMC/vr/FxMXBwsPExcW+u7vDw8S4uLiryZHFAAAAF3RSTlMA9vGttk4lfbWnpJQG0MpzYEIglFRCGzMa+EsAAAB0SURBVBjTbY5bCsMwDAQl2U6cR5s0fcz9b1oLpWBC52dhENqVRsmG5SIn60wwryEm0LQkbUacAveh5XGDh4uKfsQZlOqpJAkS5gHPUyzgYdeLjB6/H7lvGbzlssP2WDoRGGzxrVRD82sHRukZ/xhv7tns/QXrhgcaFdOKBwAAAABJRU5ErkJggg==) no-repeat 10px 50%;}div.title input:focus{background:#fcfcfc!important;}div.version{margin-top:.4045em;margin-bottom:.809em;font-size:90%;}nav.side {display:block;position:fixed;top:0;bottom:0;left:0;width:300px;overflow-x:hidden;overflow-y:hidden;min-height:100%;font-weight:400;}nav.mobile {display:none;font-weight:bold;padding:.4045em .809em;position:relative;line-height:50px;text-align:center;font-size:100%;*zoom:1;}nav a{color:inherit;text-decoration:none;display:block;}nav.side>div{position:relative;overflow-x:hidden;overflow-y:scroll;width:320px;height:100%;padding-bottom:64px;}div.nav p{height:32px;line-height:32px;padding:0 1.618em;margin:12px 0px 0px 0px;font-weight:700;text-transform:uppercase;font-size:85%;white-space:nowrap;-webkit-font-smoothing:antialiased}div.nav li>.current,div.nav li>ul{display:none;}div.nav li>a,div.nav li>label{display:block;}div.nav a,div.nav ul>li>label,div.nav ul>li>.current{width:300px;line-height:18px;padding:0.4045em 1.618em;}div.nav a,div.nav ul>li>label{cursor:pointer;}div.nav .current{font-weight:700;border-top:1px solid;border-bottom:1px solid #c9c9c9;}div.nav ul>li>ul>li>a{border-right:solid 1px #c9c9c9;font-size:90%;}div.nav ul>li>ul>li.h2>a{padding:0.4045em 2.427em;}div.nav ul>li>ul>li.h3>a{padding:.4045em 1.618em .4045em 4.045em;}div.nav ul>li>ul>li.h4>a{padding:.4045em 1.618em .4045em 5.663em;}div.nav ul>li>ul>li.h5>a{padding:.4045em 1.618em .4045em 7.281em;}div.nav ul>li>ul>li.h6>a{padding:.4045em 1.618em .4045em 8.899em;}div.nav ul,div.nav li,.breadcrumbs{margin:0px!important;padding:0px;list-style:none;}ul.breadcrumbs,.breadcrumbs li{display:inline-block;}.home{display:inline-block;max-width:16px;max-height:16px;line-height:16px;margin:0 5px 0 0;cursor:pointer;}.home::before{content:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAS1BMVEUAAAD8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/PyxWsjVAAAAGHRSTlMAx6oLLRnYiXFEvPbey518NQbsj11QKhQ+J0ktAAAAbElEQVQY053ISQ7DMAwEwRYpavHurPz/SwMoMpD46L4MpvBTB0zTP+R9z55Ebh0yQL5DaDA+0WVR3h3Gikp9iPKF9MIkQhSDwUlGHCLQxhLGJkpLZcNYS/tdyorP/DQ7HgBqKRUgHBDcw2X4AFsJCSXB/5UVAAAAAElFTkSuQmCC);}h1>a,h2>a,h3>a,h4>a,h5>a,h6>a{display:none;max-width:16px;max-height:24px;margin:-8px 0 0 5px;vertical-align:middle;}h1:hover>a,h2:hover>a,h3:hover>a,h4:hover>a,h5:hover>a,h6:hover>a{display:inline-block;text-decoration:none!important;}h1>a::before,h2>a::before,h3>a::before,h4>a::before,h5>a::before,h6>a::before{content:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAiBAMAAACkb0T0AAAAMFBMVEUAAAD8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/PzS+N+gAAAAD3RSTlMABab5cVY73o4k2cJTPb1Q83MyAAAAh0lEQVQY02P4DwWkM7YxsNiDGJ8EGBgmgxiKDDkCLAwgAQn7hQxARiGj8v8/IIYDi2a9GZChHiAnMLmBjeGTaIBUAMcFaYaNvA2sC1kD9RkSOCwZF7IW/WdgSP4+yYHlP5Bx/r+RgDiIIfW5kVEfyHBgPMYgBLLdkoEBKABkfHZgyIa7h04MAOVty/RC/PhoAAAAAElFTkSuQmCC);}h1>a:hover::after,h2>a:hover::after,h3>a:hover::after,h4>a:hover::after,h5>a:hover::after,h6>a:hover::after{content:"Hivatkozás erre a címre";display:block;padding:12px;position:absolute;margin:-8px 8px;font-weight:400;font-size:14px;background:rgba(0,0,0,.8);color:#fff;border-radius:4px;}input[type=radio]{display:none;}input[type=radio]:checked ~ ul{display:block;}.fig{margin-top:-12px;padding-bottom:12px;display:block;text-align:center;font-style:italic;}div.page{width:100%;padding:1.618em 3.236em;margin:auto;line-height:24px;}div.page ol{margin:0 0 24px 12px;padding-left:0px;}div.page ul{margin:0 0 24px 24px;list-style:disc outside;padding-left:0px;}div.page ol{list-style-type:none;counter-reset:list;}div.page ol li:before{counter-increment:list;content:counters(list,".") ". ";}div.pre{overflow-x:auto;margin:1px 0px 24px;}div.table{overflow-x:auto;margin:0px 0px 24px;}div.info,div.hint,div.warn{padding:12px;line-height:24px;margin-bottom:24px;}div.info>p,div.hint>p,div.warn>p{margin:0px;}div.info>p:first-child,div.hint>p:first-child,div.warn>p:first-child{display:block;font-weight:700;padding:2px 8px 2px;margin:-12px -12px 8px -12px;vertical-align:middle;}div.info>p:first-child>span,div.hint>p:first-child>span,div.warn>p:first-child>span{display:block;max-height:20px;margin:0px;vertical-align:middle;}div.info>p:first-child>span::before,div.hint>p:first-child>span::before,div.warn>p:first-child>span::before{content:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAApUlEQVQ4y82TwQnDMAxFpVJyLPiSbbJETr13Fo+RZZxLRghkgnSEEni9ONS0sg1tDv3wwfjbX7Iki/wVAAd4IPBCiHuudrkHVvJYgb50eaOO7cMkpv0eeQGukYuRiUsNvBFpSvTJ0P2un0Sk+6Le3WEG58yBFrjt61r7Qqbij0gLIX3CaPgOqtqoaiMig6GPtTbOwCVyLraxMEj3yPIgHTLKv3ymJySzt16bW/sWAAAAAElFTkSuQmCC);}p>div:last-child,dd>*:last-child,td>*:last-child,li>ol,li>ul{margin-bottom:0px!important;}img{border:0px;}img.imgt{display:inline-block;max-height:22px!important;padding:0px;margin:-4px 0px 0px 0px;vertical-align:middle;}img.imgl{float:left;margin:0px 12px 12px 0px;}img.imgr{float:right;margin:0px 0px 12px 12px;}div.imgc{text-align:center;padding:0px;margin:0 0 12px 0;clear:both;}img.imgc{max-width:100%;}img.imgw{width:100%;margin-bottom:12px;clear:both;}.btn{border-radius:2px;line-height:normal;white-space:nowrap;color:inherit;text-align:center;cursor:pointer;font-size:100%;padding:4px 12px 8px;border:1px solid rgba(0,0,0,.1);text-decoration:none;box-shadow:inset 0 1px 2px -1px hsla(0,0%,100%,.5),inset 0 -2px 0 0 rgba(0,0,0,.1);vertical-align:middle;*zoom:1;user-select:none;transition:all .1s linear}.prev{float:left;}.prev::before{content:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAMAAABhEH5lAAAANlBMVEUAAABAQEBAQEBAQEBAQEBAQEBAQEBBQUFAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAWW5SEAAAAEnRSTlMA/fC9r2kXAjMN34F3ZlUu6B40Y5wGAAAAVElEQVQY08XPSw6AIAwEUIbS8lFE739Zq6luGtbM8iXTTMOCZGECiCX/MhIQTyCNz+SRrUc1MWKVvR5KYCN6pUFDRtqq4Sql9IYJ+aI/70f4qdOHblOhAuUcC5KnAAAAAElFTkSuQmCC);}.next{float:right;}.next::after{content:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASBAMAAACk4JNkAAAAJFBMVEUAAABAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEC4lvDfAAAAC3RSTlMAx711ZjlFPh3zLASjkrYAAABDSURBVAjXY6AUsGhvcgAzOKR3797YAGIx7t5mvVsAxPLevZ159xYQS3v3zgLrTSDW7tTQBcy7ESyELEIHwhSEyQjbAAH1HsMY8tCHAAAAAElFTkSuQmCC);}@media screen and (max-width:991.98px){nav.mobile{display:block;}nav.side{display:none;}#_m{margin-left:0px;}}#_inditas:checked ~ nav div ul li[rel=inditas]>.toc,#_fajlformatumok:checked ~ nav div ul li[rel=fajlformatumok]>.toc,#_felhasznaloi_bemenetek:checked ~ nav div ul li[rel=felhasznaloi_bemenetek]>.toc,#_interfesz:checked ~ nav div ul li[rel=interfesz]>.toc,#_kod_szerkeszto:checked ~ nav div ul li[rel=kod_szerkeszto]>.toc,#_szprajt_szerkeszto:checked ~ nav div ul li[rel=szprajt_szerkeszto]>.toc,#_terkep_szerkeszto:checked ~ nav div ul li[rel=terkep_szerkeszto]>.toc,#_betu_szerkeszto:checked ~ nav div ul li[rel=betu_szerkeszto]>.toc,#_hangeffektek:checked ~ nav div ul li[rel=hangeffektek]>.toc,#_zenesavok:checked ~ nav div ul li[rel=zenesavok]>.toc,#_memoriaatfedok:checked ~ nav div ul li[rel=memoriaatfedok]>.toc,#_vizualis_szerkeszto:checked ~ nav div ul li[rel=vizualis_szerkeszto]>.toc,#_debuggolo:checked ~ nav div ul li[rel=debuggolo]>.toc,#_c:checked ~ nav div ul li[rel=c]>.toc,#_basic:checked ~ nav div ul li[rel=basic]>.toc,#_assembly:checked ~ nav div ul li[rel=assembly]>.toc,#_lua:checked ~ nav div ul li[rel=lua]>.toc,#_memoriaterkep:checked ~ nav div ul li[rel=memoriaterkep]>.toc,#_konzol:checked ~ nav div ul li[rel=konzol]>.toc,#_audio:checked ~ nav div ul li[rel=audio]>.toc,#_grafika:checked ~ nav div ul li[rel=grafika]>.toc,#_bemenet:checked ~ nav div ul li[rel=bemenet]>.toc,#_matematika:checked ~ nav div ul li[rel=matematika]>.toc,#_memoria:checked ~ nav div ul li[rel=memoria]>.toc,#_pattogo_labda:checked ~ nav div ul li[rel=pattogo_labda]>.toc,#_setalo:checked ~ nav div ul li[rel=setalo]>.toc,#_hangeffekt:checked ~ nav div ul li[rel=hangeffekt]>.toc,#_meg_4_licensz:checked ~ nav div ul li[rel=meg_4_licensz]>.toc,#_hivatkozasok:checked ~ nav div ul li[rel=hivatkozasok]>.toc,div.page{display:none;}#_inditas:checked ~ nav div ul li[rel=inditas]>ul,#_inditas:checked ~ nav div ul li[rel=inditas]>.current,#_inditas:checked ~ div div[rel=inditas],#_fajlformatumok:checked ~ nav div ul li[rel=fajlformatumok]>ul,#_fajlformatumok:checked ~ nav div ul li[rel=fajlformatumok]>.current,#_fajlformatumok:checked ~ div div[rel=fajlformatumok],#_felhasznaloi_bemenetek:checked ~ nav div ul li[rel=felhasznaloi_bemenetek]>ul,#_felhasznaloi_bemenetek:checked ~ nav div ul li[rel=felhasznaloi_bemenetek]>.current,#_felhasznaloi_bemenetek:checked ~ div div[rel=felhasznaloi_bemenetek],#_interfesz:checked ~ nav div ul li[rel=interfesz]>ul,#_interfesz:checked ~ nav div ul li[rel=interfesz]>.current,#_interfesz:checked ~ div div[rel=interfesz],#_kod_szerkeszto:checked ~ nav div ul li[rel=kod_szerkeszto]>ul,#_kod_szerkeszto:checked ~ nav div ul li[rel=kod_szerkeszto]>.current,#_kod_szerkeszto:checked ~ div div[rel=kod_szerkeszto],#_szprajt_szerkeszto:checked ~ nav div ul li[rel=szprajt_szerkeszto]>ul,#_szprajt_szerkeszto:checked ~ nav div ul li[rel=szprajt_szerkeszto]>.current,#_szprajt_szerkeszto:checked ~ div div[rel=szprajt_szerkeszto],#_terkep_szerkeszto:checked ~ nav div ul li[rel=terkep_szerkeszto]>ul,#_terkep_szerkeszto:checked ~ nav div ul li[rel=terkep_szerkeszto]>.current,#_terkep_szerkeszto:checked ~ div div[rel=terkep_szerkeszto],#_betu_szerkeszto:checked ~ nav div ul li[rel=betu_szerkeszto]>ul,#_betu_szerkeszto:checked ~ nav div ul li[rel=betu_szerkeszto]>.current,#_betu_szerkeszto:checked ~ div div[rel=betu_szerkeszto],#_hangeffektek:checked ~ nav div ul li[rel=hangeffektek]>ul,#_hangeffektek:checked ~ nav div ul li[rel=hangeffektek]>.current,#_hangeffektek:checked ~ div div[rel=hangeffektek],#_zenesavok:checked ~ nav div ul li[rel=zenesavok]>ul,#_zenesavok:checked ~ nav div ul li[rel=zenesavok]>.current,#_zenesavok:checked ~ div div[rel=zenesavok],#_memoriaatfedok:checked ~ nav div ul li[rel=memoriaatfedok]>ul,#_memoriaatfedok:checked ~ nav div ul li[rel=memoriaatfedok]>.current,#_memoriaatfedok:checked ~ div div[rel=memoriaatfedok],#_vizualis_szerkeszto:checked ~ nav div ul li[rel=vizualis_szerkeszto]>ul,#_vizualis_szerkeszto:checked ~ nav div ul li[rel=vizualis_szerkeszto]>.current,#_vizualis_szerkeszto:checked ~ div div[rel=vizualis_szerkeszto],#_debuggolo:checked ~ nav div ul li[rel=debuggolo]>ul,#_debuggolo:checked ~ nav div ul li[rel=debuggolo]>.current,#_debuggolo:checked ~ div div[rel=debuggolo],#_c:checked ~ nav div ul li[rel=c]>ul,#_c:checked ~ nav div ul li[rel=c]>.current,#_c:checked ~ div div[rel=c],#_basic:checked ~ nav div ul li[rel=basic]>ul,#_basic:checked ~ nav div ul li[rel=basic]>.current,#_basic:checked ~ div div[rel=basic],#_assembly:checked ~ nav div ul li[rel=assembly]>ul,#_assembly:checked ~ nav div ul li[rel=assembly]>.current,#_assembly:checked ~ div div[rel=assembly],#_lua:checked ~ nav div ul li[rel=lua]>ul,#_lua:checked ~ nav div ul li[rel=lua]>.current,#_lua:checked ~ div div[rel=lua],#_memoriaterkep:checked ~ nav div ul li[rel=memoriaterkep]>ul,#_memoriaterkep:checked ~ nav div ul li[rel=memoriaterkep]>.current,#_memoriaterkep:checked ~ div div[rel=memoriaterkep],#_konzol:checked ~ nav div ul li[rel=konzol]>ul,#_konzol:checked ~ nav div ul li[rel=konzol]>.current,#_konzol:checked ~ div div[rel=konzol],#_audio:checked ~ nav div ul li[rel=audio]>ul,#_audio:checked ~ nav div ul li[rel=audio]>.current,#_audio:checked ~ div div[rel=audio],#_grafika:checked ~ nav div ul li[rel=grafika]>ul,#_grafika:checked ~ nav div ul li[rel=grafika]>.current,#_grafika:checked ~ div div[rel=grafika],#_bemenet:checked ~ nav div ul li[rel=bemenet]>ul,#_bemenet:checked ~ nav div ul li[rel=bemenet]>.current,#_bemenet:checked ~ div div[rel=bemenet],#_matematika:checked ~ nav div ul li[rel=matematika]>ul,#_matematika:checked ~ nav div ul li[rel=matematika]>.current,#_matematika:checked ~ div div[rel=matematika],#_memoria:checked ~ nav div ul li[rel=memoria]>ul,#_memoria:checked ~ nav div ul li[rel=memoria]>.current,#_memoria:checked ~ div div[rel=memoria],#_pattogo_labda:checked ~ nav div ul li[rel=pattogo_labda]>ul,#_pattogo_labda:checked ~ nav div ul li[rel=pattogo_labda]>.current,#_pattogo_labda:checked ~ div div[rel=pattogo_labda],#_setalo:checked ~ nav div ul li[rel=setalo]>ul,#_setalo:checked ~ nav div ul li[rel=setalo]>.current,#_setalo:checked ~ div div[rel=setalo],#_hangeffekt:checked ~ nav div ul li[rel=hangeffekt]>ul,#_hangeffekt:checked ~ nav div ul li[rel=hangeffekt]>.current,#_hangeffekt:checked ~ div div[rel=hangeffekt],#_meg_4_licensz:checked ~ nav div ul li[rel=meg_4_licensz]>ul,#_meg_4_licensz:checked ~ nav div ul li[rel=meg_4_licensz]>.current,#_meg_4_licensz:checked ~ div div[rel=meg_4_licensz],#_hivatkozasok:checked ~ nav div ul li[rel=hivatkozasok]>ul,#_hivatkozasok:checked ~ nav div ul li[rel=hivatkozasok]>.current,#_hivatkozasok:checked ~ div div[rel=hivatkozasok],#_:checked ~ div div[rel=_]{display:block;}</style>
+  <style rel="logic">*{box-sizing:border-box;font-family:inherit;}body {background:rgba(0,0,0,0.05);font-weight:400;font-size:16px;}hr{display:block;height:1px;border:0;border-top:1px solid #e1e4e5;margin:26px 0;padding:0;border-top:1px solid;}br:after,br:before{display:table;content:""}br{clear:both;}h1,h2,h3,h4,h5,h6{clear:both;margin:0px 0px 20px 0px;padding-top:4px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}p{margin:0 0 24px}a{cursor:pointer;}h1{font-size:175%}h2{font-size:150%}h3{font-size:125%}h4{font-size:115%}h5{font-size:110%}h6{font-size:100%}pre,samp,code,var,kbd{font-family:Monaco,Consolas,Liberation Mono,Courier,monospace;}pre,code{display:block;overflow:auto;white-space:pre;font-size:14px;line-height:16px!important;}pre{padding:12px;margin:0px;}code{padding:0 0 12px 0;margin:12px 12px 0px 2px;background:url(data:type/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAgCAYAAADT5RIaAAAAFklEQVQI12NgYGDgZWJgYGCgDkFtAAAWnAAsyj4TxgAAAABJRU5ErkJggg==) 0 0 repeat;}.lineno{display:block;padding:0px 4px 0px 4px;margin:12px 0px 0px 0px;opacity:.4;text-align:right;float:left;white-space:pre;font-size:12px;line-height:16px!important;}pre .hl_b,samp .hl_b,code .hl_b{display:block;}blockquote{margin:0px;padding:12px;}blockquote>span:first-child::before{content:url(data:type/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAYAAABU1PscAAABRElEQVRYw+3WTytEURjH8c/4l1JTpKxsyEbYWFkpG+UVKOWFeAts7eytbJSysLLVxIKNFAslwhSlUQabUdM0xm0e967Ot+7inPN8z+13z73nXBKJRCIRoJSxbggrmMMInlHBIWoF+KEAQ9jAaJuxe2zhJUe/Iz0ZahZ/uTmMYT1nPxxg/I/xWQzn6IcD1IIha//wkEIBKhlq+nP0wwHOsYuvDjWvOfod6c1Yd9O4ZjDQZvwAbzn6oRVofpKbqLf0P+GxAD8cAO7w0NJ3WqAfDlBCuan9gaMC/XCA+cbJ+sMRqgX6oQCTWGtqX2O/QL8tfRlqyljGUlPgW2y3+SDz8Lv6mRvEQmPbm25ZqQvs/LHtRf3wCkxgtaWvij2cZJg36ocD/Pw91nGJY5zhM+O8UT/8Ck01TswrvHcxb9RPJBKJRDF8AyNbWk4WFTIzAAAAAElFTkSuQmCC);float:left;vertical-align:top;}.ui1,.ui2,.ui3,.ui4,.ui5,.ui6{display:inline-block;height:24px!important;line-height:24px!important;padding:0px 4px;margin:-2px 0px -2px;}kbd{display:inline-block;font-weight:700;border:1px solid #888;height:24px!important;padding:0px 4px;margin:-2px 0px -2px;border-radius:4px;background-image:linear-gradient(#ddd 0%,#eee 10%,#bbb 10%,#ccc 30%,#fff 85%,#eee 85%,#888 100%);}.mouseleft,.mouseright,.mousewheel{display:inline-block;min-width:16px;height:24px!important;padding:0px;margin:-2px 0px 0px 0px;vertical-align:middle;}.mouseleft::before{content:url(data:type/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAMAAADEfo0+AAAAe1BMVEUAAACoqKj9/f2zs7O1tbWRkZGlpaWsrKybm5u2traNjY2Wlpanp6empqaYmJiPj4+3t7f5+fmjo6P19fXu7u6ZmZnx8fHi4uLm5ube3t7q6uqwsLC0tLS7u7u4uLi/v7/W1tbDw8PLy8vPz8/T09Pa2trHx8eIiIhERkShhqFGAAAAAXRSTlMAQObYZgAAAI5JREFUGNNV0EcCwjAMRFEB6R2DKSGQUBLp/idEjsG23m7+cgAMIsJWwR8Z235pumDTnkUbv+lg7CIfTqvSbTquxsGFfjWXLlwsdOFs+XC1EHAWOEwCh4/A4S1weAkcFoHDU0CI8zGQx1Cpe0BVAO0j0PIfiR4cnZjLdHP7abQ9VRVZnaZ1VvjfO42o7edfH3EoHZS6XE4AAAAASUVORK5CYII=);}.mouseright::before{content:url(data:type/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAMAAADEfo0+AAAAe1BMVEUAAACoqKj9/f2zs7O1tbWRkZGlpaWsrKybm5u2traNjY2Wlpanp6empqaYmJiPj4+3t7f5+fmjo6P19fXu7u6ZmZnx8fHi4uLm5ube3t7q6uqwsLC0tLS7u7u4uLi/v7/W1tbDw8PLy8vPz8/T09Pa2trHx8eIiIhERkShhqFGAAAAAXRSTlMAQObYZgAAAI9JREFUGNNV0NkWgjAMRdGozFOxWgdEcYLk/7/Q0EpL9tNd5/ECzLRCIoJF20zdlsinTbRn5Eu0O8zIl/Jk+dAPR4uWUo6d5QNenBDOTghXJ4RRQMCnwOErcPgIHN4Ch0ng8BIQ4nxYyWOo9H1FVwDqsaL4j8T0nknmy0xz+2uMO1UXWZ2mdVbo8LtBNK2dP/2+KB2shyfVAAAAAElFTkSuQmCC);}.mousewheel::before{content:url(data:type/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAYCAMAAADEfo0+AAAAe1BMVEUAAACzs7OoqKisrKyRkZGlpaX9/f22trabm5uNjY2mpqanp6ePj4+1tbWYmJi3t7eWlpajo6OZmZmwsLD5+fnu7u7x8fHi4uLW1tbm5ube3t7T09Pq6ur19fW4uLi7u7u0tLTa2trPz8+/v7/Dw8PLy8vHx8eIiIhERkS4354xAAAAAXRSTlMAQObYZgAAAKdJREFUGNNV0NkagiAUhdHjPAECzWWlWdL7P2Fno/nJumHzXx4iMMI5YeivVVOX592k2vkfy/1CxvjL6L6KJAd9ZF+GVxP144Eh4B170kPHEPAOmtwFEPxw5E6A4AeHKyD4wWEABD84nAHBDw43QPCDwyvA4RPgMAU4vAOO0mLcKFJqzHPDNETisSH4HpntVzbDyazaLZSdj2qqsk6Suqw2d7fO2fnmP7kAJW9a/HbiAAAAAElFTkSuQmCC);}footer{width:100%;padding:0 3.236em;}footer p{opacity:0.6;}footer small{opacity:0.5;}footer a{text-decoration:none;color:inherit;}footer a:hover{text-decoration:underline;}dl{margin:0 0 24px 0;padding:0px;}dt{font-weight:700;margin-bottom:12px;}dd{margin:0 0 12px 24px;}.table table{margin:0px;border-collapse:collapse;border-spacing:0;empty-cells:show;border:1px solid;width:100%;}th{font-weight:700;padding:8px 16px;overflow:visible;vertical-align:middle;white-space:nowrap;border:1px solid;}th.wide{width:100%;}td{padding:8px 16px;overflow:visible;vertical-align:middle;font-size:90%;border:1px solid;}td.right{text-align:right;}table.grid{margin:0px;padding:0px;border:none!important;background:none!important;border-spacing:0;border:0px!important;empty-cells:show;width:100%;}table.grid tr, table.grid td{margin:0px;padding:0px;overflow:hidden;vertical-align:top;background:none!important;border:0px!important;font-size:90%;}div.frame{position:absolute;width:100%;min-height:100%;margin:0px;padding:0px;max-width:1100px;top:0px;left:0px;}#_m{margin-left:300px;min-height:100%;}div.title{display:block;width:300px;padding-top:.809em;padding-bottom:.809em;margin-bottom:.809em;text-align:center;font-weight:700;}div.title>a{padding:4px 6px;margin-bottom:.809em;font-size:150%;}div.title>a:hover{background:transparent;}div.title>a>img{max-width:280px;border:0px;padding:0px;margin:0px;}div.title input{display:none;width:270px;border-radius:50px;padding:6px 12px;font-size:80%;box-shadow:inset 0 1px 3px #ddd;transition:border .3s linear;}div.title input:required:invalid{background:#fcfcfc url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAASFBMVEUAAAC6urq7u7y7vLy8vL3Dw8TLzM67urq8vL29vr69vr/AwMK5ubm5ubm4uLi5t7fAwMC/vr/FxMXBwsPExcW+u7vDw8S4uLiryZHFAAAAF3RSTlMA9vGttk4lfbWnpJQG0MpzYEIglFRCGzMa+EsAAAB0SURBVBjTbY5bCsMwDAQl2U6cR5s0fcz9b1oLpWBC52dhENqVRsmG5SIn60wwryEm0LQkbUacAveh5XGDh4uKfsQZlOqpJAkS5gHPUyzgYdeLjB6/H7lvGbzlssP2WDoRGGzxrVRD82sHRukZ/xhv7tns/QXrhgcaFdOKBwAAAABJRU5ErkJggg==) no-repeat 10px 50%;}div.title input:focus{background:#fcfcfc!important;}div.version{margin-top:.4045em;margin-bottom:.809em;font-size:90%;}nav.side {display:block;position:fixed;top:0;bottom:0;left:0;width:300px;overflow-x:hidden;overflow-y:hidden;min-height:100%;font-weight:400;}nav.mobile {display:none;font-weight:bold;padding:.4045em .809em;position:relative;line-height:50px;text-align:center;font-size:100%;*zoom:1;}nav a{color:inherit;text-decoration:none;display:block;}nav.side>div{position:relative;overflow-x:hidden;overflow-y:scroll;width:320px;height:100%;padding-bottom:64px;}div.nav p{height:32px;line-height:32px;padding:0 1.618em;margin:12px 0px 0px 0px;font-weight:700;text-transform:uppercase;font-size:85%;white-space:nowrap;-webkit-font-smoothing:antialiased}div.nav li>.current,div.nav li>ul{display:none;}div.nav li>a,div.nav li>label{display:block;}div.nav a,div.nav ul>li>label,div.nav ul>li>.current{width:300px;line-height:18px;padding:0.4045em 1.618em;}div.nav a,div.nav ul>li>label{cursor:pointer;}div.nav .current{font-weight:700;border-top:1px solid;border-bottom:1px solid #c9c9c9;}div.nav ul>li>ul>li>a{border-right:solid 1px #c9c9c9;font-size:90%;}div.nav ul>li>ul>li.h2>a{padding:0.4045em 2.427em;}div.nav ul>li>ul>li.h3>a{padding:.4045em 1.618em .4045em 4.045em;}div.nav ul>li>ul>li.h4>a{padding:.4045em 1.618em .4045em 5.663em;}div.nav ul>li>ul>li.h5>a{padding:.4045em 1.618em .4045em 7.281em;}div.nav ul>li>ul>li.h6>a{padding:.4045em 1.618em .4045em 8.899em;}div.nav ul,div.nav li,.breadcrumbs{margin:0px!important;padding:0px;list-style:none;}ul.breadcrumbs,.breadcrumbs li{display:inline-block;}.menu{display:inline-block;position:absolute;top:12px;right:20px;cursor:pointer;width:1.5em;height:1.5em;vertical-align:middle;padding:16px 24px 16px 24px;border:solid 1px rgba(255, 255, 255, 0.5);border-radius:5px;background:no-repeat center center url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");}.home{display:inline-block;max-width:16px;max-height:16px;line-height:16px;margin:0 5px 0 0;cursor:pointer;}.home::before{content:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAS1BMVEUAAAD8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/PyxWsjVAAAAGHRSTlMAx6oLLRnYiXFEvPbey518NQbsj11QKhQ+J0ktAAAAbElEQVQY053ISQ7DMAwEwRYpavHurPz/SwMoMpD46L4MpvBTB0zTP+R9z55Ebh0yQL5DaDA+0WVR3h3Gikp9iPKF9MIkQhSDwUlGHCLQxhLGJkpLZcNYS/tdyorP/DQ7HgBqKRUgHBDcw2X4AFsJCSXB/5UVAAAAAElFTkSuQmCC);}h1>a,h2>a,h3>a,h4>a,h5>a,h6>a{display:none;max-width:16px;max-height:24px;margin:-8px 0 0 5px;vertical-align:middle;}h1:hover>a,h2:hover>a,h3:hover>a,h4:hover>a,h5:hover>a,h6:hover>a{display:inline-block;text-decoration:none!important;}h1>a::before,h2>a::before,h3>a::before,h4>a::before,h5>a::before,h6>a::before{content:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAiBAMAAACkb0T0AAAAMFBMVEUAAAD8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/PzS+N+gAAAAD3RSTlMABab5cVY73o4k2cJTPb1Q83MyAAAAh0lEQVQY02P4DwWkM7YxsNiDGJ8EGBgmgxiKDDkCLAwgAQn7hQxARiGj8v8/IIYDi2a9GZChHiAnMLmBjeGTaIBUAMcFaYaNvA2sC1kD9RkSOCwZF7IW/WdgSP4+yYHlP5Bx/r+RgDiIIfW5kVEfyHBgPMYgBLLdkoEBKABkfHZgyIa7h04MAOVty/RC/PhoAAAAAElFTkSuQmCC);}h1>a:hover::after,h2>a:hover::after,h3>a:hover::after,h4>a:hover::after,h5>a:hover::after,h6>a:hover::after{content:"Hivatkozás erre a címre";display:block;padding:12px;position:absolute;margin:-8px 8px;font-weight:400;font-size:14px;background:rgba(0,0,0,.8);color:#fff;border-radius:4px;}input[type=radio]{display:none;}input[type=radio]:checked ~ ul{display:block;}.fig{margin-top:-12px;padding-bottom:12px;display:block;text-align:center;font-style:italic;}div.page{width:100%;padding:1.618em 3.236em;margin:auto;line-height:24px;}div.page ol{margin:0 0 24px 12px;padding-left:0px;}div.page ul{margin:0 0 24px 24px;list-style:disc outside;padding-left:0px;}div.page ol{list-style-type:none;counter-reset:list;}div.page ol li:before{counter-increment:list;content:counters(list,".") ". ";}div.pre{overflow-x:auto;margin:1px 0px 24px;}div.table{overflow-x:auto;margin:0px 0px 24px;}div.info,div.hint,div.warn{padding:12px;line-height:24px;margin-bottom:24px;}div.info>p,div.hint>p,div.warn>p{margin:0px;}div.info>p:first-child,div.hint>p:first-child,div.warn>p:first-child{display:block;font-weight:700;padding:2px 8px 2px;margin:-12px -12px 8px -12px;vertical-align:middle;}div.info>p:first-child>span,div.hint>p:first-child>span,div.warn>p:first-child>span{display:block;max-height:20px;margin:0px;vertical-align:middle;}div.info>p:first-child>span::before,div.hint>p:first-child>span::before,div.warn>p:first-child>span::before{content:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAApUlEQVQ4y82TwQnDMAxFpVJyLPiSbbJETr13Fo+RZZxLRghkgnSEEni9ONS0sg1tDv3wwfjbX7Iki/wVAAd4IPBCiHuudrkHVvJYgb50eaOO7cMkpv0eeQGukYuRiUsNvBFpSvTJ0P2un0Sk+6Le3WEG58yBFrjt61r7Qqbij0gLIX3CaPgOqtqoaiMig6GPtTbOwCVyLraxMEj3yPIgHTLKv3ymJySzt16bW/sWAAAAAElFTkSuQmCC);}p>div:last-child,dd>*:last-child,td>*:last-child,li>ol,li>ul{margin-bottom:0px!important;}img{border:0px;}img.imgt{display:inline-block;max-height:22px!important;padding:0px;margin:-4px 0px 0px 0px;vertical-align:middle;}img.imgl{float:left;margin:0px 12px 12px 0px;}img.imgr{float:right;margin:0px 0px 12px 12px;}div.imgc{text-align:center;padding:0px;margin:0 0 12px 0;clear:both;}img.imgc{max-width:100%;}img.imgw{width:100%;margin-bottom:12px;clear:both;}.btn{border-radius:2px;line-height:normal;white-space:nowrap;color:inherit;text-align:center;cursor:pointer;font-size:100%;padding:4px 12px 8px;border:1px solid rgba(0,0,0,.1);text-decoration:none;box-shadow:inset 0 1px 2px -1px hsla(0,0%,100%,.5),inset 0 -2px 0 0 rgba(0,0,0,.1);vertical-align:middle;*zoom:1;user-select:none;transition:all .1s linear}.prev{float:left;}.prev::before{content:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAMAAABhEH5lAAAANlBMVEUAAABAQEBAQEBAQEBAQEBAQEBAQEBBQUFAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAWW5SEAAAAEnRSTlMA/fC9r2kXAjMN34F3ZlUu6B40Y5wGAAAAVElEQVQY08XPSw6AIAwEUIbS8lFE739Zq6luGtbM8iXTTMOCZGECiCX/MhIQTyCNz+SRrUc1MWKVvR5KYCN6pUFDRtqq4Sql9IYJ+aI/70f4qdOHblOhAuUcC5KnAAAAAElFTkSuQmCC);}.next{float:right;}.next::after{content:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASBAMAAACk4JNkAAAAJFBMVEUAAABAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEC4lvDfAAAAC3RSTlMAx711ZjlFPh3zLASjkrYAAABDSURBVAjXY6AUsGhvcgAzOKR3797YAGIx7t5mvVsAxPLevZ159xYQS3v3zgLrTSDW7tTQBcy7ESyELEIHwhSEyQjbAAH1HsMY8tCHAAAAAElFTkSuQmCC);}@media screen and (max-width:991.98px){nav.mobile{display:block;}nav.side{display:none;}#menuchk:checked ~ nav.side{display:block;}#_m{margin-left:0px;}}#_inditas:checked ~ nav div ul li[rel=inditas]>.toc,#_fajlformatumok:checked ~ nav div ul li[rel=fajlformatumok]>.toc,#_felhasznaloi_bemenetek:checked ~ nav div ul li[rel=felhasznaloi_bemenetek]>.toc,#_interfesz:checked ~ nav div ul li[rel=interfesz]>.toc,#_kod_szerkeszto:checked ~ nav div ul li[rel=kod_szerkeszto]>.toc,#_szprajt_szerkeszto:checked ~ nav div ul li[rel=szprajt_szerkeszto]>.toc,#_terkep_szerkeszto:checked ~ nav div ul li[rel=terkep_szerkeszto]>.toc,#_betu_szerkeszto:checked ~ nav div ul li[rel=betu_szerkeszto]>.toc,#_hangeffektek:checked ~ nav div ul li[rel=hangeffektek]>.toc,#_zenesavok:checked ~ nav div ul li[rel=zenesavok]>.toc,#_memoriaatfedok:checked ~ nav div ul li[rel=memoriaatfedok]>.toc,#_vizualis_szerkeszto:checked ~ nav div ul li[rel=vizualis_szerkeszto]>.toc,#_debuggolo:checked ~ nav div ul li[rel=debuggolo]>.toc,#_c:checked ~ nav div ul li[rel=c]>.toc,#_basic:checked ~ nav div ul li[rel=basic]>.toc,#_assembly:checked ~ nav div ul li[rel=assembly]>.toc,#_lua:checked ~ nav div ul li[rel=lua]>.toc,#_memoriaterkep:checked ~ nav div ul li[rel=memoriaterkep]>.toc,#_konzol:checked ~ nav div ul li[rel=konzol]>.toc,#_audio:checked ~ nav div ul li[rel=audio]>.toc,#_grafika:checked ~ nav div ul li[rel=grafika]>.toc,#_bemenet:checked ~ nav div ul li[rel=bemenet]>.toc,#_matematika:checked ~ nav div ul li[rel=matematika]>.toc,#_memoria:checked ~ nav div ul li[rel=memoria]>.toc,#_pattogo_labda:checked ~ nav div ul li[rel=pattogo_labda]>.toc,#_setalo:checked ~ nav div ul li[rel=setalo]>.toc,#_hangeffekt:checked ~ nav div ul li[rel=hangeffekt]>.toc,#_meg_4_licensz:checked ~ nav div ul li[rel=meg_4_licensz]>.toc,#_hivatkozasok:checked ~ nav div ul li[rel=hivatkozasok]>.toc,div.page{display:none;}#_inditas:checked ~ nav div ul li[rel=inditas]>ul,#_inditas:checked ~ nav div ul li[rel=inditas]>.current,#_inditas:checked ~ div div[rel=inditas],#_fajlformatumok:checked ~ nav div ul li[rel=fajlformatumok]>ul,#_fajlformatumok:checked ~ nav div ul li[rel=fajlformatumok]>.current,#_fajlformatumok:checked ~ div div[rel=fajlformatumok],#_felhasznaloi_bemenetek:checked ~ nav div ul li[rel=felhasznaloi_bemenetek]>ul,#_felhasznaloi_bemenetek:checked ~ nav div ul li[rel=felhasznaloi_bemenetek]>.current,#_felhasznaloi_bemenetek:checked ~ div div[rel=felhasznaloi_bemenetek],#_interfesz:checked ~ nav div ul li[rel=interfesz]>ul,#_interfesz:checked ~ nav div ul li[rel=interfesz]>.current,#_interfesz:checked ~ div div[rel=interfesz],#_kod_szerkeszto:checked ~ nav div ul li[rel=kod_szerkeszto]>ul,#_kod_szerkeszto:checked ~ nav div ul li[rel=kod_szerkeszto]>.current,#_kod_szerkeszto:checked ~ div div[rel=kod_szerkeszto],#_szprajt_szerkeszto:checked ~ nav div ul li[rel=szprajt_szerkeszto]>ul,#_szprajt_szerkeszto:checked ~ nav div ul li[rel=szprajt_szerkeszto]>.current,#_szprajt_szerkeszto:checked ~ div div[rel=szprajt_szerkeszto],#_terkep_szerkeszto:checked ~ nav div ul li[rel=terkep_szerkeszto]>ul,#_terkep_szerkeszto:checked ~ nav div ul li[rel=terkep_szerkeszto]>.current,#_terkep_szerkeszto:checked ~ div div[rel=terkep_szerkeszto],#_betu_szerkeszto:checked ~ nav div ul li[rel=betu_szerkeszto]>ul,#_betu_szerkeszto:checked ~ nav div ul li[rel=betu_szerkeszto]>.current,#_betu_szerkeszto:checked ~ div div[rel=betu_szerkeszto],#_hangeffektek:checked ~ nav div ul li[rel=hangeffektek]>ul,#_hangeffektek:checked ~ nav div ul li[rel=hangeffektek]>.current,#_hangeffektek:checked ~ div div[rel=hangeffektek],#_zenesavok:checked ~ nav div ul li[rel=zenesavok]>ul,#_zenesavok:checked ~ nav div ul li[rel=zenesavok]>.current,#_zenesavok:checked ~ div div[rel=zenesavok],#_memoriaatfedok:checked ~ nav div ul li[rel=memoriaatfedok]>ul,#_memoriaatfedok:checked ~ nav div ul li[rel=memoriaatfedok]>.current,#_memoriaatfedok:checked ~ div div[rel=memoriaatfedok],#_vizualis_szerkeszto:checked ~ nav div ul li[rel=vizualis_szerkeszto]>ul,#_vizualis_szerkeszto:checked ~ nav div ul li[rel=vizualis_szerkeszto]>.current,#_vizualis_szerkeszto:checked ~ div div[rel=vizualis_szerkeszto],#_debuggolo:checked ~ nav div ul li[rel=debuggolo]>ul,#_debuggolo:checked ~ nav div ul li[rel=debuggolo]>.current,#_debuggolo:checked ~ div div[rel=debuggolo],#_c:checked ~ nav div ul li[rel=c]>ul,#_c:checked ~ nav div ul li[rel=c]>.current,#_c:checked ~ div div[rel=c],#_basic:checked ~ nav div ul li[rel=basic]>ul,#_basic:checked ~ nav div ul li[rel=basic]>.current,#_basic:checked ~ div div[rel=basic],#_assembly:checked ~ nav div ul li[rel=assembly]>ul,#_assembly:checked ~ nav div ul li[rel=assembly]>.current,#_assembly:checked ~ div div[rel=assembly],#_lua:checked ~ nav div ul li[rel=lua]>ul,#_lua:checked ~ nav div ul li[rel=lua]>.current,#_lua:checked ~ div div[rel=lua],#_memoriaterkep:checked ~ nav div ul li[rel=memoriaterkep]>ul,#_memoriaterkep:checked ~ nav div ul li[rel=memoriaterkep]>.current,#_memoriaterkep:checked ~ div div[rel=memoriaterkep],#_konzol:checked ~ nav div ul li[rel=konzol]>ul,#_konzol:checked ~ nav div ul li[rel=konzol]>.current,#_konzol:checked ~ div div[rel=konzol],#_audio:checked ~ nav div ul li[rel=audio]>ul,#_audio:checked ~ nav div ul li[rel=audio]>.current,#_audio:checked ~ div div[rel=audio],#_grafika:checked ~ nav div ul li[rel=grafika]>ul,#_grafika:checked ~ nav div ul li[rel=grafika]>.current,#_grafika:checked ~ div div[rel=grafika],#_bemenet:checked ~ nav div ul li[rel=bemenet]>ul,#_bemenet:checked ~ nav div ul li[rel=bemenet]>.current,#_bemenet:checked ~ div div[rel=bemenet],#_matematika:checked ~ nav div ul li[rel=matematika]>ul,#_matematika:checked ~ nav div ul li[rel=matematika]>.current,#_matematika:checked ~ div div[rel=matematika],#_memoria:checked ~ nav div ul li[rel=memoria]>ul,#_memoria:checked ~ nav div ul li[rel=memoria]>.current,#_memoria:checked ~ div div[rel=memoria],#_pattogo_labda:checked ~ nav div ul li[rel=pattogo_labda]>ul,#_pattogo_labda:checked ~ nav div ul li[rel=pattogo_labda]>.current,#_pattogo_labda:checked ~ div div[rel=pattogo_labda],#_setalo:checked ~ nav div ul li[rel=setalo]>ul,#_setalo:checked ~ nav div ul li[rel=setalo]>.current,#_setalo:checked ~ div div[rel=setalo],#_hangeffekt:checked ~ nav div ul li[rel=hangeffekt]>ul,#_hangeffekt:checked ~ nav div ul li[rel=hangeffekt]>.current,#_hangeffekt:checked ~ div div[rel=hangeffekt],#_meg_4_licensz:checked ~ nav div ul li[rel=meg_4_licensz]>ul,#_meg_4_licensz:checked ~ nav div ul li[rel=meg_4_licensz]>.current,#_meg_4_licensz:checked ~ div div[rel=meg_4_licensz],#_hivatkozasok:checked ~ nav div ul li[rel=hivatkozasok]>ul,#_hivatkozasok:checked ~ nav div ul li[rel=hivatkozasok]>.current,#_hivatkozasok:checked ~ div div[rel=hivatkozasok],#_:checked ~ div div[rel=_]{display:block;}</style>
   <style rel="theme">hr,table,th,td{border-color:#e1e4e5;}th{background:#d6d6d6;}tr:nth-child(odd){background:#f3f6f6;}a{text-decoration:none;color:#2980B9;}samp{background:rgba(0,0,0,.1);color:#408040;}.content{background:#fcfcfc;color:#404040;font-family:Lato,Helvetica,Neue,Arial,Deja Vu,sans-serif;}.title,.home,h1>a,h2>a,h3>a,h4>a,h5>a,h6>a{background:#2980B9;color:#fcfcfc;}.version{color:rgba(255,255,255,0.3);}.search{border:1px solid #2472a4;background:#fcfcfc;}.nav{background:#343131;color:#d9d9d9;}.nav p{color:#55a5d9;}.nav label:hover,.nav a:hover{background:#4e4a4a;}.nav .current{background:#fcfcfc;color:#404040;}.nav li>ul>li{background:#e3e3e3;}.nav li>ul>li>a{color:#404040;}.nav li>ul>li>a:hover{background:#d6d6d6;}.pre {border:1px solid #e1e4e5;background:#f8f8f8;}.info{background:#e7f2fa;}.info>p:first-child{background:#6ab0de;color:#fff;}.hint{background:#dbfaf4;}.hint>p:first-child{background:#1abc9c;color:#fff;}.warn{background:#ffedcc;}.warn>p:first-child{background:#f0b37e;color:#fff;}.btn{background:#f3f6f6;}.btn:hover{background:#e5ebeb;}.hl_h{background-color:#ccffcc;}.hl_c{color:#808080;font-style:italic;}.hl_p{color:#1f7199;}.hl_o{color:#404040;}.hl_n{color:#0164eb;}.hl_s{color:#986801;}.hl_t{color:#60A050;}.hl_k{color:#a626a4;}.hl_f{color:#2a9292;}.hl_v{color:#e95649;}.ui1{border:1px outset #a0a0a0;background:#a0a0a0;color:#222;}</style>
 </head>
 <body>
   <div class="frame content">
     <input type="radio" name="page" id="_" checked><input type="radio" name="page" id="_inditas"><input type="radio" name="page" id="_fajlformatumok"><input type="radio" name="page" id="_felhasznaloi_bemenetek"><input type="radio" name="page" id="_interfesz"><input type="radio" name="page" id="_kod_szerkeszto"><input type="radio" name="page" id="_szprajt_szerkeszto"><input type="radio" name="page" id="_terkep_szerkeszto"><input type="radio" name="page" id="_betu_szerkeszto"><input type="radio" name="page" id="_hangeffektek"><input type="radio" name="page" id="_zenesavok"><input type="radio" name="page" id="_memoriaatfedok"><input type="radio" name="page" id="_vizualis_szerkeszto"><input type="radio" name="page" id="_debuggolo"><input type="radio" name="page" id="_c"><input type="radio" name="page" id="_basic"><input type="radio" name="page" id="_assembly"><input type="radio" name="page" id="_lua"><input type="radio" name="page" id="_memoriaterkep"><input type="radio" name="page" id="_konzol"><input type="radio" name="page" id="_audio"><input type="radio" name="page" id="_grafika"><input type="radio" name="page" id="_bemenet"><input type="radio" name="page" id="_matematika"><input type="radio" name="page" id="_memoria"><input type="radio" name="page" id="_pattogo_labda"><input type="radio" name="page" id="_setalo"><input type="radio" name="page" id="_hangeffekt"><input type="radio" name="page" id="_meg_4_licensz"><input type="radio" name="page" id="_hivatkozasok">
-    <nav class="side nav"><div>
+    <input type="checkbox" id="menuchk" style="display:none;"><nav class="side nav"><div>
       <div class="title"><a href="https://bztsrc.gitlab.io/meg4"><img alt="MEG-4"  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARgAAABACAYAAADBJGiiAAAYHElEQVR42u2deXxVxdnHn5k5Z85212wECARIWKygiIAiIFWUulvrWtQi1KpYEOsuyiuioOKr1YpLrYILBUSlWuBFUDalWpBFBGQVAiFkX+5+zzIz7x9ZCNalrRI0me/ncz/53OTknnN/8+SX53lmzlwCkjaF/5w/tINg3r3gy1orava7R/NcpONJWWqvYaONvufauM8vKrztq+QAtDGwlKDtkHfDc5T6gjcaHQrXqb5w6mifj5VsqtY7dt9kZLQbG/YH+gGAJkehbUGkBG2D7HN+r6oKvZooZCji7kuRlS/FWuK86Lifl1gYLtIs31izy4k+QX2bnPI9rhwRaTCSVsLPxjyKNH/GCaqmzSAIzXejlR8ldq9jLXFub8dqESjs/7luWOPNUPbPfTl5sZz+I7ZUbVwmTUaWSJLWgKooPf3hjMmWzxdThbOqfPEzTkue3zSNAxold5uGpvtDmY9YgfBvu5x7faEcGWkwkp826LhLJ/Qxff6nDY3+QgW+hNnJ7S19EXvmPCh0gpdQxJdahmYaujEtp+CEGX1HPdBbDpEskSQ/UYbcPD0zmJs/2fQFLiZCVNYd2PnY9nmP7DsW19L+hMGOqhCma/pZOtWCuml2MaxAr66Dz1/f8fhTaw5sWC7kiEmDkfxEuOShv1pWKOs63fTdTFVFdxN1y4s2rvxT/NCX3rG4ntKNK0T74/pX+4Lhvoaud1epQjSNdtN0vYCl4tEu/YbtK1q/gsmRkyWS5EfOrya9aGmU3mTo9BFTpwEVi6gbr32u9NOl6WN5XetmTSn3m/pKg5K0SRUwNRVMXTsns33eK1kdOl078rF5uhw9aTCSHzFXTXnZCoYz77Qs835L1w1TJaACm5Pf4/hVLZMT6/TbMmNKwDOpIkyqQP1DhWAwGAqEMqYQBPeOuPGBDnIUWw+KlKD1MPbpt32IqLcQqt2KiRIEAPBct0YQPC8Vr20qP345/kGsGSbk9zoRFJVihDEACABATV+geUcEAbiOLaLVlfyFO0Ye0SsZ++Q8JVpbnYU144JQZm52PFI9RNX0cs2wtteWlZRwJ/WeZyej85+4xwMAULgHOlWAENJ0rlQ8Wmcn4tNURflNXreevX87/a/jqvftKH/n+Ye4HNWfNkhK0Dq47fl3A6pu/g4wmYIxMQEAhBAQqSr/5MDubdcsfn7KXgCAS8Y9oGTk5p1hJxNOXvfjQVFpb4SROBwO4mvDxHVsHq2pWBqvqyl6bco4AQBo1KRnCjM75o/AinYTUdVeCBPSGFBCCBCcu4lIdZlg3tRodfmS16feWjx66svjszrkP6IoqtX46q6drk7UVZ1RVxc5aPr9EzVNCySqK+YhEB+/8tB4W46uzGAkx5Df3DP9RJ0qN2OMhgPwJKXURAgB89xIiqBXnGR0PwDA3TPeVIEoVxKqP1xevO99VSGgKuR6wOiI/zTia/7zIE5AJeRSleAiAIDxj78y2ApmPmoEQgMwxvSbKiKf2aGzEGK6gsTQESPHXAdOCgyVgEqV5kcFCbfv2btx9YS5c158YMyUF/sSgs9y0wk66t7Hl7/6yJ2eHGVpMJIW5v4ZsxE1/H0A4akMoeJ4pGpyKBScGLSCWQAg0kn2RRS8Ze+/+hR75NXF1AyGfwWApgHCuYnqEhYyKSiUAkLf3YpzFfBEUuXpGhtue+zFQe3y8p42fMGTACH0XSlyLBrRPTv18bI5M9lv7ioUAV0Bqh9xW5JiKuGzBw49+9Slc15cNPN/bvj40nGTdlNN8yuKKqevpcFIWpob75qsOPHIGZZpXRiLR98QiLzbLmBenpOb002lGgjOUzFmz79rwsiiR56fna2COzUzYF2GMAlzxr1qQ4OwpQGlOiCC6gsj8U21MwLHRgBJDWntcsK5nbtdq5vWSYhgVF8OAaCG6ko0fG18nkwmamvjtRNZKjYLAAC79u5MvxmjmmY1llKAEAiTZhvgjX5oxuy1k8ZdU/n2jIcqL735vqq5z90vDUYajKTFB05RAiBYnpuOPzDtlmtrpz0zMye/Y8F1gXBQQwjAc72aPZ9tW/zOyvUdU+n0E4GMrMuIohAAAM4YVJgaZPh00DQN6pu89YbAhaiIRiNUcE6bl0vYtT3kpnhmODAsK+gbrRsGau5GQgA4th0XgPYLwS1CSB7z3LpovHZqrOLQqy88eKsNAHDVNdd+IoSoRIByEUKQiMcBEQyGYUGA4hE+FZ3653mLF9141fni7eemSnORBiM5Fjw77f4aAJjV+Lxr506/7ZSbfZpK69shnueFBw3sf1UwnNEVYfJLjHHT1DFjDAImbTIYfITBwPKtG9fOdew0BQSiPiUBcD1XMMfeOPT0YfeFwyG9qTJC9VlIMpVenbKTM9Jpe3cyGc8QjF2gadqhFUvefe3NWc9zANABACKlB5X8bl0RwQQAARiEw/atW+DEficDsUK+gI6v3vflrhUAkJCjLA1G8iNg8dIVuXn5XS/3+fwYUNNckNEu5BsHAH4BoDUVPQKAcQZBk0KGpYGu64AxbqqOEMIdR15yQaf62uUwtp3mFeUVZkZ2ToGiqkecPx6LlyTs5ERmJ/858rxh/PV5b/3e7/efSgjgUVdedtGoKy8DQADM9Ug8Ub3UTwupbugAgEBYGpSaKlBwIRTwQcBQLsyyTrj18+17qoQQaMf27bu2bdm8csrkSTKbkQYjaWnGXDKcZIeDN+VmBH6mqrR5IwUDQA401TmoPiEBAMYw+DUVQqYGuq4BxgiaTVEPBUBDvroQBgvFidZW/iknM3Ra2PQ1nUcIARoy3qytPLTx8nOHcQCAQQMGdAmFggMwxkc4kee6UFFRscuvEewzaVOnZ/iwoQAIAUYIwFBN4TOmCBAghEBuuvNrlMAq+Pr5c4k0GMnRRLOyCvds3XRuXXmJhpt1ZsXh9sjhUqaxDOIcdu7YCV68DiilcHj1CgAIQM1/rfF1XMfFe4uK9GR1her3+wEazIpzDslkMnWw+GDTVPLmtWvA7/cBRqjR2wAEgOcxqKmtAcM0wGf5mjzta9b1YQAEQggoryhHFZWVcqClwUhamisG5avJ/Z+evfzVtb1BeABCgBBCIITrOyQNzdfGsqnRMoRAUFqXgmy/Bgqp95N6E0AASPzLYl4EAB4TqDae/iLko1sUQvod/okAAWSYQKQ9ABQDAPztT3eAppKvvAgCzjkkbA8IRmBqSsM1oYZqrPEixeFfEwCxlAvxtFwGIw1G0uJ0y8vqoKvkOoVgEyEBzBNVCdv50NLpWQSjgOMxN55yIWhpKsGH17pwIQAbEeiQ6QeF4PrSpLFFI0TK8zgRIMjh8grAY8INpJxyS1dLLF3tdzgzQgAAJyOEJowP+ucKhIp0LPYbVCnWNaVbY5MYEADjAuriNgBwHrQ09tW0BQECjBFGDev+uACojabtSNIG2FotB1wajKSluPuqAahTTvAcleC+qL78Ea7D1tlV0Ucywv7OCsEn1USTy1Vd82cHzcG42Xo4LgDiLofsrACoCgHcLHvgXCx8b+2eg67HQs3KJKRgVBa09LV5uWFfwNTPIwSR+gUw9ZWaEHCb32+NiibTMZUQHLBoBsFHrqZhXICqpd29h2oWeMIJA2pWxAkAnRKclxMcolOlF0IIpWzPsxla+OS7m+U9SdJgJC1JQcesjpZJJ2gqIfV9FZGqiiTmT5336dY/jhu+DSPkpTw+vXunrNt0qgDCqKlc4UKAL5qCUNACqpCvLMZFJ15z3smJhuKq0QCE47Lsqrpkh3gyvcEw6XpTp6d8pXuCAKGs9hDIajQMgZo1chCA53FwOUrnZoUmP/T6P772HqPn//CLUcGA+TzByAgKQUJB86SPXxi96LSbZskmrzQYSUuRnRm4wdCUgkZvqKxNlAqE/gYA6fKa5KNZQUOc/LPOEaoSQpqZCwAAEwIsUwe/ZQJVCTRVT/XH9BQIeiBo7h2AbJe5Kddb7HK20OXwDNVoD11V6rMQ8TVLgMXhJwIJAAEilXaLOCSX7S6u+samCiZ4AaXq5aZOzwcQyGJ89Ir1e9cCwFI56tJgJC3ArPsuHhT0G5dTlagAAB7jTKDksx6HOADAo3M+2THpuiGoJpYa1DE72Mcy6BF/+ZwLMHQKlqUBVRXA/3o30b98R3EZSjoepBzGqyLJt4M+o5tlaLfqmprxzTPIh9u1Kds9wJF7X1FJ5ZJ5q3Z+Y8kTDllxqikv6IZ6BsHYBAGdexe2H/fELSM+vv1Py2Jy9KXBSI4iU28aHswK+673WXovhWAQICCasHcoKlk04emlTX+4/Xp1Asugut/STJ2qIBpmZxp7IbqugmlqoCkKNFvIe4QtNE9GiOOBkaJgpD34/RP/l3583NnTGYfSDjmBMRpVBigKURDU93wbZ4CEEOB4zGZMLC6rjb/GOfr7H9/e9K2lzhX3vyXee+ratYSQ5bqmXogR4Fyq9CcKGQYAi2QESIORHCWenHAO6pwb7peT4b/YZ9XvLukx5giw59RE0weaH1sbS2NNUzMYFzjtekeUJJwLBgiB7TIuAHGM4DubqI7LPMfj4LL6Q++c8b4NAC/Nf/jKNRkh8xSNKhdbOs1PpJ3eCCFh6ur6eMIpsl3v73Wx9EfXTl5Q+u++z5Ub9tUMObHL0o6G9gtdUykVIpdzuP7dx69Ze/Gds+WiGGkwkqNBbnZQz8n0X5sZ8mUiXN/8wC7eRgh55/ePLzqiaVpWGxd1ifQWS1dH4qYNpRoyEgEikbIPbt1ThiglCzFC39lAdT0m6mLpzyY+/8ERx27bW76zZ9ec3VlB8639ZbWBQxXRPoCAnVDYfhMISFdHk+mr/+fN/2gW6LHX17DunbJW5uWGt2ma0hcEQlRVhhoG7bfmpRuXDbn+z7LhKw1G8kNj6uoZOZm+S3Vdbbzz2U2kUivKq6O7v3rsxOfe5wCws+HxbWz9Ptf04MxVAgAY1N+cmACA0h/ivV4/7Z3dS56+bkUoYPZWCVEFiAwOcLPtsbUAUCej4aeB3PT7J8Jb068xeubnXBPym35VJaCqCjgui279suzvV0x8ozV+DKsbSzrPOS7bpVIClBII+vQzEyn3Bhm30mAkPzCd24VODwXNn6uqglRFAaIQEUmkV37wz10bWut7/udn+/ZFk+k3EEJcVRSgqurL7xAetfCp6/JlREiDkfxArJ99SyA3O3C9oam5CsFACAbX9WK1sdRfZi7a1Gr3TXnyjU9EWXVsdtrxdhKCQVEwhANmt/z24THP3n2xLO+lwUi+Lxv+OgG1zw70D/iM01RFQYRgwBhDPGUv9Bl0TWt//9lhf7HjshkAyCWEgEZVvX1W4KIhJ3U7TkaHNBjJ98RvaX6M0c1UIR0wRkAIBgFQapn6C36fkW7t7//UUTO8aCL9oeOyHaQhe7MMrWfHnOCwnX+7S5URIg1G8l/y0qRLkd/SBwZ9xpmKQoAQDAhhcF1vdVl1bOvxlz3RJqZry6qj2x3PmwtCpAnGoChEo1QZTykpkFEiDUbyX6JpSjuF4NuoqoQRRoAwBttxU5t2Hvq036+firQVHc4bP4slkvabHhd7EAJAGIFO1e7JlPPw9FvO9clIkQYj+S/GpmvHzBstg56NEAKMEWAEwnbY53XR1HxoY1tIrtmwb6/tevMAIYYRAkIw6pSbceaZA3ucLkNFGozkP+Tdp0YV9Mhv90tdUwlq2IzJY9yti6dmX3bX6yVtTY8xD7/FEynnVY/xrY1ZjGXSYEGnzDEfvjw2ICNGGozk3+SZuy5Wjuuae2HAp/cAhBBC9VtaJlPuZ198WfY3aKMbYHsePxRL2HO5AN6w0Sc2DTq4W17mUBk10mAk/yb9f5ZXGPYb16gEmw377ILHeNp23RfOHdrrUFvV5e+rtorPd5X8oyaSqKvfx1eAQnBu0GeMPLR0UkhGjjQYyXewee4E0iErcJpBld6u64Hj1D8iseS2aDy9Uhtwb5vIXiaOHqZNHXtWZr8e7Zr2pvnDEwtFNJHaVBtJzE4mbXAcD1yXAQhxfiSeGrHs2d/KeJYGI/k2Kmti7UGIuzyPqem0A+m0A7F4SkSiyVcSSbsYAGDnm7ehZ++8sN/4ywcOaK06WIbq79UlZ8Ifb7/4ojcf/bXV+P0FH3yeLK2IvFMXTRY36sM8L8gZf/BQeaSDjCBpMJJvITvkG60Q3N22XbBtF+y0A5FY6ssde8s3nDTyafbney4K7CupHsI4v4gxUdNadbjvuQ+qdKq+gBBcnp8bnrZ25tiTnrjlHH32ks3izWWbNlTVxlel0g6zbQds24OgpfUoyMsYLSPoxwWREvx4WDFjTPeMgP4QRtDO8xh4HgPH9bzKmtg77/1jx8ypY89WMwLGKEUhAYXgWXfOWFramvWYs3Rz7ILBPdZpCjnfoOotHbL89ILB3b+8/ZllNSMGFtT4DXoeAvB5HgPBOSIY5Yw4peD9ee9vqZHRJA1G0oyZ91+kts/w365T5TzGhcIYB8/jEE/aFftLa+/16WqsS/uM8RpVakI+Y/6wsS/F24Iu8z/YGh1+ctdPGed9MvzGdaauntmve64Wiac+oKoyyKfTHoxxYIwDgAhyxp0TCrJWL127V37UiTQYSSMTLjulp8/QbhNCdGIeQ57HgDEGjusddBz3i4BPu0enyhdUVWb1ufoZuy1ps2D19ljX3MDHOlW6Z/iNwXk5gaG6qnTmjOWZmtrZY/XZHmecEIw0v6Gtfn3p51UyqqTBSADgj+PONn2GNkGn5CLGuOp59dmL53EAIbKoSk4zNfU1hNBfTh79gtMWNfpw84G4gsSa4/JzKlWCB+qUnGHqNM9jHDXTCzGPZTLGD44c3nv97Pe3yCxGGkzb5obz+qCwTz89J2T9r0qwxRiD+pS/KYNJMCYeQAAvD7ppZqota7Vlb2V8/CX9NyXTbpnH+EDOeLBRJ8YYMI8B41xxXK9g277yTZ2yfQc27q6QQXYMkZv2HGM65QSUkE+7iRIUSKePTE48zvm+Q7Wri8rr5k6fty4p1QIYcOPLzpLHR77BXI8pBD9JMMo9/NOGD1sRoiBk0nGF7cMfA4ArVTt2yGnqY42AszIsfXjjlLRtO2CnHYgl0t7Oosr3lq3bc/P0eetkP6EZ5945x40m0m/URJN3xxPpA43rYdK2C2nbAcdxIWhpwzGIs6RaskRqs4y74IRgYYfww5pKTmCMIY9x8DwGKcfzDlVGF27ZW3H73NW79kml/pW3P9ophhzXbhvnUMIYGyi4CDLGgTVM7wsuNIUg//Gdwks+2nbIlopJg2lzXP3znqebmnKz4CJ4eN0L40Vldcv2ltVN+Mt72/ZKlb6ZpRv281N7ttvtuN4BEOJUELxJR8YYAgF+Q1XWL15fJHWUBtO2mHhp30xLUycRjAZxJhoauswrrogu2VFc/btZH+wolip9N8s3F7MBhe121EQTZQSjQRjA37guxmMs4HqeNqRX7soVW0pSUi1pMG2CyVf0Q6amDKIE3wFcWMxjYDueW1oTX7SnpHbCnI++PChV+vf5cFuJCFG0lWB8gCDojwSEGWPAOAfBRE485WzLzzJ3bd5fKz8RUhpM6+e0wiwLA0xRCBrIGAfb9VhFXXJhcUXs9tlrviySCv3n7CqLAXfTu1VCSihGvTFCmczjiHNuJVJOYSLpLNi0vzYhlZIG0+oZ2C3zHJOSewXn1PUYK6tNLiqLJMfPXrP3gFTnv6ekzuae7e7u0s6/hIDowjxe6DGGMUCO4/LydXurP5EqSYNp1dw4rKvp15TJgou+jsvcikhy8cGq+A3z1xWXSnW+P+Uxh63ZWVFzarfMFZ7HejLGCgTnCmOisHNIe3dbaSwiVZIG01pR+nb0j9IUPNbzGKpN2Auqoqk7FmwqPSSl+WH5aFdlom+nwCeexztyxnsggIAQIp22Ux9VJpi8hUAaTOvjrMJgnwxDnQZC5NXE7EU1ifQdCz4rl2XRUWLtvtrI8bm+T5O2U4AE74VAhPxU+XhbeaJcqiMNplVxSnudtg8aV6oEXRJLuYujafemd7dWybLoKLOxOBLplqEtdxyvEIPoj4TY3zmobtxVnWZSHWkwrYbe2Xo3DaO70g7bXJN0xi/ZVVcpVWkZtpcnk5kafCg4L8QITsQAH35Rma6VykiDaTX0badd4Xo8GE+7d39QlJA9lxamKOImsjT0oaVgnLC9wbtrnVVSlaOPvNmxpYQm4kSMxT3vH0jKFbrHiDUlqQq/il9SFVgr1WgZ/h8P5Zw8N8X3RQAAAABJRU5ErkJggg=="> Kézikönyv</a><div class="version">0.0.1</div><input id="_q" class="search" type="text" required="required" onkeyup="s(this.value);"></div>      <div id="_s" class="nav"></div>
       <div id="_t" class="nav">
         <p>Alapok</p>
         <ul>
         <li rel="inditas"><label class="toc" for="_inditas">Indítás</label><div class="current">Indítás</div><ul>
-          <li class="h2"><a href="#bongeszodben">Böngésződben</a></li>
-          <li class="h2"><a href="#telepites">Telepítés</a></li>
-          <li class="h3"><a href="#windows">Windows</a></li>
-          <li class="h3"><a href="#linux">Linux</a></li>
-          <li class="h2"><a href="#futtatas">Futtatás</a></li>
-          <li class="h3"><a href="#parancssori_opciok">Parancssori opciók</a></li>
+          <li class="h2"><a href="#bongeszodben" onclick="m()">Böngésződben</a></li>
+          <li class="h2"><a href="#telepites" onclick="m()">Telepítés</a></li>
+          <li class="h3"><a href="#windows" onclick="m()">Windows</a></li>
+          <li class="h3"><a href="#linux" onclick="m()">Linux</a></li>
+          <li class="h2"><a href="#futtatas" onclick="m()">Futtatás</a></li>
+          <li class="h3"><a href="#parancssori_opciok" onclick="m()">Parancssori opciók</a></li>
         </ul></li>
         <li rel="fajlformatumok"><label class="toc" for="_fajlformatumok">Fájlformátumok</label><div class="current">Fájlformátumok</div><ul>
-          <li class="h2"><a href="#flopik">Flopik</a></li>
-          <li class="h2"><a href="#projektformatum">Projektformátum</a></li>
-          <li class="h3"><a href="#metainfo_txt">metainfo.txt</a></li>
-          <li class="h3"><a href="#program_x">program.X</a></li>
-          <li class="h3"><a href="#sprites_png">sprites.png</a></li>
-          <li class="h3"><a href="#map_tmx">map.tmx</a></li>
-          <li class="h3"><a href="#font_bdf">font.bdf</a></li>
-          <li class="h3"><a href="#sounds_mod">sounds.mod</a></li>
-          <li class="h3"><a href="#musicxx_mod">musicXX.mod</a></li>
-          <li class="h3"><a href="#memxx_txt">memXX.txt</a></li>
-          <li class="h2"><a href="#egyeb_formatumok">Egyéb formátumok</a></li>
+          <li class="h2"><a href="#flopik" onclick="m()">Flopik</a></li>
+          <li class="h2"><a href="#projektformatum" onclick="m()">Projektformátum</a></li>
+          <li class="h3"><a href="#metainfo_txt" onclick="m()">metainfo.txt</a></li>
+          <li class="h3"><a href="#program_x" onclick="m()">program.X</a></li>
+          <li class="h3"><a href="#sprites_png" onclick="m()">sprites.png</a></li>
+          <li class="h3"><a href="#map_tmx" onclick="m()">map.tmx</a></li>
+          <li class="h3"><a href="#font_bdf" onclick="m()">font.bdf</a></li>
+          <li class="h3"><a href="#sounds_mod" onclick="m()">sounds.mod</a></li>
+          <li class="h3"><a href="#musicxx_mod" onclick="m()">musicXX.mod</a></li>
+          <li class="h3"><a href="#memxx_txt" onclick="m()">memXX.txt</a></li>
+          <li class="h2"><a href="#egyeb_formatumok" onclick="m()">Egyéb formátumok</a></li>
         </ul></li>
         <li rel="felhasznaloi_bemenetek"><label class="toc" for="_felhasznaloi_bemenetek">Felhasználói bemenetek</label><div class="current">Felhasználói bemenetek</div><ul>
-          <li class="h2"><a href="#ui_gp">Játékpad</a></li>
-          <li class="h2"><a href="#ui_ptr">Mutató</a></li>
-          <li class="h2"><a href="#ui_kbd">Billentyűzet</a></li>
-          <li class="h3"><a href="#unicode_kodpont_beviteli_mod">UNICODE Kódpont beviteli mód</a></li>
-          <li class="h3"><a href="#kompozit_mod">Kompozit mód</a></li>
-          <li class="h3"><a href="#ikon_mod">Ikon mód</a></li>
-          <li class="h3"><a href="#katakana_es_hiragana_mod">Katakana és Hiragana mód</a></li>
+          <li class="h2"><a href="#ui_gp" onclick="m()">Játékpad</a></li>
+          <li class="h2"><a href="#ui_ptr" onclick="m()">Mutató</a></li>
+          <li class="h2"><a href="#ui_kbd" onclick="m()">Billentyűzet</a></li>
+          <li class="h3"><a href="#unicode_kodpont_beviteli_mod" onclick="m()">UNICODE Kódpont beviteli mód</a></li>
+          <li class="h3"><a href="#kompozit_mod" onclick="m()">Kompozit mód</a></li>
+          <li class="h3"><a href="#ikon_mod" onclick="m()">Ikon mód</a></li>
+          <li class="h3"><a href="#katakana_es_hiragana_mod" onclick="m()">Katakana és Hiragana mód</a></li>
         </ul></li>
         <li rel="interfesz"><label class="toc" for="_interfesz">Interfész</label><div class="current">Interfész</div><ul>
-          <li class="h2"><a href="#jatekkepernyo">Játékképernyő</a></li>
-          <li class="h2"><a href="#szerkeszto_kepernyok">Szerkesztő képernyők</a></li>
-          <li class="h2"><a href="#sugo_oldalak">Súgó oldalak</a></li>
+          <li class="h2"><a href="#jatekkepernyo" onclick="m()">Játékképernyő</a></li>
+          <li class="h2"><a href="#szerkeszto_kepernyok" onclick="m()">Szerkesztő képernyők</a></li>
+          <li class="h2"><a href="#sugo_oldalak" onclick="m()">Súgó oldalak</a></li>
         </ul></li>
         </ul>
         <p>Szerkesztők</p>
         <ul>
         <li rel="kod_szerkeszto"><label class="toc" for="_kod_szerkeszto">Kód Szerkesztő</label><div class="current">Kód Szerkesztő</div><ul>
-          <li class="h2"><a href="#programozasi_nyelv">Programozási nyelv</a></li>
-          <li class="h2"><a href="#felhasznaloi_funkciok">Felhasználói funkciók</a></li>
-          <li class="h2"><a href="#plusz_billentyukombok">Plusz billentyűkombók</a></li>
+          <li class="h2"><a href="#programozasi_nyelv" onclick="m()">Programozási nyelv</a></li>
+          <li class="h2"><a href="#felhasznaloi_funkciok" onclick="m()">Felhasználói funkciók</a></li>
+          <li class="h2"><a href="#plusz_billentyukombok" onclick="m()">Plusz billentyűkombók</a></li>
         </ul></li>
         <li rel="szprajt_szerkeszto"><label class="toc" for="_szprajt_szerkeszto">Szprájt Szerkesztő</label><div class="current">Szprájt Szerkesztő</div><ul>
-          <li class="h2"><a href="#spr_edit">Szprájt Szerkesztő Mező</a></li>
-          <li class="h2"><a href="#spr_sprs">Szprájtválasztó</a></li>
-          <li class="h2"><a href="#spr_pal">Paletta</a></li>
-          <li class="h2"><a href="#spr_tools">Eszköztár</a></li>
-          <li class="h2"><a href="#spr_sel">Kijelölések</a></li>
+          <li class="h2"><a href="#spr_edit" onclick="m()">Szprájt Szerkesztő Mező</a></li>
+          <li class="h2"><a href="#spr_sprs" onclick="m()">Szprájtválasztó</a></li>
+          <li class="h2"><a href="#spr_pal" onclick="m()">Paletta</a></li>
+          <li class="h2"><a href="#spr_tools" onclick="m()">Eszköztár</a></li>
+          <li class="h2"><a href="#spr_sel" onclick="m()">Kijelölések</a></li>
         </ul></li>
         <li rel="terkep_szerkeszto"><label class="toc" for="_terkep_szerkeszto">Térkép Szerkesztő</label><div class="current">Térkép Szerkesztő</div><ul>
-          <li class="h2"><a href="#map_box">Térkép Szerkesztő Mező</a></li>
-          <li class="h2"><a href="#map_tools">Eszköztár</a></li>
-          <li class="h2"><a href="#map_sprs">Szprájtpaletta</a></li>
-          <li class="h2"><a href="#3d_s_utveszto">3D-s útvesztő</a></li>
+          <li class="h2"><a href="#map_box" onclick="m()">Térkép Szerkesztő Mező</a></li>
+          <li class="h2"><a href="#map_tools" onclick="m()">Eszköztár</a></li>
+          <li class="h2"><a href="#map_sprs" onclick="m()">Szprájtpaletta</a></li>
+          <li class="h2"><a href="#3d_s_utveszto" onclick="m()">3D-s útvesztő</a></li>
         </ul></li>
         <li rel="betu_szerkeszto"><label class="toc" for="_betu_szerkeszto">Betű Szerkesztő</label><div class="current">Betű Szerkesztő</div><ul>
-          <li class="h2"><a href="#glifszerkeszto">Glifszerkesztő</a></li>
-          <li class="h2"><a href="#glifvalaszto">Glifválasztó</a></li>
-          <li class="h2"><a href="#font_tools">Eszköztár</a></li>
+          <li class="h2"><a href="#glifszerkeszto" onclick="m()">Glifszerkesztő</a></li>
+          <li class="h2"><a href="#glifvalaszto" onclick="m()">Glifválasztó</a></li>
+          <li class="h2"><a href="#font_tools" onclick="m()">Eszköztár</a></li>
         </ul></li>
         <li rel="hangeffektek"><label class="toc" for="_hangeffektek">Hangeffektek</label><div class="current">Hangeffektek</div><ul>
-          <li class="h2"><a href="#effektvalaszto">Effektválasztó</a></li>
-          <li class="h2"><a href="#effektszerkeszto">Effektszerkesztő</a></li>
-          <li class="h2"><a href="#sfx_tools">Hanghullám eszköztár</a></li>
+          <li class="h2"><a href="#effektvalaszto" onclick="m()">Effektválasztó</a></li>
+          <li class="h2"><a href="#effektszerkeszto" onclick="m()">Effektszerkesztő</a></li>
+          <li class="h2"><a href="#sfx_tools" onclick="m()">Hanghullám eszköztár</a></li>
         </ul></li>
         <li rel="zenesavok"><label class="toc" for="_zenesavok">Zenesávok</label><div class="current">Zenesávok</div><ul>
-          <li class="h2"><a href="#savok">Sávok</a></li>
-          <li class="h2"><a href="#csatornak">Csatornák</a></li>
-          <li class="h2"><a href="#hangjegyszerkeszto">Hangjegyszerkesztő</a></li>
-          <li class="h3"><a href="#mus_kbd">Billentyűzet</a></li>
-          <li class="h2"><a href="#general_midi">General MIDI</a></li>
-          <li class="h3"><a href="#hangszerek">Hangszerek</a></li>
-          <li class="h3"><a href="#kottak">Kották</a></li>
-          <li class="h3"><a href="#tempo">Tempó</a></li>
+          <li class="h2"><a href="#savok" onclick="m()">Sávok</a></li>
+          <li class="h2"><a href="#csatornak" onclick="m()">Csatornák</a></li>
+          <li class="h2"><a href="#hangjegyszerkeszto" onclick="m()">Hangjegyszerkesztő</a></li>
+          <li class="h3"><a href="#mus_kbd" onclick="m()">Billentyűzet</a></li>
+          <li class="h2"><a href="#general_midi" onclick="m()">General MIDI</a></li>
+          <li class="h3"><a href="#hangszerek" onclick="m()">Hangszerek</a></li>
+          <li class="h3"><a href="#kottak" onclick="m()">Kották</a></li>
+          <li class="h3"><a href="#tempo" onclick="m()">Tempó</a></li>
         </ul></li>
         <li rel="memoriaatfedok"><label class="toc" for="_memoriaatfedok">Memóriaátfedők</label><div class="current">Memóriaátfedők</div><ul>
-          <li class="h2"><a href="#atfedovalaszto">Átfedőválasztó</a></li>
-          <li class="h2"><a href="#atfedo_tartalma">Átfedő tartalma</a></li>
-          <li class="h2"><a href="#atfedo_menu">Átfedő menü</a></li>
+          <li class="h2"><a href="#atfedovalaszto" onclick="m()">Átfedőválasztó</a></li>
+          <li class="h2"><a href="#atfedo_tartalma" onclick="m()">Átfedő tartalma</a></li>
+          <li class="h2"><a href="#atfedo_menu" onclick="m()">Átfedő menü</a></li>
         </ul></li>
         <li rel="vizualis_szerkeszto"><label class="toc" for="_vizualis_szerkeszto">Vizuális Szerkesztő</label><div class="current">Vizuális Szerkesztő</div><ul>
         </ul></li>
         <li rel="debuggolo"><label class="toc" for="_debuggolo">Debuggoló</label><div class="current">Debuggoló</div><ul>
-          <li class="h2"><a href="#kodnezet">Kódnézet</a></li>
-          <li class="h2"><a href="#adatnezet">Adatnézet</a></li>
-          <li class="h2"><a href="#regiszterek">Regiszterek</a></li>
+          <li class="h2"><a href="#kodnezet" onclick="m()">Kódnézet</a></li>
+          <li class="h2"><a href="#adatnezet" onclick="m()">Adatnézet</a></li>
+          <li class="h2"><a href="#regiszterek" onclick="m()">Regiszterek</a></li>
         </ul></li>
         </ul>
         <p>Programozás</p>
         <ul>
         <li rel="c"><label class="toc" for="_c">C</label><div class="current">C</div><ul>
-          <li class="h2"><a href="#ex_c">Példa program</a></li>
-          <li class="h2"><a href="#leiras">Leírás</a></li>
-          <li class="h2"><a href="#elofordito">Előfordító</a></li>
-          <li class="h2"><a href="#c_lit">Literálok</a></li>
-          <li class="h2"><a href="#c_var">Változók</a></li>
-          <li class="h2"><a href="#c_arr">Tömbök és mutatók</a></li>
-          <li class="h2"><a href="#c_op">Műveletek</a></li>
-          <li class="h2"><a href="#c_flow">Vezérlésirányítás</a></li>
-          <li class="h2"><a href="#c_funcs">Függvények</a></li>
-          <li class="h2"><a href="#c_api">Elérhető függvények</a></li>
+          <li class="h2"><a href="#ex_c" onclick="m()">Példa program</a></li>
+          <li class="h2"><a href="#leiras" onclick="m()">Leírás</a></li>
+          <li class="h2"><a href="#elofordito" onclick="m()">Előfordító</a></li>
+          <li class="h2"><a href="#c_lit" onclick="m()">Literálok</a></li>
+          <li class="h2"><a href="#c_var" onclick="m()">Változók</a></li>
+          <li class="h2"><a href="#c_arr" onclick="m()">Tömbök és mutatók</a></li>
+          <li class="h2"><a href="#c_op" onclick="m()">Műveletek</a></li>
+          <li class="h2"><a href="#c_flow" onclick="m()">Vezérlésirányítás</a></li>
+          <li class="h2"><a href="#c_funcs" onclick="m()">Függvények</a></li>
+          <li class="h2"><a href="#c_api" onclick="m()">Elérhető függvények</a></li>
         </ul></li>
         <li rel="basic"><label class="toc" for="_basic">BASIC</label><div class="current">BASIC</div><ul>
-          <li class="h2"><a href="#ex_bas">Példa program</a></li>
-          <li class="h2"><a href="#dialektus">Dialektus</a></li>
-          <li class="h2"><a href="#bas_lit">Literálok</a></li>
-          <li class="h2"><a href="#bas_var">Változók</a></li>
-          <li class="h2"><a href="#bas_arr">Tömbök</a></li>
-          <li class="h2"><a href="#bas_op">Műveletek</a></li>
-          <li class="h2"><a href="#bas_flow">Vezérlésirányítás</a></li>
-          <li class="h2"><a href="#bas_funcs">Alrutinok és függvények</a></li>
-          <li class="h2"><a href="#bas_print">Print utasítás</a></li>
-          <li class="h2"><a href="#bas_input">Input utasítás</a></li>
-          <li class="h2"><a href="#bas_spec">Peek és Poke</a></li>
-          <li class="h2"><a href="#bas_api">Elérhető függvények</a></li>
+          <li class="h2"><a href="#ex_bas" onclick="m()">Példa program</a></li>
+          <li class="h2"><a href="#dialektus" onclick="m()">Dialektus</a></li>
+          <li class="h2"><a href="#bas_lit" onclick="m()">Literálok</a></li>
+          <li class="h2"><a href="#bas_var" onclick="m()">Változók</a></li>
+          <li class="h2"><a href="#bas_arr" onclick="m()">Tömbök</a></li>
+          <li class="h2"><a href="#bas_op" onclick="m()">Műveletek</a></li>
+          <li class="h2"><a href="#bas_flow" onclick="m()">Vezérlésirányítás</a></li>
+          <li class="h2"><a href="#bas_funcs" onclick="m()">Alrutinok és függvények</a></li>
+          <li class="h2"><a href="#bas_print" onclick="m()">Print utasítás</a></li>
+          <li class="h2"><a href="#bas_input" onclick="m()">Input utasítás</a></li>
+          <li class="h2"><a href="#bas_spec" onclick="m()">Peek és Poke</a></li>
+          <li class="h2"><a href="#bas_api" onclick="m()">Elérhető függvények</a></li>
         </ul></li>
         <li rel="assembly"><label class="toc" for="_assembly">Assembly</label><div class="current">Assembly</div><ul>
-          <li class="h2"><a href="#ex_asm">Példa program</a></li>
-          <li class="h2"><a href="#asm_desc">Leírás</a></li>
-          <li class="h2"><a href="#asm_lit">Literálok</a></li>
-          <li class="h2"><a href="#asm_var">Változók</a></li>
-          <li class="h2"><a href="#asm_flow">Vezérlésirányítás</a></li>
-          <li class="h2"><a href="#asm_func">Függvények</a></li>
-          <li class="h2"><a href="#asm_api">Elérhető függvények</a></li>
-          <li class="h2"><a href="#mnemonikok">Mnemonikok</a></li>
+          <li class="h2"><a href="#ex_asm" onclick="m()">Példa program</a></li>
+          <li class="h2"><a href="#asm_desc" onclick="m()">Leírás</a></li>
+          <li class="h2"><a href="#asm_lit" onclick="m()">Literálok</a></li>
+          <li class="h2"><a href="#asm_var" onclick="m()">Változók</a></li>
+          <li class="h2"><a href="#asm_flow" onclick="m()">Vezérlésirányítás</a></li>
+          <li class="h2"><a href="#asm_func" onclick="m()">Függvények</a></li>
+          <li class="h2"><a href="#asm_api" onclick="m()">Elérhető függvények</a></li>
+          <li class="h2"><a href="#mnemonikok" onclick="m()">Mnemonikok</a></li>
         </ul></li>
         <li rel="lua"><label class="toc" for="_lua">Lua</label><div class="current">Lua</div><ul>
-          <li class="h2"><a href="#ex_lua">Példa program</a></li>
-          <li class="h2"><a href="#tovabbi_informaciok">További információk</a></li>
-          <li class="h2"><a href="#api_elteresek">API Eltérések</a></li>
+          <li class="h2"><a href="#ex_lua" onclick="m()">Példa program</a></li>
+          <li class="h2"><a href="#tovabbi_informaciok" onclick="m()">További információk</a></li>
+          <li class="h2"><a href="#api_elteresek" onclick="m()">API Eltérések</a></li>
         </ul></li>
         </ul>
         <p>API Referencia</p>
         <ul>
         <li rel="memoriaterkep"><label class="toc" for="_memoriaterkep">Memóriatérkép</label><div class="current">Memóriatérkép</div><ul>
-          <li class="h2"><a href="#altalanos">Általános</a></li>
-          <li class="h2"><a href="#mutato">Mutató</a></li>
-          <li class="h2"><a href="#billentyuzet">Billentyűzet</a></li>
-          <li class="h2"><a href="#jatekpad">Játékpad</a></li>
-          <li class="h2"><a href="#grafikus_feldolgozo_egyseg">Grafikus Feldolgozó Egység</a></li>
-          <li class="h2"><a href="#digitalis_szignalfeldolgozo_processzor">Digitális Szignálfeldolgozó Processzor</a></li>
-          <li class="h2"><a href="#felhasznaloi_memoria">Felhasználói memória</a></li>
-          <li class="h2"><a href="#formazo_sztring">Formázó sztring</a></li>
-          <li class="h2"><a href="#3d_s_ter">3D-s Tér</a></li>
+          <li class="h2"><a href="#altalanos" onclick="m()">Általános</a></li>
+          <li class="h2"><a href="#mutato" onclick="m()">Mutató</a></li>
+          <li class="h2"><a href="#billentyuzet" onclick="m()">Billentyűzet</a></li>
+          <li class="h2"><a href="#jatekpad" onclick="m()">Játékpad</a></li>
+          <li class="h2"><a href="#grafikus_feldolgozo_egyseg" onclick="m()">Grafikus Feldolgozó Egység</a></li>
+          <li class="h2"><a href="#digitalis_szignalfeldolgozo_processzor" onclick="m()">Digitális Szignálfeldolgozó Processzor</a></li>
+          <li class="h2"><a href="#felhasznaloi_memoria" onclick="m()">Felhasználói memória</a></li>
+          <li class="h2"><a href="#formazo_sztring" onclick="m()">Formázó sztring</a></li>
+          <li class="h2"><a href="#3d_s_ter" onclick="m()">3D-s Tér</a></li>
         </ul></li>
         <li rel="konzol"><label class="toc" for="_konzol">Konzol</label><div class="current">Konzol</div><ul>
-          <li class="h2"><a href="#putc">putc</a></li>
-          <li class="h2"><a href="#printf">printf</a></li>
-          <li class="h2"><a href="#getc">getc</a></li>
-          <li class="h2"><a href="#gets">gets</a></li>
-          <li class="h2"><a href="#trace">trace</a></li>
-          <li class="h2"><a href="#delay">delay</a></li>
-          <li class="h2"><a href="#exit">exit</a></li>
+          <li class="h2"><a href="#putc" onclick="m()">putc</a></li>
+          <li class="h2"><a href="#printf" onclick="m()">printf</a></li>
+          <li class="h2"><a href="#getc" onclick="m()">getc</a></li>
+          <li class="h2"><a href="#gets" onclick="m()">gets</a></li>
+          <li class="h2"><a href="#trace" onclick="m()">trace</a></li>
+          <li class="h2"><a href="#delay" onclick="m()">delay</a></li>
+          <li class="h2"><a href="#exit" onclick="m()">exit</a></li>
         </ul></li>
         <li rel="audio"><label class="toc" for="_audio">Audió</label><div class="current">Audió</div><ul>
-          <li class="h2"><a href="#sfx">sfx</a></li>
-          <li class="h2"><a href="#music">music</a></li>
+          <li class="h2"><a href="#sfx" onclick="m()">sfx</a></li>
+          <li class="h2"><a href="#music" onclick="m()">music</a></li>
         </ul></li>
         <li rel="grafika"><label class="toc" for="_grafika">Grafika</label><div class="current">Grafika</div><ul>
-          <li class="h2"><a href="#cls">cls</a></li>
-          <li class="h2"><a href="#cget">cget</a></li>
-          <li class="h2"><a href="#pget">pget</a></li>
-          <li class="h2"><a href="#pset">pset</a></li>
-          <li class="h2"><a href="#width">width</a></li>
-          <li class="h2"><a href="#text">text</a></li>
-          <li class="h2"><a href="#line">line</a></li>
-          <li class="h2"><a href="#qbez">qbez</a></li>
-          <li class="h2"><a href="#cbez">cbez</a></li>
-          <li class="h2"><a href="#tri">tri</a></li>
-          <li class="h2"><a href="#ftri">ftri</a></li>
-          <li class="h2"><a href="#tri2d">tri2d</a></li>
-          <li class="h2"><a href="#tri3d">tri3d</a></li>
-          <li class="h2"><a href="#tritx">tritx</a></li>
-          <li class="h2"><a href="#mesh">mesh</a></li>
-          <li class="h2"><a href="#rect">rect</a></li>
-          <li class="h2"><a href="#frect">frect</a></li>
-          <li class="h2"><a href="#circ">circ</a></li>
-          <li class="h2"><a href="#fcirc">fcirc</a></li>
-          <li class="h2"><a href="#ellip">ellip</a></li>
-          <li class="h2"><a href="#fellip">fellip</a></li>
-          <li class="h2"><a href="#move">move</a></li>
-          <li class="h2"><a href="#left">left</a></li>
-          <li class="h2"><a href="#right">right</a></li>
-          <li class="h2"><a href="#up">up</a></li>
-          <li class="h2"><a href="#down">down</a></li>
-          <li class="h2"><a href="#color">color</a></li>
-          <li class="h2"><a href="#forw">forw</a></li>
-          <li class="h2"><a href="#back">back</a></li>
-          <li class="h2"><a href="#spr">spr</a></li>
-          <li class="h2"><a href="#dlg">dlg</a></li>
-          <li class="h2"><a href="#stext">stext</a></li>
-          <li class="h2"><a href="#remap">remap</a></li>
-          <li class="h2"><a href="#mget">mget</a></li>
-          <li class="h2"><a href="#mset">mset</a></li>
-          <li class="h2"><a href="#map">map</a></li>
-          <li class="h2"><a href="#maze">maze</a></li>
+          <li class="h2"><a href="#cls" onclick="m()">cls</a></li>
+          <li class="h2"><a href="#cget" onclick="m()">cget</a></li>
+          <li class="h2"><a href="#pget" onclick="m()">pget</a></li>
+          <li class="h2"><a href="#pset" onclick="m()">pset</a></li>
+          <li class="h2"><a href="#width" onclick="m()">width</a></li>
+          <li class="h2"><a href="#text" onclick="m()">text</a></li>
+          <li class="h2"><a href="#line" onclick="m()">line</a></li>
+          <li class="h2"><a href="#qbez" onclick="m()">qbez</a></li>
+          <li class="h2"><a href="#cbez" onclick="m()">cbez</a></li>
+          <li class="h2"><a href="#tri" onclick="m()">tri</a></li>
+          <li class="h2"><a href="#ftri" onclick="m()">ftri</a></li>
+          <li class="h2"><a href="#tri2d" onclick="m()">tri2d</a></li>
+          <li class="h2"><a href="#tri3d" onclick="m()">tri3d</a></li>
+          <li class="h2"><a href="#tritx" onclick="m()">tritx</a></li>
+          <li class="h2"><a href="#mesh" onclick="m()">mesh</a></li>
+          <li class="h2"><a href="#rect" onclick="m()">rect</a></li>
+          <li class="h2"><a href="#frect" onclick="m()">frect</a></li>
+          <li class="h2"><a href="#circ" onclick="m()">circ</a></li>
+          <li class="h2"><a href="#fcirc" onclick="m()">fcirc</a></li>
+          <li class="h2"><a href="#ellip" onclick="m()">ellip</a></li>
+          <li class="h2"><a href="#fellip" onclick="m()">fellip</a></li>
+          <li class="h2"><a href="#move" onclick="m()">move</a></li>
+          <li class="h2"><a href="#left" onclick="m()">left</a></li>
+          <li class="h2"><a href="#right" onclick="m()">right</a></li>
+          <li class="h2"><a href="#up" onclick="m()">up</a></li>
+          <li class="h2"><a href="#down" onclick="m()">down</a></li>
+          <li class="h2"><a href="#color" onclick="m()">color</a></li>
+          <li class="h2"><a href="#forw" onclick="m()">forw</a></li>
+          <li class="h2"><a href="#back" onclick="m()">back</a></li>
+          <li class="h2"><a href="#spr" onclick="m()">spr</a></li>
+          <li class="h2"><a href="#dlg" onclick="m()">dlg</a></li>
+          <li class="h2"><a href="#stext" onclick="m()">stext</a></li>
+          <li class="h2"><a href="#remap" onclick="m()">remap</a></li>
+          <li class="h2"><a href="#mget" onclick="m()">mget</a></li>
+          <li class="h2"><a href="#mset" onclick="m()">mset</a></li>
+          <li class="h2"><a href="#map" onclick="m()">map</a></li>
+          <li class="h2"><a href="#maze" onclick="m()">maze</a></li>
         </ul></li>
         <li rel="bemenet"><label class="toc" for="_bemenet">Bemenet</label><div class="current">Bemenet</div><ul>
-          <li class="h2"><a href="#getpad">getpad</a></li>
-          <li class="h2"><a href="#prspad">prspad</a></li>
-          <li class="h2"><a href="#relpad">relpad</a></li>
-          <li class="h2"><a href="#getbtn">getbtn</a></li>
-          <li class="h2"><a href="#getclk">getclk</a></li>
-          <li class="h2"><a href="#getkey">getkey</a></li>
-          <li class="h2"><a href="#popkey">popkey</a></li>
-          <li class="h2"><a href="#pendkey">pendkey</a></li>
-          <li class="h2"><a href="#lenkey">lenkey</a></li>
-          <li class="h2"><a href="#speckey">speckey</a></li>
+          <li class="h2"><a href="#getpad" onclick="m()">getpad</a></li>
+          <li class="h2"><a href="#prspad" onclick="m()">prspad</a></li>
+          <li class="h2"><a href="#relpad" onclick="m()">relpad</a></li>
+          <li class="h2"><a href="#getbtn" onclick="m()">getbtn</a></li>
+          <li class="h2"><a href="#getclk" onclick="m()">getclk</a></li>
+          <li class="h2"><a href="#getkey" onclick="m()">getkey</a></li>
+          <li class="h2"><a href="#popkey" onclick="m()">popkey</a></li>
+          <li class="h2"><a href="#pendkey" onclick="m()">pendkey</a></li>
+          <li class="h2"><a href="#lenkey" onclick="m()">lenkey</a></li>
+          <li class="h2"><a href="#speckey" onclick="m()">speckey</a></li>
         </ul></li>
         <li rel="matematika"><label class="toc" for="_matematika">Matematika</label><div class="current">Matematika</div><ul>
-          <li class="h2"><a href="#rand">rand</a></li>
-          <li class="h2"><a href="#rnd">rnd</a></li>
-          <li class="h2"><a href="#float">float</a></li>
-          <li class="h2"><a href="#int">int</a></li>
-          <li class="h2"><a href="#floor">floor</a></li>
-          <li class="h2"><a href="#ceil">ceil</a></li>
-          <li class="h2"><a href="#sgn">sgn</a></li>
-          <li class="h2"><a href="#abs">abs</a></li>
-          <li class="h2"><a href="#exp">exp</a></li>
-          <li class="h2"><a href="#log">log</a></li>
-          <li class="h2"><a href="#pow">pow</a></li>
-          <li class="h2"><a href="#sqrt">sqrt</a></li>
-          <li class="h2"><a href="#rsqrt">rsqrt</a></li>
-          <li class="h2"><a href="#clamp">clamp</a></li>
-          <li class="h2"><a href="#lerp">lerp</a></li>
-          <li class="h2"><a href="#pi">pi</a></li>
-          <li class="h2"><a href="#cos">cos</a></li>
-          <li class="h2"><a href="#sin">sin</a></li>
-          <li class="h2"><a href="#tan">tan</a></li>
-          <li class="h2"><a href="#acos">acos</a></li>
-          <li class="h2"><a href="#asin">asin</a></li>
-          <li class="h2"><a href="#atan">atan</a></li>
-          <li class="h2"><a href="#atan2">atan2</a></li>
-          <li class="h2"><a href="#dotv2">dotv2</a></li>
-          <li class="h2"><a href="#lenv2">lenv2</a></li>
-          <li class="h2"><a href="#scalev2">scalev2</a></li>
-          <li class="h2"><a href="#negv2">negv2</a></li>
-          <li class="h2"><a href="#addv2">addv2</a></li>
-          <li class="h2"><a href="#subv2">subv2</a></li>
-          <li class="h2"><a href="#mulv2">mulv2</a></li>
-          <li class="h2"><a href="#divv2">divv2</a></li>
-          <li class="h2"><a href="#clampv2">clampv2</a></li>
-          <li class="h2"><a href="#lerpv2">lerpv2</a></li>
-          <li class="h2"><a href="#normv2">normv2</a></li>
-          <li class="h2"><a href="#dotv3">dotv3</a></li>
-          <li class="h2"><a href="#lenv3">lenv3</a></li>
-          <li class="h2"><a href="#scalev3">scalev3</a></li>
-          <li class="h2"><a href="#negv3">negv3</a></li>
-          <li class="h2"><a href="#addv3">addv3</a></li>
-          <li class="h2"><a href="#subv3">subv3</a></li>
-          <li class="h2"><a href="#mulv3">mulv3</a></li>
-          <li class="h2"><a href="#divv3">divv3</a></li>
-          <li class="h2"><a href="#crossv3">crossv3</a></li>
-          <li class="h2"><a href="#clampv3">clampv3</a></li>
-          <li class="h2"><a href="#lerpv3">lerpv3</a></li>
-          <li class="h2"><a href="#normv3">normv3</a></li>
-          <li class="h2"><a href="#dotv4">dotv4</a></li>
-          <li class="h2"><a href="#lenv4">lenv4</a></li>
-          <li class="h2"><a href="#scalev4">scalev4</a></li>
-          <li class="h2"><a href="#negv4">negv4</a></li>
-          <li class="h2"><a href="#addv4">addv4</a></li>
-          <li class="h2"><a href="#subv4">subv4</a></li>
-          <li class="h2"><a href="#mulv4">mulv4</a></li>
-          <li class="h2"><a href="#divv4">divv4</a></li>
-          <li class="h2"><a href="#clampv4">clampv4</a></li>
-          <li class="h2"><a href="#lerpv4">lerpv4</a></li>
-          <li class="h2"><a href="#normv4">normv4</a></li>
-          <li class="h2"><a href="#idq">idq</a></li>
-          <li class="h2"><a href="#eulerq">eulerq</a></li>
-          <li class="h2"><a href="#dotq">dotq</a></li>
-          <li class="h2"><a href="#lenq">lenq</a></li>
-          <li class="h2"><a href="#scaleq">scaleq</a></li>
-          <li class="h2"><a href="#negq">negq</a></li>
-          <li class="h2"><a href="#addq">addq</a></li>
-          <li class="h2"><a href="#subq">subq</a></li>
-          <li class="h2"><a href="#mulq">mulq</a></li>
-          <li class="h2"><a href="#rotq">rotq</a></li>
-          <li class="h2"><a href="#lerpq">lerpq</a></li>
-          <li class="h2"><a href="#slerpq">slerpq</a></li>
-          <li class="h2"><a href="#normq">normq</a></li>
-          <li class="h2"><a href="#idm4">idm4</a></li>
-          <li class="h2"><a href="#trsm4">trsm4</a></li>
-          <li class="h2"><a href="#detm4">detm4</a></li>
-          <li class="h2"><a href="#addm4">addm4</a></li>
-          <li class="h2"><a href="#subm4">subm4</a></li>
-          <li class="h2"><a href="#mulm4">mulm4</a></li>
-          <li class="h2"><a href="#mulm4v3">mulm4v3</a></li>
-          <li class="h2"><a href="#mulm4v4">mulm4v4</a></li>
-          <li class="h2"><a href="#invm4">invm4</a></li>
-          <li class="h2"><a href="#trpm4">trpm4</a></li>
-          <li class="h2"><a href="#trns">trns</a></li>
+          <li class="h2"><a href="#rand" onclick="m()">rand</a></li>
+          <li class="h2"><a href="#rnd" onclick="m()">rnd</a></li>
+          <li class="h2"><a href="#float" onclick="m()">float</a></li>
+          <li class="h2"><a href="#int" onclick="m()">int</a></li>
+          <li class="h2"><a href="#floor" onclick="m()">floor</a></li>
+          <li class="h2"><a href="#ceil" onclick="m()">ceil</a></li>
+          <li class="h2"><a href="#sgn" onclick="m()">sgn</a></li>
+          <li class="h2"><a href="#abs" onclick="m()">abs</a></li>
+          <li class="h2"><a href="#exp" onclick="m()">exp</a></li>
+          <li class="h2"><a href="#log" onclick="m()">log</a></li>
+          <li class="h2"><a href="#pow" onclick="m()">pow</a></li>
+          <li class="h2"><a href="#sqrt" onclick="m()">sqrt</a></li>
+          <li class="h2"><a href="#rsqrt" onclick="m()">rsqrt</a></li>
+          <li class="h2"><a href="#clamp" onclick="m()">clamp</a></li>
+          <li class="h2"><a href="#lerp" onclick="m()">lerp</a></li>
+          <li class="h2"><a href="#pi" onclick="m()">pi</a></li>
+          <li class="h2"><a href="#cos" onclick="m()">cos</a></li>
+          <li class="h2"><a href="#sin" onclick="m()">sin</a></li>
+          <li class="h2"><a href="#tan" onclick="m()">tan</a></li>
+          <li class="h2"><a href="#acos" onclick="m()">acos</a></li>
+          <li class="h2"><a href="#asin" onclick="m()">asin</a></li>
+          <li class="h2"><a href="#atan" onclick="m()">atan</a></li>
+          <li class="h2"><a href="#atan2" onclick="m()">atan2</a></li>
+          <li class="h2"><a href="#dotv2" onclick="m()">dotv2</a></li>
+          <li class="h2"><a href="#lenv2" onclick="m()">lenv2</a></li>
+          <li class="h2"><a href="#scalev2" onclick="m()">scalev2</a></li>
+          <li class="h2"><a href="#negv2" onclick="m()">negv2</a></li>
+          <li class="h2"><a href="#addv2" onclick="m()">addv2</a></li>
+          <li class="h2"><a href="#subv2" onclick="m()">subv2</a></li>
+          <li class="h2"><a href="#mulv2" onclick="m()">mulv2</a></li>
+          <li class="h2"><a href="#divv2" onclick="m()">divv2</a></li>
+          <li class="h2"><a href="#clampv2" onclick="m()">clampv2</a></li>
+          <li class="h2"><a href="#lerpv2" onclick="m()">lerpv2</a></li>
+          <li class="h2"><a href="#normv2" onclick="m()">normv2</a></li>
+          <li class="h2"><a href="#dotv3" onclick="m()">dotv3</a></li>
+          <li class="h2"><a href="#lenv3" onclick="m()">lenv3</a></li>
+          <li class="h2"><a href="#scalev3" onclick="m()">scalev3</a></li>
+          <li class="h2"><a href="#negv3" onclick="m()">negv3</a></li>
+          <li class="h2"><a href="#addv3" onclick="m()">addv3</a></li>
+          <li class="h2"><a href="#subv3" onclick="m()">subv3</a></li>
+          <li class="h2"><a href="#mulv3" onclick="m()">mulv3</a></li>
+          <li class="h2"><a href="#divv3" onclick="m()">divv3</a></li>
+          <li class="h2"><a href="#crossv3" onclick="m()">crossv3</a></li>
+          <li class="h2"><a href="#clampv3" onclick="m()">clampv3</a></li>
+          <li class="h2"><a href="#lerpv3" onclick="m()">lerpv3</a></li>
+          <li class="h2"><a href="#normv3" onclick="m()">normv3</a></li>
+          <li class="h2"><a href="#dotv4" onclick="m()">dotv4</a></li>
+          <li class="h2"><a href="#lenv4" onclick="m()">lenv4</a></li>
+          <li class="h2"><a href="#scalev4" onclick="m()">scalev4</a></li>
+          <li class="h2"><a href="#negv4" onclick="m()">negv4</a></li>
+          <li class="h2"><a href="#addv4" onclick="m()">addv4</a></li>
+          <li class="h2"><a href="#subv4" onclick="m()">subv4</a></li>
+          <li class="h2"><a href="#mulv4" onclick="m()">mulv4</a></li>
+          <li class="h2"><a href="#divv4" onclick="m()">divv4</a></li>
+          <li class="h2"><a href="#clampv4" onclick="m()">clampv4</a></li>
+          <li class="h2"><a href="#lerpv4" onclick="m()">lerpv4</a></li>
+          <li class="h2"><a href="#normv4" onclick="m()">normv4</a></li>
+          <li class="h2"><a href="#idq" onclick="m()">idq</a></li>
+          <li class="h2"><a href="#eulerq" onclick="m()">eulerq</a></li>
+          <li class="h2"><a href="#dotq" onclick="m()">dotq</a></li>
+          <li class="h2"><a href="#lenq" onclick="m()">lenq</a></li>
+          <li class="h2"><a href="#scaleq" onclick="m()">scaleq</a></li>
+          <li class="h2"><a href="#negq" onclick="m()">negq</a></li>
+          <li class="h2"><a href="#addq" onclick="m()">addq</a></li>
+          <li class="h2"><a href="#subq" onclick="m()">subq</a></li>
+          <li class="h2"><a href="#mulq" onclick="m()">mulq</a></li>
+          <li class="h2"><a href="#rotq" onclick="m()">rotq</a></li>
+          <li class="h2"><a href="#lerpq" onclick="m()">lerpq</a></li>
+          <li class="h2"><a href="#slerpq" onclick="m()">slerpq</a></li>
+          <li class="h2"><a href="#normq" onclick="m()">normq</a></li>
+          <li class="h2"><a href="#idm4" onclick="m()">idm4</a></li>
+          <li class="h2"><a href="#trsm4" onclick="m()">trsm4</a></li>
+          <li class="h2"><a href="#detm4" onclick="m()">detm4</a></li>
+          <li class="h2"><a href="#addm4" onclick="m()">addm4</a></li>
+          <li class="h2"><a href="#subm4" onclick="m()">subm4</a></li>
+          <li class="h2"><a href="#mulm4" onclick="m()">mulm4</a></li>
+          <li class="h2"><a href="#mulm4v3" onclick="m()">mulm4v3</a></li>
+          <li class="h2"><a href="#mulm4v4" onclick="m()">mulm4v4</a></li>
+          <li class="h2"><a href="#invm4" onclick="m()">invm4</a></li>
+          <li class="h2"><a href="#trpm4" onclick="m()">trpm4</a></li>
+          <li class="h2"><a href="#trns" onclick="m()">trns</a></li>
         </ul></li>
         <li rel="memoria"><label class="toc" for="_memoria">Memória</label><div class="current">Memória</div><ul>
-          <li class="h2"><a href="#inb">inb</a></li>
-          <li class="h2"><a href="#inw">inw</a></li>
-          <li class="h2"><a href="#ini">ini</a></li>
-          <li class="h2"><a href="#outb">outb</a></li>
-          <li class="h2"><a href="#outw">outw</a></li>
-          <li class="h2"><a href="#outi">outi</a></li>
-          <li class="h2"><a href="#memsave">memsave</a></li>
-          <li class="h2"><a href="#memload">memload</a></li>
-          <li class="h2"><a href="#memcpy">memcpy</a></li>
-          <li class="h2"><a href="#memset">memset</a></li>
-          <li class="h2"><a href="#memcmp">memcmp</a></li>
-          <li class="h2"><a href="#deflate">deflate</a></li>
-          <li class="h2"><a href="#inflate">inflate</a></li>
-          <li class="h2"><a href="#time">time</a></li>
-          <li class="h2"><a href="#now">now</a></li>
-          <li class="h2"><a href="#atoi">atoi</a></li>
-          <li class="h2"><a href="#itoa">itoa</a></li>
-          <li class="h2"><a href="#val">val</a></li>
-          <li class="h2"><a href="#str">str</a></li>
-          <li class="h2"><a href="#sprintf">sprintf</a></li>
-          <li class="h2"><a href="#strlen">strlen</a></li>
-          <li class="h2"><a href="#mblen">mblen</a></li>
-          <li class="h2"><a href="#malloc">malloc</a></li>
-          <li class="h2"><a href="#realloc">realloc</a></li>
-          <li class="h2"><a href="#free">free</a></li>
+          <li class="h2"><a href="#inb" onclick="m()">inb</a></li>
+          <li class="h2"><a href="#inw" onclick="m()">inw</a></li>
+          <li class="h2"><a href="#ini" onclick="m()">ini</a></li>
+          <li class="h2"><a href="#outb" onclick="m()">outb</a></li>
+          <li class="h2"><a href="#outw" onclick="m()">outw</a></li>
+          <li class="h2"><a href="#outi" onclick="m()">outi</a></li>
+          <li class="h2"><a href="#memsave" onclick="m()">memsave</a></li>
+          <li class="h2"><a href="#memload" onclick="m()">memload</a></li>
+          <li class="h2"><a href="#memcpy" onclick="m()">memcpy</a></li>
+          <li class="h2"><a href="#memset" onclick="m()">memset</a></li>
+          <li class="h2"><a href="#memcmp" onclick="m()">memcmp</a></li>
+          <li class="h2"><a href="#deflate" onclick="m()">deflate</a></li>
+          <li class="h2"><a href="#inflate" onclick="m()">inflate</a></li>
+          <li class="h2"><a href="#time" onclick="m()">time</a></li>
+          <li class="h2"><a href="#now" onclick="m()">now</a></li>
+          <li class="h2"><a href="#atoi" onclick="m()">atoi</a></li>
+          <li class="h2"><a href="#itoa" onclick="m()">itoa</a></li>
+          <li class="h2"><a href="#val" onclick="m()">val</a></li>
+          <li class="h2"><a href="#str" onclick="m()">str</a></li>
+          <li class="h2"><a href="#sprintf" onclick="m()">sprintf</a></li>
+          <li class="h2"><a href="#strlen" onclick="m()">strlen</a></li>
+          <li class="h2"><a href="#mblen" onclick="m()">mblen</a></li>
+          <li class="h2"><a href="#malloc" onclick="m()">malloc</a></li>
+          <li class="h2"><a href="#realloc" onclick="m()">realloc</a></li>
+          <li class="h2"><a href="#free" onclick="m()">free</a></li>
         </ul></li>
         </ul>
         <p>Példák</p>
         <ul>
         <li rel="pattogo_labda"><label class="toc" for="_pattogo_labda">Pattogó labda</label><div class="current">Pattogó labda</div><ul>
-          <li class="h2"><a href="#labda_megjelenitese">Labda megjelenítése</a></li>
-          <li class="h2"><a href="#labda_mozgatasa">Labda mozgatása</a></li>
-          <li class="h2"><a href="#labda_pattogas">Labda pattogás</a></li>
-          <li class="h2"><a href="#uto_hozzaadasa">Ütő hozzáadása</a></li>
-          <li class="h2"><a href="#jatek_vege">Játék vége</a></li>
+          <li class="h2"><a href="#labda_megjelenitese" onclick="m()">Labda megjelenítése</a></li>
+          <li class="h2"><a href="#labda_mozgatasa" onclick="m()">Labda mozgatása</a></li>
+          <li class="h2"><a href="#labda_pattogas" onclick="m()">Labda pattogás</a></li>
+          <li class="h2"><a href="#uto_hozzaadasa" onclick="m()">Ütő hozzáadása</a></li>
+          <li class="h2"><a href="#jatek_vege" onclick="m()">Játék vége</a></li>
         </ul></li>
         <li rel="setalo"><label class="toc" for="_setalo">Sétáló</label><div class="current">Sétáló</div><ul>
-          <li class="h2"><a href="#szprajtlap_beszerzese">Szprájtlap beszerzése</a></li>
-          <li class="h2"><a href="#karakter_megjelenitese">Karakter megjelenítése</a></li>
-          <li class="h2"><a href="#iranyvaltoztatas">Irányváltoztatás</a></li>
-          <li class="h2"><a href="#animalas_hozzaadasa">Animálás hozzáadása</a></li>
+          <li class="h2"><a href="#szprajtlap_beszerzese" onclick="m()">Szprájtlap beszerzése</a></li>
+          <li class="h2"><a href="#karakter_megjelenitese" onclick="m()">Karakter megjelenítése</a></li>
+          <li class="h2"><a href="#iranyvaltoztatas" onclick="m()">Irányváltoztatás</a></li>
+          <li class="h2"><a href="#animalas_hozzaadasa" onclick="m()">Animálás hozzáadása</a></li>
         </ul></li>
         <li rel="hangeffekt"><label class="toc" for="_hangeffekt">Hangeffekt</label><div class="current">Hangeffekt</div><ul>
-          <li class="h2"><a href="#hullam_betoltese">Hullám betöltése</a></li>
-          <li class="h2"><a href="#hangmagassag_es_hangero">Hangmagasság és hangerő</a></li>
-          <li class="h2"><a href="#mintak_szama">Minták száma</a></li>
-          <li class="h2"><a href="#elmentes_es_beimportalas">Elmentés és beimportálás</a></li>
+          <li class="h2"><a href="#hullam_betoltese" onclick="m()">Hullám betöltése</a></li>
+          <li class="h2"><a href="#hangmagassag_es_hangero" onclick="m()">Hangmagasság és hangerő</a></li>
+          <li class="h2"><a href="#mintak_szama" onclick="m()">Minták száma</a></li>
+          <li class="h2"><a href="#elmentes_es_beimportalas" onclick="m()">Elmentés és beimportálás</a></li>
         </ul></li>
         </ul>
         <p>Függelék</p>
@@ -368,7 +368,7 @@
       </div>
     </div></nav>
     <div id="_m">
-      <nav class="mobile title">MEG-4 Kézikönyv</nav>
+      <nav class="mobile title">MEG-4 Kézikönyv<label for="menuchk" class="menu"></label></nav>
 <div class="page" rel="_">
 <h1>MEG-4 Felhasználói KéziKönyv</h1>
 <p>Üdvözöl a <a href="https://bztsrc.gitlab.io/meg4" target="new">MEG-4</a>, a Szabad és Nyílt Forráskódú virtuális fantasy konzol kézikönyve!</p>
@@ -4738,6 +4738,6 @@ jelöljünk ki a hullám végéből egy valamekkora darabot, majd válasszuk az 
       <footer><hr><p>© Copyright 2023 bzt (bztsrc@gitlab)<br><small>Generated by <a href="https://gitlab.com/bztsrc/gendoc">gendoc</a> v1.0.0</small></p></footer>
     </div>
   </div>
-<script>function c(s){var r=document.getElementById(s);if(r!=undefined){if(r.tagName=="INPUT")r.checked=true;else document.getElementById("_"+r.parentNode.getAttribute("rel")).checked=true;}}function s(s){var r=document.getElementById("_s"),p=document.getElementById("_m").getElementsByClassName("page"),n,i,j,a,b,c,d;if(s){s=s.toLowerCase();document.getElementById("_t").style.display="none";r.style.display="block";while(r.firstChild)r.removeChild(r.firstChild);n=document.createElement("p");n.appendChild(document.createTextNode("Találatok"));r.appendChild(n);for(i=1;i<p.length;i++){a=p[i].getAttribute("rel");b="";c=p[i].childNodes;d=p[i].getElementsByTagName("H1")[0].innerText;for(j=1;j<c.length && c[j].className!="btn prev";j++){if(c[j].id!=undefined&&c[j].id!=""){a=c[j].id;d=c[j].innerText;}else if(a!=b&&c[j].innerText!=undefined&&c[j].innerText.toLowerCase().indexOf(s)!=-1){b=a;n=document.createElement("a");n.appendChild(document.createTextNode(d));n.setAttribute("href","#"+a);n.setAttribute("onclick","c('"+a+"');");r.appendChild(n);}}}}else{document.getElementById("_t").style.display="block";r.style.display="none";}}document.addEventListener("DOMContentLoaded",function(e){var i,r,n;document.getElementById("_q").style.display="inline-block";if(document.location.href.indexOf("?")!=-1)document.location.href=document.location.href.replace("?","#");else{r=document.getElementsByTagName("LABEL");while(r.length){l=r[0].getAttribute("for").substr(1);n=document.createElement("a");n.appendChild(document.createTextNode(r[0].innerText));n.setAttribute("href","#"+l);n.setAttribute("onclick","c('"+(l!=""?l:"_")+"');");if(r[0].getAttribute("class")!=undefined)n.setAttribute("class",r[0].getAttribute("class"));if(r[0].getAttribute("title")!=undefined&&l!="")n.setAttribute("title",r[0].getAttribute("title"));if(r[0].getAttribute("accesskey")!=undefined)n.setAttribute("accesskey",r[0].getAttribute("accesskey"));r[0].parentNode.replaceChild(n,r[0]);r=document.getElementsByTagName("LABEL");}try{c(document.location.href.split("#")[1]);}catch(e){}}});</script>
+<script>function m(){document.getElementById("menuchk").checked=false;}function c(s){var r=document.getElementById(s);if(r!=undefined){if(r.tagName=="INPUT")r.checked=true;else document.getElementById("_"+r.parentNode.getAttribute("rel")).checked=true;}m();}function s(s){var r=document.getElementById("_s"),p=document.getElementById("_m").getElementsByClassName("page"),n,i,j,a,b,c,d;if(s){s=s.toLowerCase();document.getElementById("_t").style.display="none";r.style.display="block";while(r.firstChild)r.removeChild(r.firstChild);n=document.createElement("p");n.appendChild(document.createTextNode("Találatok"));r.appendChild(n);for(i=1;i<p.length;i++){a=p[i].getAttribute("rel");b="";c=p[i].childNodes;d=p[i].getElementsByTagName("H1")[0].innerText;for(j=1;j<c.length && c[j].className!="btn prev";j++){if(c[j].id!=undefined&&c[j].id!=""){a=c[j].id;d=c[j].innerText;}else if(a!=b&&c[j].innerText!=undefined&&c[j].innerText.toLowerCase().indexOf(s)!=-1){b=a;n=document.createElement("a");n.appendChild(document.createTextNode(d));n.setAttribute("href","#"+a);n.setAttribute("onclick","c('"+a+"');");r.appendChild(n);}}}}else{document.getElementById("_t").style.display="block";r.style.display="none";}}document.addEventListener("DOMContentLoaded",function(e){var i,r,n;document.getElementById("_q").style.display="inline-block";if(document.location.href.indexOf("?")!=-1)document.location.href=document.location.href.replace("?","#");else{r=document.querySelectorAll("LABEL:not(.menu)");while(r.length){l=r[0].getAttribute("for").substr(1);n=document.createElement("a");n.appendChild(document.createTextNode(r[0].innerText));n.setAttribute("href","#"+l);n.setAttribute("onclick","c('"+(l!=""?l:"_")+"');");if(r[0].getAttribute("class")!=undefined)n.setAttribute("class",r[0].getAttribute("class"));if(r[0].getAttribute("title")!=undefined&&l!="")n.setAttribute("title",r[0].getAttribute("title"));if(r[0].getAttribute("accesskey")!=undefined)n.setAttribute("accesskey",r[0].getAttribute("accesskey"));r[0].parentNode.replaceChild(n,r[0]);r=document.querySelectorAll("LABEL:not(.menu)");}try{c(document.location.href.split("#")[1]);}catch(e){}}});</script>
 </body>
 </html>
