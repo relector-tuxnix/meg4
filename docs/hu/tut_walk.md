@@ -20,7 +20,7 @@ Indítsd el a `meg4`-et, és húzd rá az ablakára ezt a 256 x 256 pixeles kép
 
 <imgc ../img/tut_walk1.png><fig>A beimportált szprájtlap</fig>
 
-Amint látható, egy karakterszprájt 4 x 4 szprájtból áll. Jelenítsük meg! Üsd le az <kbd>F2</kbd>-őt, hogy behozd a kódszerkesztőt.
+Amint látható, egy karakterszprájt 4 x 4 szprájtból áll. Jelenítsük meg! Üsd le az <kbd>F2</kbd>-őt, hogy behozd a [kód szerkesztő]t.
 
 Karakter megjelenítése
 ----------------------
@@ -46,8 +46,8 @@ void loop()
 
 A képernyő közepe 160, 100-nál van, de a karakterünk 4 x 4 szprájtból áll (32 x 32 pixeles), így ennek a felét le kell vonni.
 Ezt követő 0 a `sprite`, ami az első szprájtot jelenti, 4, 4-el folytatva, mivel összesen ennyi szprájtot akarunk kirakni. Az
-utolsó két paraméter 0, 0, mivel nem akarunk sem nagyítani, sem transzformációt használni. Úgy akarjuk a szprájtokat megjeleníteni,
-ahogy azok a szprájtszerkesztőben látszanak.
+utolsó két paraméter 0, 0, mivel nem akarunk sem nagyítani, sem transzformációt használni, pont úgy akarjuk a szprájtokat
+megjeleníteni, ahogy azok a [szprájt szerkesztő]ben látszanak.
 
 Irányváltoztatás
 ----------------
@@ -89,7 +89,8 @@ void loop()
 ```
 
 Leütheted az <kbd>F3</kbd>-at és a szprájtválasztóban a karakter bal felső szprájtjára kattintva kiírja az adott irányhoz
-tartozó szprájt sorszámát. Ezt az `irány` változóban fogjuk tárolni, és ezt a változót használjuk a `sprite` paraméter helyén.
+tartozó szprájt sorszámát. Ezt a sorszámot az `irány` változóban fogjuk tárolni, és ezt a változót használjuk a `sprite` paraméter
+helyén.
 
 Próbáljuk ki! Látni fogjuk, hogy a kurzornyilak lenyomására irányt vált a karakterünk.
 

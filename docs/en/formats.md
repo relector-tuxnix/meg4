@@ -1,7 +1,7 @@
 File Formats
 ============
 
-Although the built-in edtiors are pretty awesome, MEG-4 is capable of handling various file formats both on export and import
+Although the built-in editors are pretty awesome, MEG-4 is capable of handling various file formats both on export and import
 side to ease creation of content, and make the use of MEG-4 actual fun.
 
 Floppies

@@ -20,7 +20,7 @@ window to import.
 
 <imgc ../img/tut_walk1.png><fig>The imported sprite sheet</fig>
 
-As you can see, one character sprite is made up of 4 x 4 sprites. Let's display that! Press <kbd>F2</kbd> to go to the code editor.
+As you can see, one character sprite is made up of 4 x 4 sprites. Let's display that! Press <kbd>F2</kbd> to go to the [Code Editor].
 
 Display Character
 -----------------
@@ -46,8 +46,8 @@ void loop()
 
 The centre of the screen is at 160, 100 but our character is 4 x 4 sprites in size (32 x 32 pixels), so we have to subtract the
 half of that. Then comes 0 for `sprite`, meaning the first sprite, followed by 4, 4 because we want to display that many sprites.
-The last two parameters are 0, 0 because we don't want to scale nor transform. We want the sprites to be display exactly as they
-appear in the sprite editor.
+The last two parameters are 0, 0 because we don't want to scale nor transform, ee want the sprites to be displayed exactly as they
+appear in the [Sprite Editor].
 
 Changing Directions
 -------------------
@@ -87,8 +87,8 @@ void loop()
 }
 ```
 
-You can press <kbd>F3</kbd> and click on the top left sprite of the character sprite on the selector to get the sprite id for that
-direction. We set these in the `dir` variable, and we'll use this variable in place of the `sprite` parameter.
+You can press <kbd>F3</kbd> and click on the top left sprite of the character frame to get the sprite id for that
+direction. We set these ids in the `dir` variable, and then we'll use this variable in place of the `sprite` parameter.
 
 Try it out! You'll see that by pressing the arrows our character will change directions.
 
