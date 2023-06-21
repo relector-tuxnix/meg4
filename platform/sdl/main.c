@@ -22,6 +22,7 @@
  */
 
 #include "meg4.h"
+#define SDL_ENABLE_OLD_NAMES
 #include <SDL.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -29,20 +30,33 @@
 #include "../../src/stb_image.h"    /* for stbi_zlib_decompress */
 #include "data.h"
 
+#if SDL_VERSION_ATLEAST(3,0,0)
+#include <SDL_main.h>
+#define SDL_ENABLE 1
+#define SDL_DISABLE 0
+#define SDL_WINDOW_FULLSCREEN_DESKTOP 1
+#define cdevice jdevice
+#define caxis jaxis
+#define cbutton button
+#define meg4_showcursor()    SDL_ShowCursor()
+#define meg4_hidecursor()    SDL_HideCursor()
+SDL_Gamepad  *controller[4] = { 0 };
+#else
+#define meg4_showcursor()    SDL_ShowCursor(SDL_ENABLE)
+#define meg4_hidecursor()    SDL_ShowCursor(SDL_DISABLE)
+SDL_GameController *controller[4] = { 0 };
+#endif
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 SDL_Texture *screen = NULL;
 SDL_Event event;
 SDL_AudioSpec have;
-SDL_GameController *controller[4] = { 0 };
 int controllerid[4] = { -1, -1, -1, -1 };
 
 int main_draw = 1, main_ret, main_w = 0, main_h = 0, win_w, win_h, win_f = 0, audio = 0, main_alt = 0;
 int main_keymap[SDL_NUM_SCANCODES];
 void main_delay(int msec);
 
-#define meg4_showcursor()    SDL_ShowCursor(SDL_ENABLE)
-#define meg4_hidecursor()    SDL_ShowCursor(SDL_DISABLE)
 #include "../common.h"
 
 /**
@@ -52,7 +66,7 @@ void main_quit(void)
 {
     main_log(1, "quitting...         ");
     meg4_poweroff();
-    SDL_ShowCursor(SDL_ENABLE);
+    meg4_showcursor();
     if(screen) { SDL_DestroyTexture(screen); screen = NULL; }
 /* this crashes sometimes... but only sometimes... We'll exit so should be freed anyway */
 /*    if(renderer) { SDL_DestroyRenderer(renderer); renderer = NULL; }*/
@@ -61,14 +75,24 @@ void main_quit(void)
 #ifndef __EMSCRIPTEN__
         /* restore original screen resolution */
         if(win_f && (main_w != win_w || main_h != win_h)) {
+#if SDL_VERSION_ATLEAST(3,0,0)
+            window = SDL_CreateWindow("MEG-4", main_w, main_h, 1);
+#else
             window = SDL_CreateWindow("MEG-4", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, main_w, main_h,
                 SDL_WINDOW_FULLSCREEN);
+#endif
             if(window) SDL_DestroyWindow(window);
         }
 #endif
         window = NULL;
     }
-    if(audio) { SDL_PauseAudioDevice(audio, 1); SDL_CloseAudioDevice(audio); audio = 0; }
+    if(audio) {
+#if SDL_VERSION_ATLEAST(3,0,0)
+        SDL_PauseAudioDevice(audio);
+#else
+        SDL_PauseAudioDevice(audio, 1);
+#endif
+        SDL_CloseAudioDevice(audio); audio = 0; }
     SDL_Quit();
 #ifdef __EMSCRIPTEN__
     /* don't let emscripten fool you, this won't cancel the loop. it will quit... but neither of these work with asyncify! */
@@ -95,26 +119,55 @@ void main_win(int w, int h, int f)
 
     if(!f) { win_w = w; win_h = h; }
     win_f = f;
-    window = SDL_CreateWindow("MEG-4", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, f ? main_w : w, f ? main_h : h,
+#if SDL_VERSION_ATLEAST(3,0,0)
+    window = SDL_CreateWindow("MEG-4", f ? main_w : w, f ? main_h : h, f);
+#else
+    window = SDL_CreateWindow("MEG-4",
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        f ? main_w : w, f ? main_h : h,
         f ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
+#endif
     if(!window) return;
+#if SDL_VERSION_ATLEAST(3,0,0)
+    renderer = SDL_CreateRenderer(window, "", SDL_RENDERER_ACCELERATED);
+    if(!renderer) {
+        renderer = SDL_CreateRenderer(window, "", SDL_RENDERER_SOFTWARE);
+        if(!renderer) return;
+    }
+#else
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(!renderer) {
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
         if(!renderer) return;
     }
+#endif
     if(meg4_icons.buf) {
+#if SDL_VERSION_ATLEAST(3,0,0)
+        srf = SDL_CreateSurfaceFrom((Uint32 *)meg4_icons.buf, meg4_icons.w, meg4_icons.h, meg4_icons.w * 4,
+            SDL_PIXELFORMAT_RGBA8888);
+#else
         srf = SDL_CreateRGBSurfaceFrom((Uint32 *)meg4_icons.buf, meg4_icons.w, 64, 32, meg4_icons.w * 4,
             0xFF, 0xFF00, 0xFF0000, 0xFF000000);
+#endif
         if(srf) {
             SDL_SetWindowIcon(window, srf);
+#if SDL_VERSION_ATLEAST(3,0,0)
+            SDL_DestroySurface(srf);
+#else
             SDL_FreeSurface(srf);
+#endif
         }
     }
     screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, 640, 400);
     if(screen) {
 #if SDL_VERSION_ATLEAST(2,0,12)
-        SDL_SetTextureScaleMode(screen, SDL_ScaleModeNearest);
+        SDL_SetTextureScaleMode(screen,
+#if SDL_VERSION_ATLEAST(3,0,0)
+            SDL_SCALEMODE_NEAREST
+#else
+            SDL_ScaleModeNearest
+#endif
+        );
 #endif
         SDL_LockTexture(screen, NULL, &data, &p);
         memset(data, 0, p * 400);
@@ -135,7 +188,12 @@ void main_fullscreen(void)
 #if SDL_VERSION_ATLEAST(2,0,12)
     j = (win_f ? main_w : win_w); i = j / 320;
     SDL_SetTextureScaleMode(screen, nearest || (!(j % 320) && (i == 1 || i == 2 || i == 4 || i == 8) && !((win_f ? main_h : win_h) % 200)) ?
-        SDL_ScaleModeNearest : SDL_ScaleModeLinear);
+#if SDL_VERSION_ATLEAST(3,0,0)
+        SDL_SCALEMODE_NEAREST : SDL_SCALEMODE_LINEAR
+#else
+        SDL_ScaleModeNearest : SDL_ScaleModeLinear
+#endif
+    );
 #endif
 }
 
@@ -172,7 +230,13 @@ void main_loop(void) {
 #ifndef NOEDITORS
     char *fn;
 #endif
+#if SDL_VERSION_ATLEAST(3,0,0)
+    SDL_FRect src, dst;
+    SDL_Rect idst;
+    float mx, my;
+#else
     SDL_Rect src, dst;
+#endif
 
     meg4_run();
     data = NULL; p = 0;
@@ -193,26 +257,43 @@ void main_loop(void) {
             if(dst.h > win_h) { dst.h = win_h; dst.w = src.w * win_h / src.h; }
         }
     } else dst.w = dst.h = 0;
-    dst.x = (win_w - dst.w) >> 1; dst.y = (win_h - dst.h) >> 1;
+    dst.x = (win_w - dst.w) / 2; dst.y = (win_h - dst.h) / 2;
     if(main_draw) {
         if(screen) SDL_RenderCopy(renderer, screen, &src, &dst);
         SDL_RenderPresent(renderer);
     }
+#if SDL_VERSION_ATLEAST(3,0,0)
+    SDL_GetMouseState(&mx, &my);
+    idst.x = dst.x; idst.y = dst.y; idst.w = dst.w; idst.h = dst.h;
+    main_pointer(&idst, (int)mx, (int)my);
+#else
     SDL_GetMouseState(&i, &p);
     main_pointer(&dst, i, p);
+#endif
     event.type = 0; main_ret = 1;
     while(SDL_PollEvent(&event)) {
         switch(event.type) {
+#if SDL_VERSION_ATLEAST(3,0,0)
+            case SDL_EVENT_QUIT: exit_loop(); break;
+            case SDL_EVENT_WINDOW_RESIZED: {
+#else
             case SDL_QUIT: exit_loop(); break;
             case SDL_WINDOWEVENT:
                 switch(event.window.event) {
                     case SDL_WINDOWEVENT_CLOSE: exit_loop(); break;
                     case SDL_WINDOWEVENT_RESIZED: case SDL_WINDOWEVENT_SIZE_CHANGED:
+#endif
                         win_w = event.window.data1; win_h = event.window.data2;
                         i = win_w / 320;
 #if SDL_VERSION_ATLEAST(2,0,12)
                         SDL_SetTextureScaleMode(screen, nearest || (!(win_w % 320) && (i == 1 || i == 2 || i == 4 || i == 8) &&
-                            !(win_h % 200)) ? SDL_ScaleModeNearest : SDL_ScaleModeLinear);
+                            !(win_h % 200)) ?
+#if SDL_VERSION_ATLEAST(3,0,0)
+                                SDL_SCALEMODE_NEAREST : SDL_SCALEMODE_LINEAR
+#else
+                                SDL_ScaleModeNearest : SDL_ScaleModeLinear
+#endif
+                        );
 #endif
                     break;
                 }
@@ -289,7 +370,7 @@ void main_loop(void) {
                     meg4_pushkey((char*)&event.text.text);
             break;
             case SDL_CONTROLLERDEVICEADDED:
-                for(i = 0; i < 4 && controllerid[i] != event.cdevice.which; i++);
+                for(i = 0; i < 4 && controllerid[i] != (int)event.cdevice.which; i++);
                 if(i >= 4) for(i = 0; i < 4 && controllerid[i] != -1; i++);
                 if(i < 4) {
                     if(controller[i]) SDL_GameControllerClose(controller[i]);
@@ -298,7 +379,7 @@ void main_loop(void) {
                 }
             break;
             case SDL_CONTROLLERDEVICEREMOVED:
-                for(i = 0; i < 4 && controllerid[i] != event.cdevice.which; i++);
+                for(i = 0; i < 4 && controllerid[i] != (int)event.cdevice.which; i++);
                 if(i < 4) {
                     if(controller[i]) SDL_GameControllerClose(controller[i]);
                     controller[i] = NULL;
@@ -306,7 +387,7 @@ void main_loop(void) {
                 }
             break;
             case SDL_CONTROLLERBUTTONDOWN:
-                for(i = 0; i < 4 && controllerid[i] != event.cbutton.which; i++);
+                for(i = 0; i < 4 && controllerid[i] != (int)event.cbutton.which; i++);
                 if(i < 4) {
                     switch(event.cbutton.button) {
                         case SDL_CONTROLLER_BUTTON_DPAD_LEFT: meg4_setpad(i, MEG4_BTN_L); break;
@@ -321,7 +402,7 @@ void main_loop(void) {
                 }
             break;
             case SDL_CONTROLLERBUTTONUP:
-                for(i = 0; i < 4 && controllerid[i] != event.cbutton.which; i++);
+                for(i = 0; i < 4 && controllerid[i] != (int)event.cbutton.which; i++);
                 if(i < 4) {
                     switch(event.cbutton.button) {
                         case SDL_CONTROLLER_BUTTON_DPAD_LEFT: meg4_clrpad(i, MEG4_BTN_L); break;
@@ -336,7 +417,7 @@ void main_loop(void) {
                 }
             break;
             case SDL_CONTROLLERAXISMOTION:
-                for(i = 0; i < 4 && controllerid[i] != event.caxis.which; i++);
+                for(i = 0; i < 4 && controllerid[i] != (int)event.caxis.which; i++);
                 if(i < 4) {
                     if(event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY || event.caxis.axis == SDL_CONTROLLER_AXIS_RIGHTY) {
                         meg4_clrpad(i, MEG4_BTN_L | MEG4_BTN_R);
@@ -482,7 +563,11 @@ int main(int argc, char **argv)
     char *fn;
     int32_t tickdiff;
     uint32_t ticks;
+#if SDL_VERSION_ATLEAST(3,0,0)
+    const SDL_DisplayMode *dm;
+#else
     SDL_DisplayMode dm;
+#endif
 #ifdef __WIN32__
     char *lng = main_lng;
 #else
@@ -643,12 +728,22 @@ int main(int argc, char **argv)
     memset(&want, 0, sizeof(want));
     memset(&have, 0, sizeof(have));
     want.freq = 44100;
+#if SDL_VERSION_ATLEAST(3,0,0)
+    want.format = SDL_AUDIO_F32;
+#else
     want.format = AUDIO_F32;
+#endif
     want.channels = 1;
     want.samples = 4096;
     want.callback = main_audio;
     audio = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
-    if(audio && (have.freq != 44100 || have.channels != 1 || have.format != AUDIO_F32)) {
+    if(audio && (have.freq != 44100 || have.channels != 1 || have.format !=
+#if SDL_VERSION_ATLEAST(3,0,0)
+        SDL_AUDIO_F32
+#else
+        AUDIO_F32
+#endif
+      )) {
         SDL_CloseAudioDevice(audio); audio = 0;
     }
     if(verbose && audio) main_log(1, "audio opened %uHz, %u bits", have.freq, 32);
@@ -671,9 +766,14 @@ int main(int argc, char **argv)
     win_h = main_h = EM_ASM_INT({ return Module.canvas.height; });
     main_win(main_w, main_h, 0);
 #else
+#if SDL_VERSION_ATLEAST(3,0,0)
+    dm = SDL_GetDesktopDisplayMode(0);
+    win_w = main_w = dm->w; win_h = main_h = dm->h;
+#else
     SDL_GetDesktopDisplayMode(0, &dm);
     /*dm.w = 640; dm.h = 400;*/
     win_w = main_w = dm.w; win_h = main_h = dm.h;
+#endif
 #if DEBUG
     main_win(640, 400, 0);
 #else
@@ -694,12 +794,26 @@ int main(int argc, char **argv)
     if(ptr2) {
         ops = SDL_RWFromConstMem(ptr2, w);
         SDL_GameControllerAddMappingsFromRW(ops, 0);
+#if SDL_VERSION_ATLEAST(3,0,0)
+        SDL_DestroyRW(ops);
+#else
         SDL_FreeRW(ops);
+#endif
         free(ptr2);
     }
+#if SDL_VERSION_ATLEAST(3,0,0)
+    SDL_SetGamepadEventsEnabled(SDL_ENABLE);
+#else
     SDL_GameControllerEventState(SDL_ENABLE);
-    SDL_ShowCursor(SDL_DISABLE);
-    if(audio) SDL_PauseAudioDevice(audio, 0);
+#endif
+    meg4_showcursor();
+    if(audio) {
+#if SDL_VERSION_ATLEAST(3,0,0)
+        SDL_PlayAudioDevice(audio);
+#else
+        SDL_PauseAudioDevice(audio, 0);
+#endif
+    }
 #if !defined(__ANDROID__) && !defined(__IOS__)
     SDL_StartTextInput();
 #endif

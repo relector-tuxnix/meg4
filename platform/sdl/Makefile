@@ -47,8 +47,8 @@ else
     EXTRA += $(USE_MINGWSDL)/build/.libs/libSDL2.a
    else
     ifneq ("$(wildcard SDL3/*)","")
-     CFLAGS += -I./SDL3/include
-     EXTRA += ./SDL3/build/.libs/libSDL3.a
+     CFLAGS += -I./SDL3/include/SDL3 -I./SDL3/include
+     EXTRA += ./SDL3/build/libSDL3.a
     else
      ifneq ("$(wildcard SDL2/*)","")
       CFLAGS += -I./SDL2/include
@@ -67,8 +67,8 @@ else
      LIBS += -lSDL2
    else
     ifneq ("$(wildcard SDL3/*)","")
-     CFLAGS += -I./SDL3/include
-     EXTRA += ./SDL3/build/.libs/libSDL3.a
+     CFLAGS += -I./SDL3/include/SDL3 -I./SDL3/include
+     EXTRA += ./SDL3/build/libSDL3.a
     else
      ifneq ("$(wildcard SDL2/*)","")
       CFLAGS += -I./SDL2/include
@@ -94,6 +94,8 @@ ifneq ($(EMBED),)
 endif
 EXTRA += data.o
 
+include ../common.mk
+
 ifneq ("$(wildcard SDL2/*)","")
 SDL2/build/.libs/libSDL2.a:
 ifeq ($(wildcard SDL2/configure),)
@@ -108,17 +110,12 @@ endif
 endif
 
 ifneq ("$(wildcard SDL3/*)","")
-SDL3/build/.libs/libSDL3.a:
-ifeq ($(wildcard SDL3/configure),)
-	@cd SDL3 && ./autogen.sh
+SDL3/build/libSDL3.a:
+ifeq ($(wildcard SDL3/build/Makefile),)
+	@cd SDL3 && mkdir build && cd build && cmake -S .. -B ../build && cmake . -DCMAKE_BUILD_TYPE=Release -DSDL_SHARED=false -DSDL_STATIC=true -DSDL_DBUS=false -DSDL_IBUS=false
 endif
-ifeq ($(wildcard SDL3/Makefile),)
-	@cd SDL3 && ./configure --disable-shared --enable-static --disable-dbus
+	@make --no-print-directory -s -C SDL3/build all
 endif
-	@make --no-print-directory -s -C SDL3 all
-endif
-
-include ../common.mk
 
 gamecontrollerdb.txt:
 	curl -L "https://github.com/gabomdq/SDL_GameControllerDB/raw/master/gamecontrollerdb.txt" --output gamecontrollerdb.txt
