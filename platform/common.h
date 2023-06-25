@@ -47,7 +47,12 @@ void meg4_export(char *name, int binary);
 #include <fileapi.h>
 #include <shlobj.h>
 #include <shellapi.h>
+/* Ehhh, we MUST include this AFTER the standard windows headers, otherwise OFN doesn't work */
+#ifdef SDL_VERSION_ATLEAST
+#include <SDL_syswm.h>
+#endif
 
+static HWND hwnd = NULL;
 static HINSTANCE hWinInstance;
 static char *main_lng = NULL;
 
@@ -267,7 +272,7 @@ void main_openfile(void)
     memset(&szFile,0,sizeof(szFile));
     memset(&ofn,0,sizeof(ofn));
     ofn.lStructSize     = sizeof(ofn);
-    ofn.hwndOwner       = NULL;
+    ofn.hwndOwner       = hwnd;
     ofn.hInstance       = hWinInstance;
     ofn.lpstrFile       = szFile;
     ofn.nMaxFile        = sizeof(szFile)-1;
@@ -322,7 +327,7 @@ int main_savefile(const char *name, uint8_t *buf, int len)
         if(l > 0) wsprintfW(szExt, L"%s\0*.%s\0", szFile + l, szFile + l);
         memset(&ofn,0,sizeof(ofn));
         ofn.lStructSize     = sizeof(ofn);
-        ofn.hwndOwner       = NULL;
+        ofn.hwndOwner       = hwnd;
         ofn.hInstance       = hWinInstance;
         ofn.lpstrFilter     = szExt;
         ofn.lpstrFile       = szFile;

@@ -597,6 +597,9 @@ int main(int argc, char **argv)
         main_log(0, "unable to initialize GLFW window");
         return 1;
     }
+#ifdef __WIN32__
+    hwnd = glfwGetWin32Window(window);
+#endif
     /* according to https://www.glfw.org/docs/latest/input_guide.html#gamepad_mapping we dont' have to load
      * gamecontrollerdb.txt ourselves, because glfw should already contain a copy of that */
 #ifndef NOGLES

@@ -569,6 +569,7 @@ int main(int argc, char **argv)
     SDL_DisplayMode dm;
 #endif
 #ifdef __WIN32__
+    SDL_SysWMinfo wmInfo = { 0 };
     char *lng = main_lng;
 #else
     char *lng = getenv("LANG");
@@ -786,6 +787,11 @@ int main(int argc, char **argv)
         main_log(0, "unable to get SDL window");
         return 1;
     }
+#ifdef __WIN32__
+    SDL_VERSION(&wmInfo.version);
+    SDL_GetWindowWMInfo(window, &wmInfo);
+    hwnd = wmInfo.info.win.window;
+#endif
     /* uncompress built-in gamecontrollerdb */
     ptr = (uint8_t*)binary_gamecontrollerdb + 3;
     i = *ptr++; ptr += 6; if(i & 4) { w = *ptr++; w += (*ptr++ << 8); ptr += w; } if(i & 8) { while(*ptr++ != 0); }
@@ -806,7 +812,7 @@ int main(int argc, char **argv)
 #else
     SDL_GameControllerEventState(SDL_ENABLE);
 #endif
-    meg4_showcursor();
+    meg4_hidecursor();
     if(audio) {
 #if SDL_VERSION_ATLEAST(3,0,0)
         SDL_PlayAudioDevice(audio);
