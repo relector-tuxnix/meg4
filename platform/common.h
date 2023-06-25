@@ -369,7 +369,7 @@ char **main_getfloppies(void)
     if(h != INVALID_HANDLE_VALUE) {
         do {
             wcscpy_s(szFile + l, FILENAME_MAX, ffd.cFileName);
-            j = wcslen(ffd.cFileName);
+            j = wcslen(ffd.cFileName) * 4;
             if(ffd.cFileName[0] == L'.' || !j) continue;
             ret = (char**)realloc(ret, (n + 2) * sizeof(char*));
             if(!ret) break;
