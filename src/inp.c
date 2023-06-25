@@ -308,7 +308,7 @@ void meg4_clrkey(int sc)
 {
     int i;
 
-    if(sc < 1 || sc >= MEG4_NUM_KEY || !(meg4.mmio.kbdkeys[sc >> 3] & (1 << (sc & 7)))) return;
+    if(sc < 0 || sc >= MEG4_NUM_KEY || !(meg4.mmio.kbdkeys[sc >> 3] & (1 << (sc & 7)))) return;
     meg4.mmio.kbdkeys[sc >> 3] &= ~(1 << (sc & 7));
     for(i = 0; i < 8; i++)
         if(meg4.mmio.padkeys[i] && meg4.mmio.padkeys[i] == sc)
@@ -316,7 +316,8 @@ void meg4_clrkey(int sc)
     /* an empty AltGr press and release (no combination with other keys) acts as a Compose key */
     if(sc == MEG4_KEY_RALT && meg4_emptyaltgr)
         meg4_pushkey("\002");
-    meg4_emptyaltgr = 0;
+    /* for some reason under Win, AltGr is sent not alone, but together with left control... */
+    if(sc != MEG4_KEY_LCTRL) meg4_emptyaltgr = 0;
 }
 
 /**
@@ -356,6 +357,8 @@ void meg4_setkey(int sc)
         } else
         if(meg4_api_getkey(MEG4_KEY_LCTRL) || meg4_api_getkey(MEG4_KEY_RCTRL)) {
             switch(sc) {
+                /* for some reason under Win, AltGr is sent not alone, but together with left control... */
+                case MEG4_KEY_RALT: meg4_emptyaltgr = 1; break;
                 case MEG4_KEY_A: meg4_pushkey("Sel"); break;
                 case MEG4_KEY_I: meg4_pushkey("Inv"); break;
                 case MEG4_KEY_X: meg4_pushkey("Cut"); break;

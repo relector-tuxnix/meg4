@@ -99,7 +99,6 @@ void meg4_putc(uint32_t c)
         return;
     } else
     if(c < 32 || c > 0xffff) return;
-    fnt = meg4_font + 8 * c;
     l = meg4_font[8 * 65536 + c] & 0xf; r = meg4_font[8 * 65536 + c] >> 4;
     m = r - l + 1; cache[numcache++] = m + 1; meg4.mmio.conx += m + 1;
     fnt = meg4_font + 8 * c;

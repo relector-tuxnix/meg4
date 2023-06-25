@@ -361,22 +361,22 @@ char **main_getfloppies(void)
     ret = (char**)malloc(sizeof(char*));
     if(!ret) return NULL; else ret[0] = NULL;
     memset(&szFile,0,sizeof(szFile));
-    l = MultiByteToWideChar(CP_UTF8, 0, main_floppydir, -1, szFile, sizeof(szFile)-1);
-    if(!l) return NULL;
+    l = MultiByteToWideChar(CP_UTF8, 0, main_floppydir, -1, szFile, sizeof(szFile)-1) - 1;
+    if(l < 1) return NULL;
     if(szFile[l - 1] != L'\\') szFile[l++] = L'\\';
     wcscpy_s(szFile + l, FILENAME_MAX, L"*.PNG");
     h = FindFirstFileW(szFile, &ffd);
     if(h != INVALID_HANDLE_VALUE) {
         do {
             wcscpy_s(szFile + l, FILENAME_MAX, ffd.cFileName);
-            j = WideCharToMultiByte(CP_UTF8, 0, szFile, -1, NULL, PATH_MAX + FILENAME_MAX + 2, NULL, NULL);
+            j = wcslen(ffd.cFileName);
             if(ffd.cFileName[0] == L'.' || !j) continue;
             ret = (char**)realloc(ret, (n + 2) * sizeof(char*));
             if(!ret) break;
             ret[n + 1] = NULL;
-            ret[n] = (char*)malloc(j + 1);
+            ret[n] = (char*)malloc(l + j + 1);
             if(!ret[n]) continue;
-            WideCharToMultiByte(CP_UTF8, 0, szFile, -1, ret[n], j + 1, NULL, NULL);
+            WideCharToMultiByte(CP_UTF8, 0, szFile, -1, ret[n], l + j + 1, NULL, NULL);
             n++;
         } while(FindNextFileW(h, &ffd) != 0);
         FindClose(h);
