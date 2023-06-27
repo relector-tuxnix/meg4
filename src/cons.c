@@ -201,7 +201,7 @@ void meg4_api_trace(str_t fmt, ...)
 #ifndef NOEDITORS
     char tmp[256];
     /* we can't specify command line flags on web, so verbose is always turned off there */
-#ifndef __emscripten__
+#ifndef __EMSCRIPTEN__
     extern int verbose;
     if(verbose &&
 #else
@@ -209,7 +209,7 @@ void meg4_api_trace(str_t fmt, ...)
 #endif
       fmt >= MEG4_MEM_USER && fmt < MEG4_MEM_LIMIT - 1) {
         meg4_snprintf(tmp, sizeof(tmp), (char*)meg4.data + fmt - MEG4_MEM_USER);
-        main_log(1, "trace: %s", tmp);
+        main_log(0, "trace: %s", tmp);
     }
 #else
     (void)fmt;
