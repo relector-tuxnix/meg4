@@ -34,7 +34,7 @@ Name: default theme
 102   0   0     error message background
 140 140   0     error message foreground
  76  76  76     highlight background
- 31 102 102     highlight comment
+ 41 112 112     highlight comment
  31 113 153     highlight pseudo
 124 154 124     highlight operator
   1 100 235     highlight number

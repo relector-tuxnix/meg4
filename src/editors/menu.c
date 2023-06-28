@@ -168,7 +168,7 @@ int menu_ctrl(void)
         if(l && !clk) {
             switch(menu_sel) {
                 case MENU_ABOUT: menu_active = -1; return 1;
-                case MENU_RUN: meg4_switchmode(MEG4_MODE_GAME); break;
+                case MENU_RUN: meg4_switchmode(!cpu_compile() ? MEG4_MODE_CODE : MEG4_MODE_GAME); break;
                 case MENU_SAVE: meg4_switchmode(MEG4_MODE_SAVE); break;
 #ifndef EMBED
                 case MENU_IMPORT: main_openfile(); break;

@@ -199,9 +199,15 @@ void meg4_api_trace(str_t fmt, ...)
 {
     /* I know, admitedly not the best place, but I don't want to introduce a new chapter for three functions only */
 #ifndef NOEDITORS
-    extern int verbose;
     char tmp[256];
-    if(verbose && fmt >= MEG4_MEM_USER && fmt < MEG4_MEM_LIMIT - 1) {
+    /* we can't specify command line flags on web, so verbose is always turned off there */
+#ifndef __emscripten__
+    extern int verbose;
+    if(verbose &&
+#else
+    if(
+#endif
+      fmt >= MEG4_MEM_USER && fmt < MEG4_MEM_LIMIT - 1) {
         meg4_snprintf(tmp, sizeof(tmp), (char*)meg4.data + fmt - MEG4_MEM_USER);
         main_log(1, "trace: %s", tmp);
     }

@@ -277,6 +277,7 @@ void code_up(void)
             if(!(meg4.src[cursor] & 8)) cursor += 3;
         }
     }
+    if(cursor < 1) cursor = 0;
 }
 
 /**
@@ -297,6 +298,7 @@ void code_down(void)
             if(!(meg4.src[cursor] & 8)) cursor += 3;
         }
     }
+    if(cursor > meg4.src_len - 1) cursor = meg4.src_len - 1;
 }
 
 /**
@@ -306,6 +308,7 @@ void code_left(void)
 {
     if(meg4.src && meg4.src_len > 0 && cursor > 0)
         do { cursor--; } while(cursor > 0 && (meg4.src[cursor] & 0xC0) == 0x80);
+    if(cursor < 1) cursor = 0;
 }
 
 /**
@@ -315,6 +318,7 @@ void code_right(void)
 {
     if(meg4.src && meg4.src_len > 0 && cursor < meg4.src_len - 1)
         do { cursor++; } while(cursor < meg4.src_len - 1 && (meg4.src[cursor] & 0xC0) == 0x80);
+    if(cursor > meg4.src_len - 1) cursor = meg4.src_len - 1;
 }
 
 /**
@@ -611,6 +615,7 @@ int code_ctrl(void)
         } else
         /* menubar release */
         if(py < 12) {
+            if(px >= 472 && px < 484) { meg4_switchmode(!cpu_compile() ? MEG4_MODE_CODE : MEG4_MODE_GAME); last = 0; return 1; } else
             if(px >= 492 && px < 504) goto find; else
             if(px >= 504 && px < 516) goto repl; else
             if(px >= 516 && px < 528) goto line; else
@@ -687,7 +692,7 @@ book:               if(meg4.src_bm[0]) { modal = 6; modalclk = -1; }
                 } else
                 if(!memcmp(&key, "TgBM", 4)) { code_tglbmark(row); } else
                 if(!memcmp(&key, "Up", 3)) {
-                    if(meg4_api_getkey(MEG4_KEY_LCTRL) || meg4_api_getkey(MEG4_KEY_LCTRL)) {
+                    if(meg4_api_getkey(MEG4_KEY_LCTRL) || meg4_api_getkey(MEG4_KEY_RCTRL)) {
                         n = (int)(sizeof(meg4.src_bm)/sizeof(meg4.src_bm[0]));
                         for(i = 0; i + 1 < n && meg4.src_bm[i] && meg4.src_bm[i + 1] < (uint32_t)row; i++);
                         if(meg4.src_bm[i] && meg4.src_bm[i] < (uint32_t)row) code_goto(meg4.src_bm[i]); else {
@@ -697,7 +702,7 @@ book:               if(meg4.src_bm[0]) { modal = 6; modalclk = -1; }
                     } else { if(i) { sels = cursor; } code_up(); }
                 } else
                 if(!memcmp(&key, "Down", 4)) {
-                    if(meg4_api_getkey(MEG4_KEY_LCTRL) || meg4_api_getkey(MEG4_KEY_LCTRL)) {
+                    if(meg4_api_getkey(MEG4_KEY_LCTRL) || meg4_api_getkey(MEG4_KEY_RCTRL)) {
                         n = (int)(sizeof(meg4.src_bm)/sizeof(meg4.src_bm[0]));
                         for(i = 0; i < n && meg4.src_bm[i] && meg4.src_bm[i] <= (uint32_t)row; i++);
                         if(i < n && meg4.src_bm[i]) code_goto(meg4.src_bm[i]); else
@@ -726,7 +731,15 @@ copy:               if(sels != -1U && sele != -1U) {
 paste:              if((clipboard = main_getclipboard())) { code_insert(clipboard, 0); free(clipboard); }
                 } else
                 if(!memcmp(&key, "\t", 2)) code_instab(); else
-                if(!memcmp(&key, "\n", 2) || !meg4_api_speckey(key)) { code_insert((char*)&key, meg4_api_lenkey(key)); }
+                if(!memcmp(&key, "\n", 2)) {
+                    j = k = 0;
+                    if(cursor) {
+                        for(j = cursor - 1; j > 0 && meg4.src[j] != '\n'; j--);
+                        if(j) for(k = j + 1; k < cursor && (meg4.src[k] == ' ' || meg4.src[k] == '\t'); k++);
+                    }
+                    if(j < k) code_insert((char*)&meg4.src[j], k - j);
+                    else code_insert((char*)&key, meg4_api_lenkey(key));
+                } else if(!meg4_api_speckey(key)) { code_insert((char*)&key, meg4_api_lenkey(key)); }
                 /* check for shift release to end selection */
                 if((meg4_api_getkey(MEG4_KEY_LSHIFT) || meg4_api_getkey(MEG4_KEY_LSHIFT))) sele = cursor;
                 else if(lastc != cursor) sels = sele = -1U;
@@ -743,6 +756,7 @@ paste:              if((clipboard = main_getclipboard())) { code_insert(clipboar
  */
 void code_menu(uint32_t *dst, int dw, int dh, int dp)
 {
+    /* run */       menu_icon(dst, dw, dh, dp, 472,  56, 40, 1, MEG4_KEY_R, MENU_RUN);
     /* find */      menu_icon(dst, dw, dh, dp, 492, 120, 40, 1, MEG4_KEY_F, STAT_FIND);
     /* replace */   menu_icon(dst, dw, dh, dp, 504,   0, 56, 1, MEG4_KEY_H, STAT_REPLACE);
     /* goto */      menu_icon(dst, dw, dh, dp, 516,  24, 56, 1, MEG4_KEY_L, STAT_GOTO);

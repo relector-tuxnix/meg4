@@ -1162,6 +1162,10 @@ int cpu_compile(void)
 #endif
     if(meg4.code_type > 1) { code_error(2, lang[ERR_UNKLNG]); return 0; }
 
+    /* make sure code ends with a newline */
+    if(meg4.src && meg4.src_len > 1 && meg4.src[meg4.src_len - 2] != '\n')
+        { meg4.src[meg4.src_len - 1] = '\n'; meg4.src_len++; }
+
     /* let's have the syntax highlighter do the heavy lifting... */
     memset(&comp, 0, sizeof(comp));
     comp.r = hl_find(meg4.src + 2);
