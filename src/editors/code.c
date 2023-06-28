@@ -186,6 +186,11 @@ void code_delete(uint32_t start, uint32_t end)
     for(i = start; i < end; i++) if(meg4.src[i] == '\n') numnl--;
     memmove(meg4.src + start, meg4.src + end, meg4.src_len - end);
     meg4.src_len -= end - start;
+    if(meg4.src_len < 1) {
+        memcpy(meg4.src, "#!c\n\n", 6);
+        meg4.src_len = 5;
+        start = 4;
+    }
     cursor = start;
     postok = cursor;
     tok = hl_tokenize(rules, meg4.src, meg4.src + meg4.src_len, tok, &numtok, &alloctok, &postok);
@@ -199,7 +204,8 @@ void code_insert(char *str, uint32_t len)
 {
     uint32_t i;
 
-    if(!str || !*str || !meg4.src || meg4.src_len < 1) return;
+    if(!str || !*str) return;
+    if(!meg4.src || meg4.src_len < 1) allocsize = cursor = 0;
     if(len < 1) len = strlen(str);
     for(i = 0; i < len; i++)
         if(str[i] == '\r') { memmove(str + i, str + i + 1, len - i); i--; len--; }

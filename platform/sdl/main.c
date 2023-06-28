@@ -129,9 +129,9 @@ void main_win(int w, int h, int f)
 #endif
     if(!window) return;
 #if SDL_VERSION_ATLEAST(3,0,0)
-    renderer = SDL_CreateRenderer(window, "", SDL_RENDERER_ACCELERATED);
+    renderer = SDL_CreateRenderer(window, NULL, SDL_RENDERER_ACCELERATED);
     if(!renderer) {
-        renderer = SDL_CreateRenderer(window, "", SDL_RENDERER_SOFTWARE);
+        renderer = SDL_CreateRenderer(window, NULL, SDL_RENDERER_SOFTWARE);
         if(!renderer) return;
     }
 #else
@@ -317,7 +317,7 @@ void main_loop(void) {
             break;
             case SDL_KEYDOWN:
                 switch(event.key.keysym.sym) {
-                    case SDLK_LALT: case SDLK_RALT: case SDLK_LCTRL: case SDLK_RCTRL: main_alt = 1; break;
+                    case SDLK_LALT: case SDLK_LCTRL: main_alt = 1; break;
                     case SDLK_RETURN:
                         if(main_alt) {
                             main_fullscreen();
@@ -361,7 +361,7 @@ void main_loop(void) {
             break;
             case SDL_KEYUP:
                 switch(event.key.keysym.sym) {
-                    case SDLK_LALT: case SDLK_RALT: case SDLK_LCTRL: case SDLK_RCTRL: main_alt = 0; break;
+                    case SDLK_LALT: case SDLK_LCTRL: main_alt = 0; break;
                 }
                 if(event.key.keysym.scancode < SDL_NUM_SCANCODES) meg4_clrkey(main_keymap[event.key.keysym.scancode]);
             break;
@@ -537,7 +537,7 @@ void main_delay(int msec)
  */
 void main_hdr(void)
 {
-    printf("\r\nMEG-4 v%s (SDL, build %u) by bzt Copyright (C) 2023 GPLv3+\r\n\r\n", meg4ver, BUILD);
+    printf("\r\nMEG-4 v%s (SDL%d, build %u) by bzt Copyright (C) 2023 GPLv3+\r\n\r\n", meg4ver, SDL_MAJOR_VERSION, BUILD);
 }
 
 /**
@@ -768,7 +768,7 @@ int main(int argc, char **argv)
     main_win(main_w, main_h, 0);
 #else
 #if SDL_VERSION_ATLEAST(3,0,0)
-    dm = SDL_GetDesktopDisplayMode(0);
+    dm = SDL_GetDesktopDisplayMode(SDL_GetPrimaryDisplay());
     win_w = main_w = dm->w; win_h = main_h = dm->h;
 #else
     SDL_GetDesktopDisplayMode(0, &dm);

@@ -71,6 +71,8 @@ ifneq ($(JOYFALLBACK),)
  CFLAGS += -DJOYFALLBACK=1
 endif
 
+include ../common.mk
+
 ifneq ("$(wildcard portaudio/*)","")
 portaudio/lib/.libs/libportaudio.a:
 ifeq ($(wildcard portaudio/configure),)
@@ -89,8 +91,6 @@ ifeq ($(wildcard glfw3/build/Makefile),)
 endif
 	@make --no-print-directory -s -C glfw3/build all
 endif
-
-include ../common.mk
 
 static-glfw3:
 	git clone https://github.com/glfw/glfw.git

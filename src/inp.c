@@ -330,7 +330,7 @@ void meg4_setkey(int sc)
     meg4_emptyaltgr = 0;
     if(sc < 0 || sc >= MEG4_NUM_KEY) return;
     if(!(meg4.mmio.kbdkeys[sc >> 3] & (1 << (sc & 7)))) {
-        if(meg4_api_getkey(MEG4_KEY_LALT) || meg4_api_getkey(MEG4_KEY_RALT)) {
+        if(meg4_api_getkey(MEG4_KEY_LALT)) {
             switch(sc) {
                 case MEG4_KEY_H: meg4_pushkey("#"); break;          /* U+00023 hashmark */
                 case MEG4_KEY_S: meg4_pushkey("$"); break;          /* U+00024 dollar */

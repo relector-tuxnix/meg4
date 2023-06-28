@@ -589,7 +589,8 @@ int main(int argc, char **argv)
 #if DEBUG
     main_win(640, 400, 0);
 #else
-    main_win(main_w, main_h, 1);
+    main_win(640/*main_w*/, 400/*main_h*/, 0/*1*/);
+    main_fullscreen();
 #endif
     if(!window) {
         meg4_poweroff();

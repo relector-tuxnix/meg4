@@ -15,10 +15,10 @@ platform/*/meg4
 platform/meg4*
 platform/emscripten/meg4.js
 platform/emscripten/meg4.wasm
-platform/sdl/SDL2
-platform/sdl/SDL3
-platform/glfw_pa/glfw3
-platform/glfw_pa/portaudio
+platform/sdl/SDL*
+platform/glfw_pa/glfw*
+platform/glfw_pa/portaudio*
+platform/raylib/raylib*
 src/editors/pro.*
 data.c
 data.h
