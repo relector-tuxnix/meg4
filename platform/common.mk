@@ -36,8 +36,11 @@ TMP2 = $(TMP:aarch64=arm64)
 DEBARCH = $(TMP2:armv7l=armhf)
 VERSION = $(shell cat ../../src/meg4.c|grep meg4ver|head -1|cut -d '"' -f 2)
 
-ifeq ($(USE_EMCC),)
+ifeq ($(USE_EMCC)$(USE_C99),)
  CFLAGS += -ansi -pedantic
+endif
+ifneq ($(USE_C99),)
+ CFLAGS += --std=c99
 endif
 CFLAGS += -Wall -Wextra -Wno-pragmas -ffunction-sections -I../../src -DBUILD="$(shell date +"%Y%j")"
 ifneq ($(NOEDITORS),)
