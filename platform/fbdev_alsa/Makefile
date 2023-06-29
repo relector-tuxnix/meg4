@@ -30,7 +30,7 @@ ifneq ("$(wildcard alsa-lib/*)","")
 else
  LIBS += -lasound
 endif
-LIBS += -lm -lpthread
+LIBS += -lm -ldl -lpthread
 
 CFLAGS=-Wno-long-long
 ifneq ($(USE_INIT),)

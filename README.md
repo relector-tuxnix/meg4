@@ -13,7 +13,7 @@ Installation
 | Platform   | Link                                                                                                           |
 |------------|----------------------------------------------------------------------------------------------------------------|
 | Windows    | [meg4-i686-win-sdl.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-i686-win-sdl.zip)                     |
-| Linux      | [meg4-x86_64-linux-sdl.tgz](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64-linux-sdl.tgz)<br>[meg4-x86_64-linux-glfw.tgz](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64-linux-glfw.tgz) |
+| Linux      | [meg4-x86_64-linux-sdl.tgz](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64-linux-sdl.tgz)<br>[meg4-x86_64-linux-glfw.tgz](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64-linux-glfw.tgz)<br>[meg4-x86_64-linux-fbdev.tgz](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64-linux-fbdev.tgz) |
 | Ubuntu     | [meg4_0.0.1-amd64.deb](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4_0.0.1-amd64.deb)                       |
 | RaspiOS    | [meg4_0.0.1-armhf.deb](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4_0.0.1-armhf.deb)                       |
 | Emscripten | [meg4-wasm-emscripten.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-wasm-emscripten.zip)               |
