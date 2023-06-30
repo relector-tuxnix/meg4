@@ -459,10 +459,11 @@ int meg4_api_getkey(int sc)
 void meg4_pushkey(char *key)
 {
     uint32_t unicode;
-    char *s = key, tmp[4];
+    char tmp[8] = { 0 }, *s = tmp;
     char **map, **found;
     int i, p;
 
+    strncpy(tmp, key, 4);
     switch(s[0]) {
         case 0:
         case 6: case 7: /* reserved for future use, should new complex input maps needed */
