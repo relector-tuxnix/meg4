@@ -330,7 +330,7 @@ void main_delay(int msec)
 {
     struct timespec tv;
     tv.tv_sec = 0; tv.tv_nsec = msec * 1000000;
-    nanosleep(&tv, NULL);
+    while(nanosleep(&tv, &tv) == -1 && tv.tv_nsec > 1000000);
 }
 
 /**

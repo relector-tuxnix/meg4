@@ -19,6 +19,7 @@ platform/sdl/SDL*
 platform/glfw_pa/glfw*
 platform/glfw_pa/portaudio*
 platform/raylib/raylib*
+platform/fbdev_alsa/alsa-lib*
 src/editors/pro.*
 data.c
 data.h

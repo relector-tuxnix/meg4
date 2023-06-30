@@ -429,7 +429,7 @@ normal:
             }
         }
     }
-    meg4.mmio.kbdkeys[sc >> 3] |= (1 << (sc & 7));
+    if(sc) meg4.mmio.kbdkeys[sc >> 3] |= (1 << (sc & 7));
     for(i = 0; i < 8; i++)
         if(meg4.mmio.padkeys[i] && meg4.mmio.padkeys[i] == sc) {
             meg4.mmio.padbtns[0] |= (1 << i);
