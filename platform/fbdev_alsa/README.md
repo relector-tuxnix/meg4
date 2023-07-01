@@ -2,7 +2,7 @@ MEG-4 Linux FrameBuffer + ALSA Port
 ===================================
 
 This directory contains the main executable for a backend that does not need any library, as it uses the Linux kernel
-interfaces directly. This allows MEG-4 to be used as an Operating System.
+interfaces directly. This allows this port to be used as a [MEG-4 Operating System](../../docs/MEG-4_OS.md).
 
 Compilation options
 -------------------
@@ -33,9 +33,7 @@ new layout mapping, just copy us.h and edit it. You only have to fill in keys fo
 to be produced, special keys like <kbd>Esc</kbd>, <kbd>F1</kbd> etc. are handled regardless. If not specified, defaults
 to US / International keyboard mapping.
 
-To sum it up, to compile MEG-4 as a stand alone Operating System, use
-```
-USE_INIT=1 KBDMAP=hu LANG=hu FLOPPYDEV=/dev/sda1 make static-asound all
-```
+To sum it up: `USE_INIT=1 KBDMAP=hu LANG=hu FLOPPYDEV=/dev/sda1 make static-asound all`
 
-Then copy the `meg4` binary to the root fs as `init` and get it loaded by a Linux kernel as the first and only user space process.
+Then copy the `meg4` binary to the root fs as `init` and get it loaded by a Linux kernel as the first and only user
+space process.
