@@ -24,15 +24,8 @@ BACKEND=fbdev
 PACKAGE=Linux
 EMBED=1
 
-ifneq ("$(wildcard alsa-lib/*)","")
- CFLAGS += -I./alsa-lib/include
- EXTRA += ./alsa-lib/src/.libs/libasound.a
-else
- LIBS += -lasound
-endif
-LIBS += -lm -ldl -lpthread
+LIBS += -lm -lpthread
 
-CFLAGS=-Wno-long-long
 ifneq ($(USE_INIT),)
  CFLAGS+=-DUSE_INIT=1
  LDFLAGS=-static
@@ -48,14 +41,3 @@ ifneq ($(KBDMAP),)
 endif
 
 include ../common.mk
-
-ifneq ("$(wildcard alsa-lib/*)","")
-alsa-lib/src/.libs/libasound.a:
-ifeq ($(wildcard alsa-lib/Makefile),)
-	@cd alsa-lib && GITCOMPILE_NO_MAKE=1 ./gitcompile --disable-shared --enable-static --disable-mixer --enable-pcm --disable-rawmidi --disable-seq --disable-ucm --disable-alisp --disable-old-symbols --disable-python
-endif
-	@make --no-print-directory -s -C alsa-lib all
-endif
-
-static-asound:
-	git clone https://github.com/alsa-project/alsa-lib.git

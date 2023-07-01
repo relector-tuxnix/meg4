@@ -829,7 +829,12 @@ char **main_getfloppies(void)
  */
 int main_cfgsave(char *cfg, uint8_t *buf, int len)
 {
-    char file[PATH_MAX + FILENAME_MAX + 1], *tmp = getenv("HOME");
+    char file[PATH_MAX + FILENAME_MAX + 1], *tmp =
+#ifdef USE_INIT
+        "/mnt/MEG-4";
+#else
+        getenv("HOME");
+#endif
     int ret = 0, i;
     if(tmp) {
         strcpy(file, tmp);
@@ -848,7 +853,12 @@ int main_cfgsave(char *cfg, uint8_t *buf, int len)
 uint8_t *main_cfgload(char *cfg, int *len)
 {
     uint8_t *ret = NULL;
-    char file[PATH_MAX + FILENAME_MAX + 1], *tmp = getenv("HOME");
+    char file[PATH_MAX + FILENAME_MAX + 1], *tmp =
+#ifdef USE_INIT
+        "/mnt/MEG-4";
+#else
+        getenv("HOME");
+#endif
     if(tmp) {
         strcpy(file, tmp);
         strcat(file, "/.config/MEG-4/"); strcat(file, cfg);

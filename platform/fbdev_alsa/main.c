@@ -26,6 +26,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <pthread.h>
 #include <termios.h>
 #include <sys/time.h>
 #include <sys/ioctl.h>
@@ -36,9 +37,11 @@
 #include <linux/kd.h>
 #include <linux/fb.h>
 #include <linux/input.h>
-#define inline __inline__
-#include <alsa/asoundlib.h>
+#include <sound/asound.h>
 #include "meg4.h"
+
+#define ALSA_BUFFER_SIZE 4096
+#define ALSA_PERIOD_SIZE 1024
 
 int fb = -1, ek = -1, em = -1;
 struct fb_fix_screeninfo fb_fix;
@@ -46,11 +49,13 @@ struct fb_var_screeninfo fb_var, fb_orig;
 uint32_t *scrbuf = NULL;
 uint8_t *fbuf = NULL, *foffs;
 struct termios oldt, newt;
-snd_pcm_t *audio = NULL;
-snd_async_handler_t *pcm_callback = NULL;
-snd_pcm_uframes_t buffer_size = 4096;
-snd_pcm_uframes_t period_size = 256;
-float *abuf = NULL;
+int afd = -1, audio = 0;
+volatile unsigned int period_size, boundary;
+struct snd_pcm_mmap_status *mmap_status;
+struct snd_pcm_mmap_control *mmap_control;
+float abuf[ALSA_BUFFER_SIZE];
+int16_t ibuf[2*ALSA_BUFFER_SIZE];
+pthread_t th = 0;
 void sync(void);
 
 int main_w = 0, main_h = 0, main_exit = 0, win_w, win_h, win_x, win_y, main_alt = 0, main_sh = 0, main_meta = 0, main_caps = 0, main_keymap[512];
@@ -79,6 +84,71 @@ char *main_kbdlayout[128*4] = {
 #define meg4_hidecursor()
 #include "../common.h"
 
+/* helpers for hw_params */
+static struct snd_interval *param_to_interval(struct snd_pcm_hw_params *p, int n)
+{
+    return &(p->intervals[n - SNDRV_PCM_HW_PARAM_FIRST_INTERVAL]);
+}
+
+static struct snd_mask *param_to_mask(struct snd_pcm_hw_params *p, int n)
+{
+    return &(p->masks[n - SNDRV_PCM_HW_PARAM_FIRST_MASK]);
+}
+
+static void param_set_mask(struct snd_pcm_hw_params *p, int n, unsigned int bit)
+{
+    struct snd_mask *m = param_to_mask(p, n);
+    if (bit >= SNDRV_MASK_MAX)
+        return;
+    m->bits[0] = 0;
+    m->bits[1] = 0;
+    m->bits[bit >> 5] |= (1 << (bit & 31));
+}
+
+static void param_set_min(struct snd_pcm_hw_params *p, int n, unsigned int val)
+{
+    struct snd_interval *i = param_to_interval(p, n);
+    i->min = val;
+}
+
+static void param_set_int(struct snd_pcm_hw_params *p, int n, unsigned int val)
+{
+    struct snd_interval *i = param_to_interval(p, n);
+    i->min = val;
+    i->max = val;
+    i->integer = 1;
+}
+
+static unsigned int param_get_int(struct snd_pcm_hw_params *p, int n)
+{
+    struct snd_interval *i = param_to_interval(p, n);
+    return (i->integer) ? i->max : 0;
+}
+
+static void param_init(struct snd_pcm_hw_params *p)
+{
+    struct snd_mask *m;
+    struct snd_interval *i;
+    int n;
+
+    memset(p, 0, sizeof(struct snd_pcm_hw_params));
+    for (n = SNDRV_PCM_HW_PARAM_FIRST_MASK;
+         n <= SNDRV_PCM_HW_PARAM_LAST_MASK; n++) {
+            m = param_to_mask(p, n);
+            m->bits[0] = ~0;
+            m->bits[1] = ~0;
+    }
+    for (n = SNDRV_PCM_HW_PARAM_FIRST_INTERVAL;
+         n <= SNDRV_PCM_HW_PARAM_LAST_INTERVAL; n++) {
+            i = param_to_interval(p, n);
+            i->min = 0;
+            i->max = ~0;
+    }
+    p->rmask = ~0U;
+    p->cmask = 0;
+    p->info = ~0U;
+}
+
 /**
  * Exit emulator
  */
@@ -92,12 +162,14 @@ void main_quit(void)
     if(ek >= 0) close(ek);
     if(em >= 0) close(em);
     if(audio) {
-        if(pcm_callback) snd_async_del_handler (pcm_callback);
-        snd_pcm_drain(audio); snd_pcm_close(audio); audio = NULL;
+        period_size = 0;
+        if(th) { pthread_cancel(th); pthread_join(th, NULL); th = 0; }
+        if(mmap_status) munmap(mmap_status, 4096);
+        if(mmap_control) munmap(mmap_control, 4096);
+        if(afd > 0) { ioctl(afd, SNDRV_PCM_IOCTL_DRAIN); close(afd); afd = -1; }
     }
     if(scrbuf) { free(scrbuf); scrbuf = NULL; }
     if(fbuf) { memset(fbuf, 0, fb_fix.smem_len); msync(fbuf, fb_fix.smem_len, MS_SYNC); munmap(fbuf, fb_fix.smem_len); fbuf = NULL; }
-    if(abuf) { free(abuf); abuf = NULL; }
     if(fb >= 0) {
         if(fb_orig.bits_per_pixel != 32) ioctl(fb, FBIOPUT_VSCREENINFO, &fb_orig);
         close(fb);
@@ -214,15 +286,34 @@ void main_osk_hide(void)
 /**
  * Audio callback
  */
-void main_audio(snd_async_handler_t *pcm_callback)
+static void *main_audio(void *data)
 {
-    snd_pcm_t *pcm_handle = snd_async_handler_get_pcm(pcm_callback);
-    snd_pcm_uframes_t avail = snd_pcm_avail_update(pcm_handle);
-    while(avail >= period_size) {
-        meg4_audiofeed((float*)abuf, period_size);
-        snd_pcm_writei(pcm_handle, abuf, period_size);
-        avail = snd_pcm_avail_update(pcm_handle);
+    struct snd_xferi xfer = { 0 };
+    int16_t *buf;
+    unsigned int i, j, numframes = period_size;
+    int ret, avail;
+
+    (void)data;
+    while(period_size) {
+        numframes = period_size;
+        meg4_audiofeed((float*)abuf, numframes);
+        for(i = j = 0; i < numframes; i++, j += 2)
+            ibuf[j] = ibuf[j + 1] = abuf[i] * 32767.0f;
+        buf = ibuf;
+        do {
+            xfer.buf = buf;
+            xfer.frames = numframes > period_size ? period_size : numframes;
+            xfer.result = 0;
+            if(!(ret = ioctl(afd, SNDRV_PCM_IOCTL_WRITEI_FRAMES, &xfer))) {
+                avail = mmap_status->hw_ptr + ALSA_BUFFER_SIZE - mmap_control->appl_ptr;
+                if(avail < 0) avail += boundary; else
+                if((unsigned int)avail >= boundary) avail -= boundary;
+                numframes -= xfer.result;
+                buf += xfer.result;
+            } else if(ret < 0) break;
+        } while(period_size && numframes > 0);
     }
+    return NULL;
 }
 
 /**
@@ -248,8 +339,8 @@ void main_hdr(void)
  */
 int main(int argc, char **argv)
 {
-    snd_pcm_sw_params_t *sw_params;
-    snd_pcm_hw_params_t *hw_params;
+    struct snd_pcm_hw_params params;
+    struct snd_pcm_sw_params spar;
     struct input_event ev[64];
     struct timespec ts;
     int i, j, k, l, m, p, mx = 160, my = 100;
@@ -388,34 +479,36 @@ int main(int argc, char **argv)
     main_keymap[KEY_MENU] = MEG4_KEY_MENU;
 
     /* huh, wanna see some seriously and conceptually fucked up api? */
-    if(snd_pcm_open(&audio, "default", SND_PCM_STREAM_PLAYBACK, 0) >= 0) {
-        snd_pcm_hw_params_malloc(&hw_params);
-        snd_pcm_hw_params_any(audio, hw_params);
-        snd_pcm_hw_params_set_access(audio, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
-        snd_pcm_hw_params_set_format(audio, hw_params, SND_PCM_FORMAT_FLOAT);
-        snd_pcm_hw_params_set_rate_near(audio, hw_params, &rrate, NULL);
-        snd_pcm_hw_params_set_channels(audio, hw_params, 1);
-        snd_pcm_hw_params_set_buffer_size_near(audio, hw_params, &buffer_size);
-        snd_pcm_hw_params_set_period_size_near(audio, hw_params, &period_size, NULL);
-        if(snd_pcm_hw_params(audio, hw_params) >= 0) {
-            snd_pcm_sw_params_malloc(&sw_params);
-            snd_pcm_sw_params_current(audio, sw_params);
-            snd_pcm_sw_params_set_start_threshold(audio, sw_params, buffer_size - period_size);
-            snd_pcm_sw_params_set_avail_min(audio, sw_params, period_size);
-            if(snd_pcm_sw_params(audio, sw_params) >= 0) {
-                abuf = (float*)malloc(period_size * sizeof(float));
-                if(abuf) {
-                    memset(abuf, 0, period_size * sizeof(float));
-                    snd_pcm_prepare(audio);
-                    snd_async_add_pcm_handler(&pcm_callback, audio, main_audio, NULL);
-                    snd_pcm_writei(audio, abuf, period_size);
-                } else { snd_pcm_close(audio); audio = NULL; }
-            } else { snd_pcm_close(audio); audio = NULL; }
-            snd_pcm_sw_params_free(sw_params);
-        } else { snd_pcm_close(audio); audio = NULL; }
-        snd_pcm_hw_params_free(hw_params);
-    } else audio = NULL;
-    if(verbose && audio) main_log(1, "audio opened %uHz, %u bits", rrate, 32);
+    if((afd = open("/dev/snd/pcmC0D0p", O_RDWR)) > 0) {
+        param_init(&params);
+        param_set_mask(&params, SNDRV_PCM_HW_PARAM_ACCESS, SNDRV_PCM_ACCESS_RW_INTERLEAVED);
+        param_set_mask(&params, SNDRV_PCM_HW_PARAM_FORMAT, SNDRV_PCM_FORMAT_S16_LE);
+        param_set_min(&params, SNDRV_PCM_HW_PARAM_BUFFER_SIZE, ALSA_BUFFER_SIZE);
+        param_set_min(&params, SNDRV_PCM_HW_PARAM_PERIOD_SIZE, ALSA_PERIOD_SIZE);
+        param_set_int(&params, SNDRV_PCM_HW_PARAM_PERIODS, ALSA_BUFFER_SIZE / ALSA_PERIOD_SIZE);
+        param_set_int(&params, SNDRV_PCM_HW_PARAM_RATE, 44100);
+        param_set_int(&params, SNDRV_PCM_HW_PARAM_CHANNELS, 2);
+        if(ioctl(afd, SNDRV_PCM_IOCTL_HW_PARAMS, &params)) { close(afd); afd = -1; goto noaudio; }
+        period_size = param_get_int(&params, SNDRV_PCM_HW_PARAM_PERIOD_SIZE);
+        memset(&spar, 0, sizeof(spar));
+        spar.tstamp_mode = SNDRV_PCM_TSTAMP_ENABLE;
+        spar.period_step = 1;
+        spar.avail_min = period_size;
+        spar.start_threshold = ALSA_BUFFER_SIZE - period_size;
+        spar.stop_threshold = ALSA_BUFFER_SIZE;
+        spar.xfer_align = period_size / 2; /* for old kernels */
+        if(ioctl(afd, SNDRV_PCM_IOCTL_SW_PARAMS, &spar)) { close(afd); afd = -1; goto noaudio; }
+        boundary = spar.boundary;
+        mmap_status = mmap(NULL, 4096, PROT_READ, MAP_SHARED, afd, SNDRV_PCM_MMAP_OFFSET_STATUS);
+        if(!mmap_status || mmap_status == MAP_FAILED) { mmap_status = NULL; close(afd); afd = -1; goto noaudio; }
+        mmap_control = mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_SHARED, afd, SNDRV_PCM_MMAP_OFFSET_CONTROL);
+        if(!mmap_control || mmap_control == MAP_FAILED) {
+            munmap(mmap_status, 4096); mmap_status = NULL; mmap_control = NULL; close(afd); afd = -1; goto noaudio;
+        }
+        audio = 1;
+    }
+noaudio:
+    if(verbose && audio) main_log(1, "audio opened %uHz, %u bits", rrate, 16);
 
     scrbuf = (uint32_t*)malloc(640 * 400 * sizeof(uint32_t));
     if(!scrbuf) {
@@ -429,6 +522,7 @@ int main(int argc, char **argv)
         main_log(0, "unable to initialize framebuffer");
         return 1;
     }
+
     /* turn on the emulator */
     meg4_poweron(lng);
 #ifndef NOEDITORS
@@ -442,7 +536,13 @@ int main(int argc, char **argv)
 #else
     (void)ptr; (void)infile;
 #endif
-    if(audio) snd_pcm_start(audio);
+    if(audio) {
+        pthread_create(&th, NULL, main_audio, NULL);
+        if(ioctl(afd, SNDRV_PCM_IOCTL_PREPARE) < 0) {
+            munmap(mmap_status, 4096); munmap(mmap_control, 4096); mmap_status = NULL; mmap_control = NULL;
+            close(afd); afd = -1; audio = 0; period_size = 0;
+        }
+    }
     while(!main_exit) {
         clock_gettime(CLOCK_MONOTONIC, &ts);
         ticks = (uint64_t) ts.tv_sec * 1000000000 + (uint64_t) ts.tv_nsec;

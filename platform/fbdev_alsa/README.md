@@ -10,7 +10,6 @@ Compilation options
 | Command               | Description                                                |
 |-----------------------|------------------------------------------------------------|
 | `make`                | Compile the `meg4` executable for this platform            |
-| `make static-asound`  | Download asoundlib for static linking                      |
 | `make install`        | Install the compiled executable                            |
 | `make package`        | Create a package from the compiled executable              |
 | `make clean`          | Clean the platform, but do not touch libmeg4               |
@@ -33,7 +32,7 @@ new layout mapping, just copy us.h and edit it. You only have to fill in keys fo
 to be produced, special keys like <kbd>Esc</kbd>, <kbd>F1</kbd> etc. are handled regardless. If not specified, defaults
 to US / International keyboard mapping.
 
-To sum it up: `USE_INIT=1 KBDMAP=hu LANG=hu FLOPPYDEV=/dev/sda1 make static-asound all`
+To sum it up: `USE_INIT=1 KBDMAP=hu LANG=hu FLOPPYDEV=/dev/sda1 make`
 
 Then copy the `meg4` binary to the root fs as `init` and get it loaded by a Linux kernel as the first and only user
 space process.

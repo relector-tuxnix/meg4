@@ -31,9 +31,6 @@ all: meg4.iso
 
 ### compile MEG-4 as an init process ###
 ../fbdev_alsa/meg4:
-ifeq ($(wildcard ../fbdev_alsa/alsa-lib/*),)
-	@make --no-print-directory -C ../fbdev_alsa static-asound
-endif
 	USE_INIT=1 KBDMAP=$(KBDMAP) LANG=$(LANG) FLOPPYDEV=$(FLOPPYDEV) make --no-print-directory -C ../fbdev_alsa all
 
 rootfs/init: ../fbdev_alsa/meg4
