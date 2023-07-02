@@ -341,6 +341,9 @@ int main(int argc, char **argv)
 {
     struct snd_pcm_hw_params params;
     struct snd_pcm_sw_params spar;
+    struct snd_ctl_elem_list elist;
+    struct snd_ctl_elem_info ei;
+    struct snd_ctl_elem_value av;
     struct input_event ev[64];
     struct timespec ts;
     int i, j, k, l, m, p, mx = 160, my = 100;
@@ -480,6 +483,7 @@ int main(int argc, char **argv)
 
     /* huh, wanna see some seriously and conceptually fucked up api? */
     if((afd = open("/dev/snd/pcmC0D0p", O_RDWR)) > 0) {
+        /* set up PCM device */
         param_init(&params);
         param_set_mask(&params, SNDRV_PCM_HW_PARAM_ACCESS, SNDRV_PCM_ACCESS_RW_INTERLEAVED);
         param_set_mask(&params, SNDRV_PCM_HW_PARAM_FORMAT, SNDRV_PCM_FORMAT_S16_LE);
@@ -506,6 +510,35 @@ int main(int argc, char **argv)
             munmap(mmap_status, 4096); mmap_status = NULL; mmap_control = NULL; close(afd); afd = -1; goto noaudio;
         }
         audio = 1;
+        /* try to unmute and set hardware volume to max */
+        if((k = open("/dev/snd/controlC0", O_RDWR)) > 0) {
+            memset(&elist, 0, sizeof(elist));
+            if(!ioctl(k, SNDRV_CTL_IOCTL_ELEM_LIST, &elist)) {
+                elist.pids = malloc(elist.count * sizeof(struct snd_ctl_elem_id));
+                if(elist.pids) {
+                    memset(elist.pids, 0, elist.count * sizeof(struct snd_ctl_elem_id));
+                    elist.space = elist.count;
+                    if(!ioctl(k, SNDRV_CTL_IOCTL_ELEM_LIST, &elist))
+                        for(i = 0; i < (int)elist.count; i++) {
+                            memset(&ei, 0, sizeof(ei));
+                            ei.id.numid = elist.pids[i].numid;
+                            if(!ioctl(k, SNDRV_CTL_IOCTL_ELEM_INFO, &ei) &&
+                              (ei.access & SNDRV_CTL_ELEM_ACCESS_READWRITE) == SNDRV_CTL_ELEM_ACCESS_READWRITE &&
+                              (ei.type == SNDRV_CTL_ELEM_TYPE_INTEGER || ei.type == SNDRV_CTL_ELEM_TYPE_BOOLEAN) &&
+                              strstr((char*)ei.id.name, SNDRV_CTL_NAME_PLAYBACK)) {
+                                memset(&av, 0, sizeof(av));
+                                av.id.numid = ei.id.numid;
+                                if(!ioctl(k, SNDRV_CTL_IOCTL_ELEM_READ, &av)) {
+                                    for(j = 0; j < (int)ei.count; j++) av.value.integer.value[j] = ei.value.integer.max;
+                                    ioctl(k, SNDRV_CTL_IOCTL_ELEM_WRITE, &av);
+                                }
+                            }
+                        }
+                    free(elist.pids);
+                }
+            }
+            close(k);
+        }
     }
 noaudio:
     if(verbose && audio) main_log(1, "audio opened %uHz, %u bits", rrate, 16);
