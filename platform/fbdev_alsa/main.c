@@ -574,12 +574,12 @@ int main(int argc, char **argv)
 #ifdef USE_INIT
     char *lng = LANG;
     (void)argc; (void)argv;
-    /* we must do some housekeeping when we run as the init process */
-    mkdir("/dev", 0777); mount("none", "/dev", "devtmpfs", 0, NULL);
-    mkdir("/proc", 0777); mount("none", "/proc", "procfs", 0, NULL);
-    mkdir("/sys", 0777); mount("none", "/sys", "sysfs", 0, NULL);
-    mkdir("/tmp", 0777); mount("none", "/tmp", "tmpfs", 0, NULL);
-    mkdir("/mnt", 0777); mount(FLOPPYDEV, "/mnt", "auto", MS_SYNCHRONOUS | MS_NODEV | MS_NOEXEC, NULL);
+    /* we must do some housekeeping when we run as the init process. Assume read-only root fs */
+    mount("none", "/dev", "devtmpfs", 0, NULL);
+    mount("none", "/proc", "procfs", 0, NULL);
+    mount("none", "/sys", "sysfs", 0, NULL);
+    mount("none", "/tmp", "tmpfs", 0, NULL);
+    mount(FLOPPYDEV, "/mnt", "auto", MS_SYNCHRONOUS | MS_NODEV | MS_NOEXEC, NULL);
     open("/dev/stdin", O_RDONLY);
     open("/dev/stdout", O_WRONLY);
     open("/dev/stderr", O_WRONLY);

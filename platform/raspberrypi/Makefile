@@ -53,6 +53,7 @@ boot/kernel8.img: firmware.zip
 
 ### create initial ramdisk ###
 boot/initrd: rootfs/init
+	@mkdir rootfs/dev rootfs/mnt rootfs/proc rootfs/sys rootfs/tmp
 	cd rootfs && find . | cpio -R root:root -H newc -o | gzip > ../boot/initrd
 
 ### construct disk image ###

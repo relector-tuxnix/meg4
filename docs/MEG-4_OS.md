@@ -23,11 +23,17 @@ Step 3: create an initrd
 
 First, create a temporary directory, copy `meg4` (from step 1) as `init` into. Make sure that it's executable `chmod +x init`.
 Then create the directory `lib/modules/(kernel version)/` under it, and copy the kernel modules you compiled in step 2 there.
-Finally, using `cpio -H newc > initrd`, create an archive file from the contents of that temporary directory.
+Create some more directories for mount points: `dev`, `proc`, `sys`, `tmp` and `mnt`. Finally, using `cpio -H newc > initrd`,
+create an archive file from the contents of that temporary directory.
 
 ```
 initrd archive:
+  dev/
   lib/
+  mnt/
+  proc/
+  sys/
+  tmp/
   init
 ```
 
