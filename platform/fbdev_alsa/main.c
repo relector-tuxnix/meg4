@@ -43,11 +43,13 @@
 #define ALSA_BUFFER_SIZE 4096
 #define ALSA_PERIOD_SIZE 1024
 
-int fb = -1, ek = -1, em = -1;
+enum { KBD, MOUSE, PAD };
+
+int fb = -1, en = 0, ed[256], *sax = NULL, *say = NULL;
 struct fb_fix_screeninfo fb_fix;
 struct fb_var_screeninfo fb_var, fb_orig;
 uint32_t *scrbuf = NULL;
-uint8_t *fbuf = NULL, *foffs;
+uint8_t *fbuf = NULL, *foffs, *ffull;
 struct termios oldt, newt;
 int afd = -1, audio = 0;
 volatile unsigned int period_size, boundary;
@@ -58,8 +60,8 @@ int16_t ibuf[2*ALSA_BUFFER_SIZE];
 pthread_t th = 0;
 void sync(void);
 
-int main_w = 0, main_h = 0, main_exit = 0, win_w, win_h, win_x, win_y, main_alt = 0, main_sh = 0, main_meta = 0, main_caps = 0, main_keymap[512];
-int win_dp, win_dp2, win_dp3, win_dp4, win_dp5, win_dp6, win_dp7, win_dp8;
+int main_w = 0, main_h = 0, main_exit = 0, main_alt = 0, main_sh = 0, main_meta = 0, main_caps = 0, main_keymap[512];
+int win_f = 1, win_w, win_h, win_fw, win_fh, win_dp, win_dp2, win_dp3, win_dp4, win_dp5, win_dp6, win_dp7, win_dp8;
 void main_delay(int msec);
 /* keyboard layout mapping */
 char *main_kbdlayout[128*4] = {
@@ -157,10 +159,12 @@ void main_quit(void)
 #ifdef USE_INIT
     pid_t pid;
 #endif
+    int i;
+
     main_log(1, "quitting...         ");
     meg4_poweroff();
-    if(ek >= 0) close(ek);
-    if(em >= 0) close(em);
+    for(i = 0; i < en; i += 2)
+        if(ed[i] > 0) { close(ed[i]); ed[i] = -1; }
     if(audio) {
         period_size = 0;
         if(th) { pthread_cancel(th); pthread_join(th, NULL); th = 0; }
@@ -169,6 +173,8 @@ void main_quit(void)
         if(afd > 0) { ioctl(afd, SNDRV_PCM_IOCTL_DRAIN); close(afd); afd = -1; }
     }
     if(scrbuf) { free(scrbuf); scrbuf = NULL; }
+    if(sax) { free(sax); sax = NULL; }
+    if(say) { free(say); say = NULL; }
     if(fbuf) { memset(fbuf, 0, fb_fix.smem_len); msync(fbuf, fb_fix.smem_len, MS_SYNC); munmap(fbuf, fb_fix.smem_len); fbuf = NULL; }
     if(fb >= 0) {
         if(fb_orig.bits_per_pixel != 32) ioctl(fb, FBIOPUT_VSCREENINFO, &fb_orig);
@@ -196,17 +202,21 @@ void main_win(void)
     struct dirent *de;
     /* Linux kernel limits device names in 256 bytes, so this must be enough even with the path prefix */
     char dev[512] = "/dev/input/by-path";
-    int l;
+    int l, x, y;
 
     /* get keyboard and mouse event device */
-    dh = opendir(dev); ek = em = -1; dev[18] = '/';
-    while((ek < 0 || em < 0) && (de = readdir(dh)) != NULL) {
+    dh = opendir(dev); en = 0; memset(ed, 0, sizeof(ed)); dev[18] = '/';
+    while(en < 256 && (de = readdir(dh)) != NULL) {
         l = strlen(de->d_name);
-        if(ek == -1 && l > 9 && !strcmp(de->d_name + l - 9, "event-kbd")) {
-            strcpy(dev + 19, de->d_name); ek = open(dev, O_RDONLY | O_NDELAY | O_NONBLOCK);
+        if(l > 9 && !strcmp(de->d_name + l - 9, "event-kbd")) {
+            strcpy(dev + 19, de->d_name);
+            ed[en] = open(dev, O_RDONLY | O_NDELAY | O_NONBLOCK); ed[en + 1] = KBD;
+            if(ed[en] > 0) en += 2;
         }
-        if(em == -1 && l > 11 && !strcmp(de->d_name + l - 11, "event-mouse")) {
-            strcpy(dev + 19, de->d_name); em = open(dev, O_RDONLY | O_NDELAY | O_NONBLOCK);
+        if(l > 11 && !strcmp(de->d_name + l - 11, "event-mouse")) {
+            strcpy(dev + 19, de->d_name);
+            ed[en] = open(dev, O_RDONLY | O_NDELAY | O_NONBLOCK); ed[en + 1] = MOUSE;
+            if(ed[en] > 0) en += 2;
         }
     }
     closedir(dh);
@@ -230,11 +240,18 @@ void main_win(void)
     fbuf = (uint8_t*)mmap(0, fb_fix.smem_len, PROT_READ | PROT_WRITE, MAP_SHARED, fb, 0);
     if(fbuf == NULL || (intptr_t)fbuf == -1) { close(fb); fb = -1; fbuf = NULL; return; }
     memset(fbuf, 0, fb_fix.smem_len);
+    /* calculate windowed and full screen sizes, keeping aspect ratio */
     main_w = fb_var.xres; main_h = fb_var.yres;
     win_w = 640; win_h = 400;
     while(main_w >= win_w + 640 && main_h >= win_h + 400) { win_w += 640; win_h += 400; }
-    win_x = (main_w - win_w) >> 1; win_y = (main_h - win_h) >> 1;
-    foffs = fbuf + win_y * fb_fix.line_length + (win_x << 2);
+    x = (main_w - win_w) >> 1; y = (main_h - win_h) >> 1;
+    foffs = fbuf + y * fb_fix.line_length + (x << 2);
+    win_fw = main_w; win_fh = 400 * main_w / 640;
+    if(win_fh > main_h) { win_fh = main_h; win_fw = 640 * main_h / 400; }
+    x = (main_w - win_fw) >> 1; y = (main_h - win_fh) >> 1;
+    ffull = fbuf + y * fb_fix.line_length + (x << 2);
+    l = (win_fw > win_fh ? win_fw : win_fh) + 1;
+    sax = (int*)malloc(l * sizeof(int)); say = (int*)malloc(l * sizeof(int));
     win_dp = fb_fix.line_length >> 2; win_dp2 = win_dp << 1; win_dp3 = win_dp * 3; win_dp4 = win_dp << 2;
     win_dp5 = win_dp * 5; win_dp6 = win_dp * 6; win_dp7 = win_dp * 7; win_dp8 = win_dp << 3;
 }
@@ -244,6 +261,8 @@ void main_win(void)
  */
 void main_fullscreen(void)
 {
+    memset(fbuf, 0, fb_fix.smem_len);
+    win_f ^= 1;
 }
 
 /**
@@ -327,6 +346,205 @@ void main_delay(int msec)
 }
 
 /**
+ * Display screen with fixed scaler ("windowed" mode, pixel perfect, but does not fill the entire screen)
+ */
+void main_fix_scaler(void)
+{
+    uint32_t *src, *dst;
+    int i, j, k, l, m, p;
+
+    src = scrbuf + (le16toh(meg4.mmio.scrx) > 320 || le16toh(meg4.mmio.scry) > 200 ? 0 : le16toh(meg4.mmio.scry) * 640 + le16toh(meg4.mmio.scrx));
+    dst = (uint32_t*)foffs;
+    /* optimized upscaler for 1x, 2x, 3x, 4x, 6x and 8x */
+    p = win_h / meg4.screen.h;
+    if(!fb_var.red.offset) {
+        /* RGBA */
+        switch(p) {
+            case 1:
+                for(j = 0, i = meg4.screen.w << 2; j < meg4.screen.h; j++, src += 640, dst += win_dp)
+                    memcpy(dst, src, i);
+            break;
+            case 2:
+                for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp2)
+                    for(i = k = 0; i < meg4.screen.w; i++, k += 2)
+                        dst[k] = dst[k + 1] = dst[k + win_dp] = dst[k + win_dp + 1] = src[i];
+            break;
+            case 3:
+                for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp3)
+                    for(i = k = 0; i < meg4.screen.w; i++, k += 3)
+                        dst[k] = dst[k + 1] = dst[k + 2] =
+                        dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] =
+                        dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = src[i];
+            break;
+            case 4:
+                for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp4)
+                    for(i = k = 0; i < meg4.screen.w; i++, k += 4)
+                        dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] =
+                        dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] =
+                        dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
+                        dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] = src[i];
+            break;
+            case 6:
+                for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp6)
+                    for(i = k = 0; i < meg4.screen.w; i++, k += 6)
+                        dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] = dst[k + 4] = dst[k + 5] =
+                        dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] = dst[k + win_dp + 4] = dst[k + win_dp + 5] =
+                        dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
+                        dst[k + win_dp2 + 4] = dst[k + win_dp2 + 5] =
+                        dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] =
+                        dst[k + win_dp3 + 4] = dst[k + win_dp3 + 5] =
+                        dst[k + win_dp4] = dst[k + win_dp4 + 1] = dst[k + win_dp4 + 2] = dst[k + win_dp4 + 3] =
+                        dst[k + win_dp4 + 4] = dst[k + win_dp4 + 5] =
+                        dst[k + win_dp5] = dst[k + win_dp5 + 1] = dst[k + win_dp5 + 2] = dst[k + win_dp5 + 3] =
+                        dst[k + win_dp5 + 4] = dst[k + win_dp5 + 5] = src[i];
+            break;
+            case 8:
+                for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp8)
+                    for(i = k = 0; i < meg4.screen.w; i++, k += 8)
+                        dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] = dst[k + 4] = dst[k + 5] = dst[k + 6] = dst[k + 7] =
+                        dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] =
+                        dst[k + win_dp + 4] = dst[k + win_dp + 5] = dst[k + win_dp + 6] = dst[k + win_dp + 7] =
+                        dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
+                        dst[k + win_dp2 + 4] = dst[k + win_dp2 + 5] = dst[k + win_dp2 + 6] = dst[k + win_dp2 + 7] =
+                        dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] =
+                        dst[k + win_dp3 + 4] = dst[k + win_dp3 + 5] = dst[k + win_dp3 + 6] = dst[k + win_dp3 + 7] =
+                        dst[k + win_dp4] = dst[k + win_dp4 + 1] = dst[k + win_dp4 + 2] = dst[k + win_dp4 + 3] =
+                        dst[k + win_dp4 + 4] = dst[k + win_dp4 + 5] = dst[k + win_dp4 + 6] = dst[k + win_dp4 + 7] =
+                        dst[k + win_dp5] = dst[k + win_dp5 + 1] = dst[k + win_dp5 + 2] = dst[k + win_dp5 + 3] =
+                        dst[k + win_dp5 + 4] = dst[k + win_dp5 + 5] = dst[k + win_dp5 + 6] = dst[k + win_dp5 + 7] =
+                        dst[k + win_dp6] = dst[k + win_dp6 + 1] = dst[k + win_dp6 + 2] = dst[k + win_dp6 + 3] =
+                        dst[k + win_dp6 + 4] = dst[k + win_dp6 + 5] = dst[k + win_dp6 + 6] = dst[k + win_dp6 + 7] =
+                        dst[k + win_dp7] = dst[k + win_dp7 + 1] = dst[k + win_dp7 + 2] = dst[k + win_dp7 + 3] =
+                        dst[k + win_dp7 + 4] = dst[k + win_dp7 + 5] = dst[k + win_dp7 + 6] = dst[k + win_dp7 + 7] = src[i];
+            break;
+            default:
+                for(j = 0; j < meg4.screen.h; j++, src += 640)
+                    for(m = 0; m < p; m++, dst += win_dp)
+                        for(i = k = 0; i < meg4.screen.w; i++)
+                            for(l = 0; l < p; l++, k++)
+                                dst[k] = src[i];
+            break;
+        }
+    } else {
+        /* BGRA */
+        switch(p) {
+            case 1:
+                for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp)
+                    for(i = 0; i < meg4.screen.w; i++)
+                        dst[i] = ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
+            break;
+            case 2:
+                for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp2)
+                    for(i = k = 0; i < meg4.screen.w; i++, k += 2)
+                        dst[k] = dst[k + 1] = dst[k + win_dp] = dst[k + win_dp + 1] =
+                            ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
+            break;
+            case 3:
+                for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp3)
+                    for(i = k = 0; i < meg4.screen.w; i++, k += 3)
+                        dst[k] = dst[k + 1] = dst[k + 2] =
+                        dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] =
+                        dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] =
+                            ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
+            break;
+            case 4:
+                for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp4)
+                    for(i = k = 0; i < meg4.screen.w; i++, k += 4)
+                        dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] =
+                        dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] =
+                        dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
+                        dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] =
+                            ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
+            break;
+            case 6:
+                for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp6)
+                    for(i = k = 0; i < meg4.screen.w; i++, k += 6)
+                        dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] = dst[k + 4] = dst[k + 5] =
+                        dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] = dst[k + win_dp + 4] = dst[k + win_dp + 5] =
+                        dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
+                        dst[k + win_dp2 + 4] = dst[k + win_dp2 + 5] =
+                        dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] =
+                        dst[k + win_dp3 + 4] = dst[k + win_dp3 + 5] =
+                        dst[k + win_dp4] = dst[k + win_dp4 + 1] = dst[k + win_dp4 + 2] = dst[k + win_dp4 + 3] =
+                        dst[k + win_dp4 + 4] = dst[k + win_dp4 + 5] =
+                        dst[k + win_dp5] = dst[k + win_dp5 + 1] = dst[k + win_dp5 + 2] = dst[k + win_dp5 + 3] =
+                        dst[k + win_dp5 + 4] = dst[k + win_dp5 + 5] =
+                            ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
+            break;
+            case 8:
+                for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp8)
+                    for(i = k = 0; i < meg4.screen.w; i++, k += 8)
+                        dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] = dst[k + 4] = dst[k + 5] = dst[k + 6] = dst[k + 7] =
+                        dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] =
+                        dst[k + win_dp + 4] = dst[k + win_dp + 5] = dst[k + win_dp + 6] = dst[k + win_dp + 7] =
+                        dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
+                        dst[k + win_dp2 + 4] = dst[k + win_dp2 + 5] = dst[k + win_dp2 + 6] = dst[k + win_dp2 + 7] =
+                        dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] =
+                        dst[k + win_dp3 + 4] = dst[k + win_dp3 + 5] = dst[k + win_dp3 + 6] = dst[k + win_dp3 + 7] =
+                        dst[k + win_dp4] = dst[k + win_dp4 + 1] = dst[k + win_dp4 + 2] = dst[k + win_dp4 + 3] =
+                        dst[k + win_dp4 + 4] = dst[k + win_dp4 + 5] = dst[k + win_dp4 + 6] = dst[k + win_dp4 + 7] =
+                        dst[k + win_dp5] = dst[k + win_dp5 + 1] = dst[k + win_dp5 + 2] = dst[k + win_dp5 + 3] =
+                        dst[k + win_dp5 + 4] = dst[k + win_dp5 + 5] = dst[k + win_dp5 + 6] = dst[k + win_dp5 + 7] =
+                        dst[k + win_dp6] = dst[k + win_dp6 + 1] = dst[k + win_dp6 + 2] = dst[k + win_dp6 + 3] =
+                        dst[k + win_dp6 + 4] = dst[k + win_dp6 + 5] = dst[k + win_dp6 + 6] = dst[k + win_dp6 + 7] =
+                        dst[k + win_dp7] = dst[k + win_dp7 + 1] = dst[k + win_dp7 + 2] = dst[k + win_dp7 + 3] =
+                        dst[k + win_dp7 + 4] = dst[k + win_dp7 + 5] = dst[k + win_dp7 + 6] = dst[k + win_dp7 + 7] =
+                            ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
+            break;
+            default:
+                for(j = 0; j < meg4.screen.h; j++, src += 640)
+                    for(m = 0; m < p; m++, dst += win_dp)
+                        for(i = k = 0; i < meg4.screen.w; i++)
+                            for(l = 0; l < p; l++, k++)
+                                dst[k] = ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
+            break;
+        }
+    }
+}
+
+/**
+ * Display screen with arbitrary scaler (fullscreen mode, might be blurry, linear interpolation)
+ */
+void main_arb_scaler(void)
+{
+    uint8_t b[4];
+    uint32_t *src, *dst, *c00, *c01, *c10, *c11, *csp, *dp, *ep;
+    int o = 0, x, y, sx, sy, *csax, *csay, csx, csy, ex, ey, t1, t2, sstep, lx, ly, l;
+    int sw = meg4.screen.w, sh = meg4.screen.h, sp = 640, w = win_fw, h = win_fh, p = fb_fix.line_length;
+
+    src = scrbuf + (le16toh(meg4.mmio.scrx) > 320 || le16toh(meg4.mmio.scry) > 200 ? 0 : le16toh(meg4.mmio.scry) * 640 + le16toh(meg4.mmio.scrx));
+    dst = (uint32_t*)ffull;
+    sx = (int) (65536.0 * (float)sw / (float)w); sy = (int) (65536.0 * (float)sh / (float)h);
+    csp = src; ep = src + sp * sh - 1; dp = (uint32_t*)((uint8_t*)dst + o);
+    csx = 0; csax = sax; for(x = 0; x <= w; x++) { *csax = csx; csax++; csx &= 0xffff; csx += sx; }
+    csy = 0; csay = say; for(y = 0; y <= h; y++) { *csay = csy; csay++; csy &= 0xffff; csy += sy; }
+    csay = say; ly = 0;
+    for(y = l = 0; y < h; y++) {
+        c00 = csp; c01 = csp; c01++; c10 = csp; c10 += sp; c11 = c10; c11++; csax = sax; lx = 0;
+        for(x = 0; x < w - 1; x++) {
+            if(c00 > ep) { c00 = ep; } if(c01 > ep) { c01 = ep; } if(c10 > ep) { c10 = ep; } if(c11 > ep) { c11 = ep; }
+            ex = (*csax & 0xffff); ey = (*csay & 0xffff);
+            t1 = (((((*c01 >> 24) - (*c00 >> 24)) * ex) >> 16) + (*c00 >> 24)) & 0xff;
+            t2 = (((((*c11 >> 24) - (*c10 >> 24)) * ex) >> 16) + (*c10 >> 24)) & 0xff;
+            b[3] = ((((t2 - t1) * ey) >> 16) + t1); if(b[3] == 254) b[3] = 255;
+            t1 = (((((*c01 & 0xff) - (*c00 & 0xff)) * ex) >> 16) + (*c00 & 0xff)) & 0xff;
+            t2 = (((((*c11 & 0xff) - (*c10 & 0xff)) * ex) >> 16) + (*c10 & 0xff)) & 0xff;
+            b[0] = ((((t2 - t1) * ey) >> 16) + t1);
+            t1 = ((((((*c01 >> 8) & 0xff) - ((*c00 >> 8) & 0xff)) * ex) >> 16) + ((*c00 >> 8) & 0xff)) & 0xff;
+            t2 = ((((((*c11 >> 8) & 0xff) - ((*c10 >> 8) & 0xff)) * ex) >> 16) + ((*c10 >> 8) & 0xff)) & 0xff;
+            b[1] = ((((t2 - t1) * ey) >> 16) + t1);
+            t1 = ((((((*c01 >> 16) & 0xff) - ((*c00 >> 16) & 0xff)) * ex) >> 16) + ((*c00 >> 16) & 0xff)) & 0xff;
+            t2 = ((((((*c11 >> 16) & 0xff) - ((*c10 >> 16) & 0xff)) * ex) >> 16) + ((*c10 >> 16) & 0xff)) & 0xff;
+            b[2] = ((((t2 - t1) * ey) >> 16) + t1);
+            *dp = !fb_var.red.offset ? /* RGBA */ *((uint32_t*)b) : /* BGRA */ (uint32_t)((b[0] << 16) | (b[1] << 8) | b[2]);
+            dp++; csax++; if(*csax > 0) { sstep = (*csax >> 16); lx += sstep; if(lx < sw) { c00 += sstep; c01 += sstep; c10 += sstep; c11 += sstep; } }
+        }
+        csay++; if(*csay > 0) { sstep = (*csay >> 16); ly += sstep; if(ly < sh) csp += (sstep * sp); }
+        o += p; dp = (uint32_t*)((uint8_t*)dst + o);
+    }
+}
+
+/**
  * Print program version and copyright
  */
 void main_hdr(void)
@@ -346,10 +564,10 @@ int main(int argc, char **argv)
     struct snd_ctl_elem_value av;
     struct input_event ev[64];
     struct timespec ts;
-    int i, j, k, l, m, p, mx = 160, my = 100;
+    int i, j, k, n, mx = 160, my = 100;
     char *infile = NULL, *fn;
     char s[5];
-    uint32_t *src, *dst, rrate = 44100;
+    uint32_t rrate = 44100;
     uint8_t *ptr;
     int32_t tickdiff;
     uint64_t ticks;
@@ -576,250 +794,113 @@ noaudio:
             close(afd); afd = -1; audio = 0; period_size = 0;
         }
     }
+    meg4_setptr(mx, my);
     while(!main_exit) {
         clock_gettime(CLOCK_MONOTONIC, &ts);
         ticks = (uint64_t) ts.tv_sec * 1000000000 + (uint64_t) ts.tv_nsec;
-        /* mouse events */
-        if(em >= 0 && (k = read(em, ev, sizeof(ev))) >= (int)sizeof(ev[0])) {
-            for(i = 0, k /= sizeof(ev[0]); i < k; i++)
-                if(ev[i].type == EV_KEY && ev[i].value >= 0 && ev[i].value <= 1) {
-                    j = ev[i].code == BTN_LEFT ? MEG4_BTN_L : (ev[i].code == BTN_RIGHT ? MEG4_BTN_R : MEG4_BTN_M);
-                    if(ev[i].value) meg4_setbtn(j); else meg4_clrbtn(j);
-                } else
-                if(ev[i].type == EV_REL)
-                    switch(ev[i].code) {
-                        case REL_X:
-                            mx += ev[i].value;
-                            if(mx < 0) mx = 0;
-                            if(mx > meg4.screen.w) mx = meg4.screen.w;
-                            meg4_setptr(mx, my);
+        /* handle user input events */
+        for(n = 0; n < en; n += 2)
+            if((k = read(ed[n], ev, sizeof(ev))) >= (int)sizeof(ev[0])) {
+                for(i = 0, k /= sizeof(ev[0]); i < k; i++)
+                    switch(ed[n + 1]) {
+                        case MOUSE:
+                            /* mouse events */
+                            if(ev[i].type == EV_KEY && ev[i].value >= 0 && ev[i].value <= 1) {
+                                j = ev[i].code == BTN_LEFT ? MEG4_BTN_L : (ev[i].code == BTN_RIGHT ? MEG4_BTN_R : MEG4_BTN_M);
+                                if(ev[i].value) meg4_setbtn(j); else meg4_clrbtn(j);
+                            } else
+                            if(ev[i].type == EV_REL)
+                                switch(ev[i].code) {
+                                    case REL_X:
+                                        mx += ev[i].value;
+                                        if(mx < 0) mx = 0;
+                                        if(mx > meg4.screen.w) mx = meg4.screen.w;
+                                        meg4_setptr(mx, my);
+                                    break;
+                                    case REL_Y:
+                                        my += ev[i].value;
+                                        if(my < 0) my = 0;
+                                        if(my > meg4.screen.h) my = meg4.screen.h;
+                                        meg4_setptr(mx, my);
+                                    break;
+                                    case REL_WHEEL: meg4_setscr(ev[i].value > 0, ev[i].value < 0, 0, 0); break;
+                                }
                         break;
-                        case REL_Y:
-                            my += ev[i].value;
-                            if(my < 0) my = 0;
-                            if(my > meg4.screen.h) my = meg4.screen.h;
-                            meg4_setptr(mx, my);
-                        break;
-                        case REL_WHEEL: meg4_setscr(ev[i].value > 0, ev[i].value < 0, 0, 0); break;
-                    }
-        }
-        /* keyboard events */
-        if(ek >= 0 && (k = read(ek, ev, sizeof(ev))) >= (int)sizeof(ev[0])) {
-            for(i = 0, k /= sizeof(ev[0]); i < k; i++)
-                if(ev[i].type == EV_KEY && ev[i].value >= 0 && ev[i].value <= 2) {
-                    if(ev[i].code > 0 && ev[i].code < (sizeof(main_keymap)/sizeof(main_keymap[0]))) {
-                        if(ev[i].value == 0) {
-                            /* key release */
-                            if(ev[i].code == KEY_LEFTCTRL || ev[i].code == KEY_LEFTALT) main_alt = 0;
-                            if(ev[i].code == KEY_LEFTMETA || ev[i].code == KEY_RIGHTMETA || ev[i].code == KEY_RIGHTALT) main_meta = 0;
-                            if(ev[i].code == KEY_LEFTSHIFT || ev[i].code == KEY_RIGHTSHIFT) main_sh = 0;
-                            if(ev[i].code == KEY_CAPSLOCK) main_caps = 0;
-                            meg4_clrkey(main_keymap[ev[i].code]);
-                        } else
-                        if(ev[i].value == 1) {
-                            /* key press */
-                            if(ev[i].code == KEY_LEFTCTRL || ev[i].code == KEY_LEFTALT) main_alt = 1;
-                            if(ev[i].code == KEY_LEFTMETA || ev[i].code == KEY_RIGHTMETA || ev[i].code == KEY_RIGHTALT) main_meta = 1;
-                            if(ev[i].code == KEY_LEFTSHIFT || ev[i].code == KEY_RIGHTSHIFT) main_sh = 1;
-                            if(ev[i].code == KEY_CAPSLOCK) main_caps = 1;
-                            switch(ev[i].code) {
-                                case KEY_ESC: if(main_alt) main_exit = 1; else meg4_pushkey("\x1b\0\0"); break;
-                                case KEY_F1: meg4_pushkey("F1\0"); break;
-                                case KEY_F2: meg4_pushkey("F2\0"); break;
-                                case KEY_F3: meg4_pushkey("F3\0"); break;
-                                case KEY_F4: meg4_pushkey("F4\0"); break;
-                                case KEY_F5: meg4_pushkey("F5\0"); break;
-                                case KEY_F6: meg4_pushkey("F6\0"); break;
-                                case KEY_F7: meg4_pushkey("F7\0"); break;
-                                case KEY_F8: meg4_pushkey("F8\0"); break;
-                                case KEY_F9: meg4_pushkey("F9\0"); break;
-                                case KEY_F10: meg4_pushkey("F10"); break;
-                                case KEY_F11: meg4_pushkey("F11"); break;
-                                case KEY_F12: meg4_pushkey("F12"); break;
-                                case KEY_PRINT: meg4_pushkey("PSc"); break;
-                                case KEY_SCROLLLOCK: meg4_pushkey("SLk"); break;
-                                case KEY_NUMLOCK: meg4_pushkey("NLk"); break;
-                                case KEY_BACKSPACE: meg4_pushkey("\b\0\0"); break;
-                                case KEY_TAB: meg4_pushkey("\t\0\0"); break;
-                                case KEY_ENTER: case KEY_KPENTER: meg4_pushkey("\n\0\0"); break;
-                                case KEY_CAPSLOCK: meg4_pushkey("CLk"); break;
-                                case KEY_UP: meg4_pushkey("Up\0"); break;
-                                case KEY_DOWN: meg4_pushkey("Down"); break;
-                                case KEY_LEFT: meg4_pushkey("Left"); break;
-                                case KEY_RIGHT: meg4_pushkey("Rght"); break;
-                                case KEY_HOME: meg4_pushkey("Home"); break;
-                                case KEY_END: meg4_pushkey("End"); break;
-                                case KEY_PAGEUP: meg4_pushkey("PgUp"); break;
-                                case KEY_PAGEDOWN: meg4_pushkey("PgDn"); break;
-                                case KEY_INSERT: meg4_pushkey("Ins"); break;
-                                case KEY_DELETE: meg4_pushkey("Del"); break;
-                                default:
-                                    if(ev[i].code < sizeof(main_kbdlayout)/(sizeof(main_kbdlayout[0])*4)) {
-                                        memset(s, 0, sizeof(s));
-                                        strncpy(s, main_kbdlayout[(ev[i].code << 2) | (main_meta << 1) | (main_caps ^ main_sh)], 4);
-                                        if(s[0]) meg4_pushkey(s);
-                                        if(main_alt && s[0] == 'q' && !s[1]) main_exit = 1;
+                        case KBD:
+                            /* keyboard events */
+                            if(ev[i].type == EV_KEY && ev[i].value >= 0 && ev[i].value <= 2) {
+                                if(ev[i].code > 0 && ev[i].code < (sizeof(main_keymap)/sizeof(main_keymap[0]))) {
+                                    if(ev[i].value == 0) {
+                                        /* key release */
+                                        if(ev[i].code == KEY_LEFTCTRL || ev[i].code == KEY_LEFTALT) main_alt = 0;
+                                        if(ev[i].code == KEY_LEFTMETA || ev[i].code == KEY_RIGHTMETA || ev[i].code == KEY_RIGHTALT) main_meta = 0;
+                                        if(ev[i].code == KEY_LEFTSHIFT || ev[i].code == KEY_RIGHTSHIFT) main_sh = 0;
+                                        if(ev[i].code == KEY_CAPSLOCK) main_caps = 0;
+                                        meg4_clrkey(main_keymap[ev[i].code]);
+                                    } else
+                                    if(ev[i].value == 1) {
+                                        /* key press */
+                                        if(ev[i].code == KEY_LEFTCTRL || ev[i].code == KEY_LEFTALT) main_alt = 1;
+                                        if(ev[i].code == KEY_LEFTMETA || ev[i].code == KEY_RIGHTMETA || ev[i].code == KEY_RIGHTALT) main_meta = 1;
+                                        if(ev[i].code == KEY_LEFTSHIFT || ev[i].code == KEY_RIGHTSHIFT) main_sh = 1;
+                                        if(ev[i].code == KEY_CAPSLOCK) main_caps = 1;
+                                        switch(ev[i].code) {
+                                            case KEY_ESC: if(main_alt) main_exit = 1; else meg4_pushkey("\x1b\0\0"); break;
+                                            case KEY_F1: meg4_pushkey("F1\0"); break;
+                                            case KEY_F2: meg4_pushkey("F2\0"); break;
+                                            case KEY_F3: meg4_pushkey("F3\0"); break;
+                                            case KEY_F4: meg4_pushkey("F4\0"); break;
+                                            case KEY_F5: meg4_pushkey("F5\0"); break;
+                                            case KEY_F6: meg4_pushkey("F6\0"); break;
+                                            case KEY_F7: meg4_pushkey("F7\0"); break;
+                                            case KEY_F8: meg4_pushkey("F8\0"); break;
+                                            case KEY_F9: meg4_pushkey("F9\0"); break;
+                                            case KEY_F10: meg4_pushkey("F10"); break;
+                                            case KEY_F11: meg4_pushkey("F11"); break;
+                                            case KEY_F12: meg4_pushkey("F12"); break;
+                                            case KEY_PRINT: meg4_pushkey("PSc"); break;
+                                            case KEY_SCROLLLOCK: meg4_pushkey("SLk"); break;
+                                            case KEY_NUMLOCK: meg4_pushkey("NLk"); break;
+                                            case KEY_BACKSPACE: meg4_pushkey("\b\0\0"); break;
+                                            case KEY_TAB: meg4_pushkey("\t\0\0"); break;
+                                            case KEY_ENTER: case KEY_KPENTER: meg4_pushkey("\n\0\0"); break;
+                                            case KEY_CAPSLOCK: meg4_pushkey("CLk"); break;
+                                            case KEY_UP: meg4_pushkey("Up\0"); break;
+                                            case KEY_DOWN: meg4_pushkey("Down"); break;
+                                            case KEY_LEFT: meg4_pushkey("Left"); break;
+                                            case KEY_RIGHT: meg4_pushkey("Rght"); break;
+                                            case KEY_HOME: meg4_pushkey("Home"); break;
+                                            case KEY_END: meg4_pushkey("End"); break;
+                                            case KEY_PAGEUP: meg4_pushkey("PgUp"); break;
+                                            case KEY_PAGEDOWN: meg4_pushkey("PgDn"); break;
+                                            case KEY_INSERT: meg4_pushkey("Ins"); break;
+                                            case KEY_DELETE: meg4_pushkey("Del"); break;
+                                            default:
+                                                if(ev[i].code < sizeof(main_kbdlayout)/(sizeof(main_kbdlayout[0])*4)) {
+                                                    memset(s, 0, sizeof(s));
+                                                    strncpy(s, main_kbdlayout[(ev[i].code << 2) | (main_meta << 1) | (main_caps ^ main_sh)], 4);
+                                                    if(s[0]) meg4_pushkey(s);
+                                                    if(main_alt && s[0] == 'q' && !s[1]) main_exit = 1;
+                                                }
+                                            break;
+                                        }
+                                        meg4_setkey(main_keymap[ev[i].code]);
                                     }
-                                break;
+                                }
                             }
-                            meg4_setkey(main_keymap[ev[i].code]);
-                        }
+                        break;
+                        case PAD:
+                            /* controller events */
+                            /* TODO: handle gamepads */
+                        break;
                     }
-                }
-        }
-        /* controller events */
-        /* TODO: handle gamepads */
-
+            }
         /* run the emulator and display screen */
         meg4_run();
         meg4_redraw(scrbuf, 640, 400, 640 * 4);
-        src = scrbuf + (le16toh(meg4.mmio.scrx) > 320 || le16toh(meg4.mmio.scry) > 200 ? 0 : le16toh(meg4.mmio.scry) * 640 + le16toh(meg4.mmio.scrx));
-        dst = (uint32_t*)foffs;
-        /* optimized upscaler for 1x, 2x, 3x, 4x, 6x and 8x */
-        p = win_h / meg4.screen.h;
-        if(!fb_var.red.offset) {
-            /* RGBA */
-            switch(p) {
-                case 1:
-                    for(j = 0, i = meg4.screen.w << 2; j < meg4.screen.h; j++, src += 640, dst += win_dp)
-                        memcpy(dst, src, i);
-                break;
-                case 2:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp2)
-                        for(i = k = 0; i < meg4.screen.w; i++, k += 2)
-                            dst[k] = dst[k + 1] = dst[k + win_dp] = dst[k + win_dp + 1] = src[i];
-                break;
-                case 3:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp3)
-                        for(i = k = 0; i < meg4.screen.w; i++, k += 3)
-                            dst[k] = dst[k + 1] = dst[k + 2] =
-                            dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] =
-                            dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = src[i];
-                break;
-                case 4:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp4)
-                        for(i = k = 0; i < meg4.screen.w; i++, k += 4)
-                            dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] =
-                            dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] =
-                            dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
-                            dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] = src[i];
-                break;
-                case 6:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp6)
-                        for(i = k = 0; i < meg4.screen.w; i++, k += 6)
-                            dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] = dst[k + 4] = dst[k + 5] =
-                            dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] = dst[k + win_dp + 4] = dst[k + win_dp + 5] =
-                            dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
-                            dst[k + win_dp2 + 4] = dst[k + win_dp2 + 5] =
-                            dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] =
-                            dst[k + win_dp3 + 4] = dst[k + win_dp3 + 5] =
-                            dst[k + win_dp4] = dst[k + win_dp4 + 1] = dst[k + win_dp4 + 2] = dst[k + win_dp4 + 3] =
-                            dst[k + win_dp4 + 4] = dst[k + win_dp4 + 5] =
-                            dst[k + win_dp5] = dst[k + win_dp5 + 1] = dst[k + win_dp5 + 2] = dst[k + win_dp5 + 3] =
-                            dst[k + win_dp5 + 4] = dst[k + win_dp5 + 5] = src[i];
-                break;
-                case 8:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp8)
-                        for(i = k = 0; i < meg4.screen.w; i++, k += 8)
-                            dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] = dst[k + 4] = dst[k + 5] = dst[k + 6] = dst[k + 7] =
-                            dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] =
-                            dst[k + win_dp + 4] = dst[k + win_dp + 5] = dst[k + win_dp + 6] = dst[k + win_dp + 7] =
-                            dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
-                            dst[k + win_dp2 + 4] = dst[k + win_dp2 + 5] = dst[k + win_dp2 + 6] = dst[k + win_dp2 + 7] =
-                            dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] =
-                            dst[k + win_dp3 + 4] = dst[k + win_dp3 + 5] = dst[k + win_dp3 + 6] = dst[k + win_dp3 + 7] =
-                            dst[k + win_dp4] = dst[k + win_dp4 + 1] = dst[k + win_dp4 + 2] = dst[k + win_dp4 + 3] =
-                            dst[k + win_dp4 + 4] = dst[k + win_dp4 + 5] = dst[k + win_dp4 + 6] = dst[k + win_dp4 + 7] =
-                            dst[k + win_dp5] = dst[k + win_dp5 + 1] = dst[k + win_dp5 + 2] = dst[k + win_dp5 + 3] =
-                            dst[k + win_dp5 + 4] = dst[k + win_dp5 + 5] = dst[k + win_dp5 + 6] = dst[k + win_dp5 + 7] =
-                            dst[k + win_dp6] = dst[k + win_dp6 + 1] = dst[k + win_dp6 + 2] = dst[k + win_dp6 + 3] =
-                            dst[k + win_dp6 + 4] = dst[k + win_dp6 + 5] = dst[k + win_dp6 + 6] = dst[k + win_dp6 + 7] =
-                            dst[k + win_dp7] = dst[k + win_dp7 + 1] = dst[k + win_dp7 + 2] = dst[k + win_dp7 + 3] =
-                            dst[k + win_dp7 + 4] = dst[k + win_dp7 + 5] = dst[k + win_dp7 + 6] = dst[k + win_dp7 + 7] = src[i];
-                break;
-                default:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640)
-                        for(m = 0; m < p; m++, dst += win_dp)
-                            for(i = k = 0; i < meg4.screen.w; i++)
-                                for(l = 0; l < p; l++, k++)
-                                    dst[k] = src[i];
-                break;
-            }
-        } else {
-            /* BGRA */
-            switch(p) {
-                case 1:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp)
-                        for(i = 0; i < meg4.screen.w; i++)
-                            dst[i] = ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
-                break;
-                case 2:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp2)
-                        for(i = k = 0; i < meg4.screen.w; i++, k += 2)
-                            dst[k] = dst[k + 1] = dst[k + win_dp] = dst[k + win_dp + 1] =
-                                ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
-                break;
-                case 3:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp3)
-                        for(i = k = 0; i < meg4.screen.w; i++, k += 3)
-                            dst[k] = dst[k + 1] = dst[k + 2] =
-                            dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] =
-                            dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] =
-                                ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
-                break;
-                case 4:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp4)
-                        for(i = k = 0; i < meg4.screen.w; i++, k += 4)
-                            dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] =
-                            dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] =
-                            dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
-                            dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] =
-                                ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
-                break;
-                case 6:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp6)
-                        for(i = k = 0; i < meg4.screen.w; i++, k += 6)
-                            dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] = dst[k + 4] = dst[k + 5] =
-                            dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] = dst[k + win_dp + 4] = dst[k + win_dp + 5] =
-                            dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
-                            dst[k + win_dp2 + 4] = dst[k + win_dp2 + 5] =
-                            dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] =
-                            dst[k + win_dp3 + 4] = dst[k + win_dp3 + 5] =
-                            dst[k + win_dp4] = dst[k + win_dp4 + 1] = dst[k + win_dp4 + 2] = dst[k + win_dp4 + 3] =
-                            dst[k + win_dp4 + 4] = dst[k + win_dp4 + 5] =
-                            dst[k + win_dp5] = dst[k + win_dp5 + 1] = dst[k + win_dp5 + 2] = dst[k + win_dp5 + 3] =
-                            dst[k + win_dp5 + 4] = dst[k + win_dp5 + 5] =
-                                ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
-                break;
-                case 8:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640, dst += win_dp8)
-                        for(i = k = 0; i < meg4.screen.w; i++, k += 8)
-                            dst[k] = dst[k + 1] = dst[k + 2] = dst[k + 3] = dst[k + 4] = dst[k + 5] = dst[k + 6] = dst[k + 7] =
-                            dst[k + win_dp] = dst[k + win_dp + 1] = dst[k + win_dp + 2] = dst[k + win_dp + 3] =
-                            dst[k + win_dp + 4] = dst[k + win_dp + 5] = dst[k + win_dp + 6] = dst[k + win_dp + 7] =
-                            dst[k + win_dp2] = dst[k + win_dp2 + 1] = dst[k + win_dp2 + 2] = dst[k + win_dp2 + 3] =
-                            dst[k + win_dp2 + 4] = dst[k + win_dp2 + 5] = dst[k + win_dp2 + 6] = dst[k + win_dp2 + 7] =
-                            dst[k + win_dp3] = dst[k + win_dp3 + 1] = dst[k + win_dp3 + 2] = dst[k + win_dp3 + 3] =
-                            dst[k + win_dp3 + 4] = dst[k + win_dp3 + 5] = dst[k + win_dp3 + 6] = dst[k + win_dp3 + 7] =
-                            dst[k + win_dp4] = dst[k + win_dp4 + 1] = dst[k + win_dp4 + 2] = dst[k + win_dp4 + 3] =
-                            dst[k + win_dp4 + 4] = dst[k + win_dp4 + 5] = dst[k + win_dp4 + 6] = dst[k + win_dp4 + 7] =
-                            dst[k + win_dp5] = dst[k + win_dp5 + 1] = dst[k + win_dp5 + 2] = dst[k + win_dp5 + 3] =
-                            dst[k + win_dp5 + 4] = dst[k + win_dp5 + 5] = dst[k + win_dp5 + 6] = dst[k + win_dp5 + 7] =
-                            dst[k + win_dp6] = dst[k + win_dp6 + 1] = dst[k + win_dp6 + 2] = dst[k + win_dp6 + 3] =
-                            dst[k + win_dp6 + 4] = dst[k + win_dp6 + 5] = dst[k + win_dp6 + 6] = dst[k + win_dp6 + 7] =
-                            dst[k + win_dp7] = dst[k + win_dp7 + 1] = dst[k + win_dp7 + 2] = dst[k + win_dp7 + 3] =
-                            dst[k + win_dp7 + 4] = dst[k + win_dp7 + 5] = dst[k + win_dp7 + 6] = dst[k + win_dp7 + 7] =
-                                ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
-                break;
-                default:
-                    for(j = 0; j < meg4.screen.h; j++, src += 640)
-                        for(m = 0; m < p; m++, dst += win_dp)
-                            for(i = k = 0; i < meg4.screen.w; i++)
-                                for(l = 0; l < p; l++, k++)
-                                    dst[k] = ((src[i] & 0xff) << 16) | (src[i] & 0xff00) | ((src[i] >> 16) & 0xff);
-                break;
-            }
-        }
+        if(win_f) main_arb_scaler();
+        else main_fix_scaler();
+        /* delay to run loop at 60 FPS */
         clock_gettime(CLOCK_MONOTONIC, &ts);
         tickdiff = ((1000000000/60) - (((uint64_t) ts.tv_sec * 1000000000 + (uint64_t) ts.tv_nsec) - ticks)) / 1000000;
         if(tickdiff > 0 && tickdiff < 1000) main_delay(tickdiff);
