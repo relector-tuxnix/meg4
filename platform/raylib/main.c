@@ -88,8 +88,7 @@ void main_fullscreen(void)
  */
 void main_focus(void)
 {
-    /* how to do this with raylib? */
-    /* SetWindowFocused(); */
+    SetWindowFocused();
 }
 
 /**
