@@ -833,7 +833,11 @@ int main_cfgsave(char *cfg, uint8_t *buf, int len)
 #ifdef USE_INIT
         "/mnt/MEG-4";
 #else
+#ifdef __ANDROID__
+        SDL_AndroidGetExternalStoragePath();
+#else
         getenv("HOME");
+#endif
 #endif
     int ret = 0, i;
     if(tmp) {
@@ -857,7 +861,11 @@ uint8_t *main_cfgload(char *cfg, int *len)
 #ifdef USE_INIT
         "/mnt/MEG-4";
 #else
+#ifdef __ANDROID__
+        SDL_AndroidGetExternalStoragePath();
+#else
         getenv("HOME");
+#endif
 #endif
     if(tmp) {
         strcpy(file, tmp);
@@ -922,6 +930,15 @@ void main_parsecommandline(int argc, char **argv, char **lng, char **infile)
 {
     int i, j;
 
+#ifdef __ANDROID__
+    char *tmp = SDL_AndroidGetExternalStoragePath();
+    main_floppydir = (char*)malloc(strlen(tmp) + 32);
+    if(main_floppydir) {
+        strcpy(main_floppydir, tmp);
+        strcat(main_floppydir, "/../../../../Download/MEG-4");
+        mkdir(main_floppydir, 0777);
+    }
+#endif
     *infile = NULL;
     for(i = 1; i < argc && argv && argv[i]; i++) {
         if(!memcmp(argv[i], "--help", 6) || !strcmp(argv[i], CLIFLAG "h") || !strcmp(argv[i], CLIFLAG "?")) goto usage;
