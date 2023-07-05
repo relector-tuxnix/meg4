@@ -82,6 +82,12 @@ correctly returned, or might be not; it also might segfault and crash MEG-4... T
 I surely could, but it's not my job to fix Lua. Address your complaints to Pontifical Catholic University of Rio de Janeiro. On
 the other hand contributions for Lua workarounds are always welcome.
 
+Contributors
+------------
+
+I would like to say thanks to [Mátyás Jani](https://gitlab.com/jzombi) for thorugh testing and making suggestions on useful
+features.
+
 To Do
 -----
 

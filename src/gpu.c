@@ -908,7 +908,7 @@ void meg4_spr(uint32_t *dst, int dp, int x, int y, int sprite, int scale, int ty
     int x0 = le16toh(meg4.mmio.cropx0), y0 = le16toh(meg4.mmio.cropy0), x1 = le16toh(meg4.mmio.cropx1), y1 = le16toh(meg4.mmio.cropy1);
     uint8_t *s, *d, *a, *b;
 
-    if(x >= x1 || y >= y1 || sprite > 1023 || scale < -3 || scale > 4 || type < 0 || type > 5) return;
+    if(x >= x1 || y >= y1 || sprite > 1023 || scale < -3 || scale > 4 || type < 0 || type > 7) return;
     if(!scale) scale = 1;
     w = siz[scale + 3];
     if(x + w < x0 || y + w < y0) return;
@@ -925,11 +925,13 @@ void meg4_spr(uint32_t *dst, int dp, int x, int y, int sprite, int scale, int ty
                 for(a = d, i = 0; i < w; i++, a += 4)
                     if(x + i >= x0 && x + i < y1) {
                         switch(type) {
-                            case 1: b = s + ((w - j - 1) << p) + (i << 2); break;
-                            case 2: b = s + (j << p) + ((w - i - 1) << 2); break;
-                            case 3: b = s + ((w - i - 1) << p) + (j << 2); break;
-                            case 4: b = s + ((w - j - 1) << p) + ((w - i - 1) << 2); break;
-                            case 5: b = s + (i << p) + ((w - j - 1) << 2); break;
+                            case 1: b = s + ((w - i - 1) << p) + (j << 2); break;
+                            case 2: b = s + ((w - j - 1) << p) + ((w - i - 1) << 2); break;
+                            case 3: b = s + (i << p) + ((w - j - 1) << 2); break;
+                            case 4: b = s + ((w - j - 1) << p) + (i << 2); break;
+                            case 5: b = s + ((w - i - 1) << p) + ((w - j - 1) << 2); break;
+                            case 6: b = s + (j << p) + ((w - i - 1) << 2); break;
+                            case 7: b = s + ((w - j - 1) << p) + ((w - i - 1) << 2); break;
                             default: b = s + (j << p) + (i << 2); break;
                         }
                         if(b[3]) {
@@ -945,11 +947,13 @@ void meg4_spr(uint32_t *dst, int dp, int x, int y, int sprite, int scale, int ty
                 for(a = d, i = 0, m = x; i < 8; i++, m += scale, a += k)
                     if(m >= x0 && m < y1) {
                         switch(type) {
-                            case 1: b = s + ((7 - j) << 8) + (i); break;
-                            case 2: b = s + (j << 8) + (7 - i); break;
-                            case 3: b = s + ((7 - i) << 8) + (j); break;
-                            case 4: b = s + ((7 - j) << 8) + (7 - i); break;
-                            case 5: b = s + (i << 8) + (7 - j); break;
+                            case 1: b = s + ((7 - i) << 8) + (j); break;
+                            case 2: b = s + ((7 - j) << 8) + (7 - i); break;
+                            case 3: b = s + (i << 8) + (7 - j); break;
+                            case 4: b = s + ((7 - j) << 8) + (i); break;
+                            case 5: b = s + ((7 - i) << 8) + (7 - j); break;
+                            case 6: b = s + (j << 8) + (7 - i); break;
+                            case 7: b = s + ((7 - j) << 8) + (7 - i); break;
                             default: b = s + (j << 8) + (i); break;
                         }
                         if(b[0]) {
@@ -2273,23 +2277,25 @@ void meg4_api_back(uint16_t cnt)
  * @param sw number of horizontal sprites
  * @param sh number of vertical sprites
  * @param scale scale, -3 to 4
- * @param type transformation, 0=normal, 1=flip vertically, 2=flip horizontally, 3=rotate 90, 4=rotate 180, 5=rotate 270
+ * @param type transform, 0=normal, 1=rotate 90, 2=rotate 180, 3=rotate 270, 4=flip vertically, 5=flip+90, 6=flip horizontally, 7=flip+270
  * @see [dlg], [stext]
  */
 void meg4_api_spr(int16_t x, int16_t y, uint16_t sprite, uint8_t sw, uint8_t sh, int8_t scale, uint8_t type)
 {
     int i, j, k, m, l, s, siz[] = { 1, 2, 4, 0, 8, 16, 24, 32 }, X, Y;
-    if(sprite > 1023 || sw < 1 || sh < 1 || scale < -3 || scale > 4 || type > 5) return;
+    if(sprite > 1023 || sw < 1 || sh < 1 || scale < -3 || scale > 4 || type > 7) return;
     s = siz[(!scale ? 1 : scale) + 3];
     m = 32 - (sprite & 31); if(sw < m) m = sw;
     for(j = 0, k = sprite, Y = y; j < sh && k < 1024; j++, k += 32, Y += s)
         for(i = 0, l = k, X = x; i < m; i++, l++, X += s)
             switch(type) {
-                case 1: meg4_spr(meg4.vram, 2560, X, y + (sh - j - 1) * s, l, scale, type); break;
-                case 2: meg4_spr(meg4.vram, 2560, x + (sw - i - 1) * s, Y, l, scale, type); break;
-                case 3: meg4_spr(meg4.vram, 2560, x + (sh - j - 1) * s, y + i * s, l, scale, type); break;
-                case 4: meg4_spr(meg4.vram, 2560, x + (sw - i - 1) * s, y + (sh - j - 1) * s, l, scale, type); break;
-                case 5: meg4_spr(meg4.vram, 2560, x + j * s, y + (sw - i - 1) * s, l, scale, type); break;
+                case 1: meg4_spr(meg4.vram, 2560, x + (sh - j - 1) * s, y + i * s, l, scale, type); break;
+                case 2: meg4_spr(meg4.vram, 2560, x + (sw - i - 1) * s, y + (sh - j - 1) * s, l, scale, type); break;
+                case 3: meg4_spr(meg4.vram, 2560, x + j * s, y + (sw - i - 1) * s, l, scale, type); break;
+                case 4: meg4_spr(meg4.vram, 2560, X, y + (sh - j - 1) * s, l, scale, type); break;
+                case 5: meg4_spr(meg4.vram, 2560, x + (sh - j - 1) * s, y + (sh - i - 1) * s, l, scale, type); break;
+                case 6: meg4_spr(meg4.vram, 2560, x + (sw - i - 1) * s, Y, l, scale, type); break;
+                case 7: meg4_spr(meg4.vram, 2560, x + (sh - i - 1) * s, y + (sh - j - 1) * s, l, scale, type); break;
                 default: meg4_spr(meg4.vram, 2560, X, Y, l, scale, type); break;
             }
 }

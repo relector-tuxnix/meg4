@@ -1153,7 +1153,7 @@ Megjelenít egy, vagy akár több, egymásmelletti szprájtot.
 | sw | vízszintes szprájtok száma |
 | sh | függőleges szprájtok száma |
 | scale | nagyítás, -3-tól 4-ig |
-| type | típus, 0=normális, 1=tükrözés függőlegesen, 2=tükrözés vízszintesen, 3=forgatás 90, 4=forgatás 180, 5=forgatás 270 |
+| type | típus, 0=normális, 1=forg. 90, 2=forg. 180, 3=forg. 270, 4=függőleges tükrözés, 6=tükr.+90, 5=vízszintes tükr., 7=tükr.+270 |
 </dd>
 <dt>Lásd még</dt><dd>
 [dlg], [stext]

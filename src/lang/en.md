@@ -1155,7 +1155,7 @@ Displays a sprite, or multiple adjacent sprites.
 | sw | number of horizontal sprites |
 | sh | number of vertical sprites |
 | scale | scale, -3 to 4 |
-| type | transformation, 0=normal, 1=flip vertically, 2=flip horizontally, 3=rotate 90, 4=rotate 180, 5=rotate 270 |
+| type | transform, 0=normal, 1=rotate 90, 2=rotate 180, 3=rotate 270, 4=flip vertically, 5=flip+90, 6=flip horizontally, 7=flip+270 |
 </dd>
 <dt>See Also</dt><dd>
 [dlg], [stext]
