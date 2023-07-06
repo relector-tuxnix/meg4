@@ -584,12 +584,13 @@ int main(int argc, char **argv)
 #else
     (void)ptr; (void)infile;
 #endif
-    win_w = main_w = vidmode->width;
-    win_h = main_h = vidmode->height;
+    main_w = vidmode->width;
+    main_h = vidmode->height;
 #if DEBUG
     main_win(640, 400, 0);
 #else
-    main_win(640/*main_w*/, 400/*main_h*/, 0/*1*/);
+    for(win_w = win_h = 0; win_w + 320 < main_w && win_h + 200 < main_h; win_w += 320, win_h += 200);
+    main_win(win_w/*main_w*/, win_h/*main_h*/, 0/*1*/);
     main_fullscreen();
 #endif
     if(!window) {
@@ -699,8 +700,7 @@ serr:   if(vshdr) glDeleteShader(vshdr);
 #endif
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, screen);
-        j = ww / 320;
-        i = nearest || (!(ww % 320) && (j == 1 || j == 2 || j == 4 || j == 8) && !(wh % 200)) ? GL_NEAREST : GL_LINEAR;
+        i = nearest || (!(ww % 320) && !(wh % 200)) ? GL_NEAREST : GL_LINEAR;
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, i);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, i);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 640, 400, 0, GL_RGBA, GL_UNSIGNED_BYTE, scrbuf);

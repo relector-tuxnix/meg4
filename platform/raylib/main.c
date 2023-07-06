@@ -59,18 +59,19 @@ void main_win(int w, int h, int f)
 {
     Image icon;
 
-    if(!f) { win_w = w; win_h = h; }
     win_f = f;
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
-    InitWindow(f ? main_w : w, f ? main_h : h, "MEG-4");
+    InitWindow(w, h, "MEG-4");
     SetExitKey(KEY_NULL);
-    SetWindowMinSize(320, 200);
     if(meg4_icons.buf) {
         icon.width = meg4_icons.w; icon.height = 64; icon.data = meg4_icons.buf; icon.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
         SetWindowIcon(icon);
     }
+    /* unfortuantely this only works *after* an InitWindow call was already made */
     main_w = GetMonitorWidth(GetCurrentMonitor());
     main_h = GetMonitorHeight(GetCurrentMonitor());
+    for(win_w = win_h = 0; win_w + 320 < main_w && win_h + 200 < main_h; win_w += 320, win_h += 200);
+    SetWindowMinSize(win_w, win_h);
 }
 
 /**

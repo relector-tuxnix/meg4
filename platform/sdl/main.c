@@ -180,14 +180,10 @@ void main_win(int w, int h, int f)
  */
 void main_fullscreen(void)
 {
-#if SDL_VERSION_ATLEAST(2,0,12)
-    int i, j;
-#endif
     win_f ^= 1;
     SDL_SetWindowFullscreen(window, win_f ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 #if SDL_VERSION_ATLEAST(2,0,12)
-    j = (win_f ? main_w : win_w); i = j / 320;
-    SDL_SetTextureScaleMode(screen, nearest || (!(j % 320) && (i == 1 || i == 2 || i == 4 || i == 8) && !((win_f ? main_h : win_h) % 200)) ?
+    SDL_SetTextureScaleMode(screen, nearest || (!((win_f ? main_w : win_w) % 320) && !((win_f ? main_h : win_h) % 200)) ?
 #if SDL_VERSION_ATLEAST(3,0,0)
         SDL_SCALEMODE_NEAREST : SDL_SCALEMODE_LINEAR
 #else
@@ -286,8 +282,7 @@ void main_loop(void) {
                         win_w = event.window.data1; win_h = event.window.data2;
                         i = win_w / 320;
 #if SDL_VERSION_ATLEAST(2,0,12)
-                        SDL_SetTextureScaleMode(screen, nearest || (!(win_w % 320) && (i == 1 || i == 2 || i == 4 || i == 8) &&
-                            !(win_h % 200)) ?
+                        SDL_SetTextureScaleMode(screen, nearest || (!(win_w % 320) && !(win_h % 200)) ?
 #if SDL_VERSION_ATLEAST(3,0,0)
                                 SDL_SCALEMODE_NEAREST : SDL_SCALEMODE_LINEAR
 #else
@@ -769,16 +764,17 @@ int main(int argc, char **argv)
 #else
 #if SDL_VERSION_ATLEAST(3,0,0)
     dm = SDL_GetDesktopDisplayMode(SDL_GetPrimaryDisplay());
-    win_w = main_w = dm->w; win_h = main_h = dm->h;
+    main_w = dm->w; main_h = dm->h;
 #else
     SDL_GetDesktopDisplayMode(0, &dm);
     /*dm.w = 640; dm.h = 400;*/
-    win_w = main_w = dm.w; win_h = main_h = dm.h;
+    main_w = dm.w; main_h = dm.h;
 #endif
 #if DEBUG
     main_win(640, 400, 0);
 #else
-    main_win(640/*main_w*/, 400/*main_h*/, 0/*1*/);
+    for(win_w = win_h = 0; win_w + 320 < main_w && win_h + 200 < main_h; win_w += 320, win_h += 200);
+    main_win(win_w/*main_w*/, win_h/*main_h*/, 0/*1*/);
     main_fullscreen();
 #endif
 #endif
