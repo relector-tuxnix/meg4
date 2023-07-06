@@ -563,6 +563,79 @@ Plays a music track.
 | volume | volume to be used, 0 to 255, 0 turns off music |
 </dd>
 
+# GPIO
+
+## gpio_rev
+
+```c
+uint32_t gpio_rev(void)
+```
+<dt>Description</dt><dd>
+Query the GPIO board's revision number. Returns 0 if GPIO isn't supported on the platform.
+</dd>
+<dt>Return Value</dt><dd>
+Board's revision number.
+</dd>
+<hr>
+## gpio_conf
+
+```c
+int gpio_conf(uint8_t pin, uint8_t dir)
+```
+<dt>Description</dt><dd>
+Configure the direction of a pin.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| pin | pin number |
+| dir | 0=output, 1=input |
+</dd>
+<dt>Return Value</dt><dd>
+Returns 1 on success, 0 on error (GPIO pin not supported on platform).
+</dd>
+<dt>See Also</dt><dd>
+[gpio_get], [gpio_set]
+</dd>
+<hr>
+## gpio_get
+
+```c
+int gpio_get(uint8_t pin)
+```
+<dt>Description</dt><dd>
+Read the value of a GPIO input pin.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| pin | pin number |
+</dd>
+<dt>Return Value</dt><dd>
+Returns 1 if the pin is high, 0 if it's low.
+</dd>
+<dt>See Also</dt><dd>
+[gpio_conf], [gpio_set]
+</dd>
+<hr>
+## gpio_set
+
+```c
+int gpio_set(uint8_t pin, int value)
+```
+<dt>Description</dt><dd>
+Write the value of a GPIO output pin.
+</dd>
+<dt>Parameters</dt><dd>
+| Argument | Description |
+| pin | pin number |
+| value | 1 to set the pin high, 0 for low. |
+</dd>
+<dt>Return Value</dt><dd>
+Returns 1 on success, 0 on error (GPIO pin not supported on platform).
+</dd>
+<dt>See Also</dt><dd>
+[gpio_conf], [gpio_get]
+</dd>
+
 # Graphics
 
 ## cls

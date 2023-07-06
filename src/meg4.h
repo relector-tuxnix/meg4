@@ -588,6 +588,12 @@ void meg4_api_music(uint8_t track, uint16_t row, uint8_t volume);
 void meg4_playnote(uint8_t *note, uint8_t volume);
 #endif
 
+/* gpio.c - general purpose input / output pins (specific platforms only) */
+uint32_t meg4_api_gpio_rev(void);
+int meg4_api_gpio_conf(uint8_t pin, uint8_t dir);
+int meg4_api_gpio_get(uint8_t pin);
+int meg4_api_gpio_set(uint8_t pin, int value);
+
 /* gpu.c - graphics and screen output */
 void meg4_getscreen(void);
 void meg4_getview(void);

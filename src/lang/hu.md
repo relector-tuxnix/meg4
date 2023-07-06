@@ -561,6 +561,79 @@ Lejátszik egy zenesávot.
 | volume | hangerő, 0-tól 255-ig, 0 kikapcsolja a zenét |
 </dd>
 
+# GPIO
+
+## gpio_rev
+
+```c
+uint32_t gpio_rev(void)
+```
+<dt>Leírás</dt><dd>
+Lekérdezi a GPIO board revíziós számát. 0-át ad vissza, ha a GPIO nem támogatott a platformon.
+</dd>
+<dt>Visszatérési érték</dt><dd>
+Board revíziós szám.
+</dd>
+<hr>
+## gpio_conf
+
+```c
+int gpio_conf(uint8_t pin, uint8_t dir)
+```
+<dt>Leírás</dt><dd>
+A tüske irányának bekonfigurálása.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| pin | tüske száma |
+| dir | 0=kimenet, 1=bemenet |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+1-el tér vissza, ha sikeres volt, 0-ával hiba esetén (a GPIO tüske nincs támogatva a platformon).
+</dd>
+<dt>Lásd még</dt><dd>
+[gpio_get], [gpio_set]
+</dd>
+<hr>
+## gpio_get
+
+```c
+int gpio_get(uint8_t pin)
+```
+<dt>Leírás</dt><dd>
+Kiolvassa egy bementre programozott GPIO tüske értékét.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| pin | tüske száma |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+1-el tér vissza, ha a tüske magas, 0-ával ha alacsony.
+</dd>
+<dt>Lásd még</dt><dd>
+[gpio_conf], [gpio_set]
+</dd>
+<hr>
+## gpio_set
+
+```c
+int gpio_set(uint8_t pin, int value)
+```
+<dt>Leírás</dt><dd>
+Beállítja egy kimenetre programozott GPIO tüske értékét.
+</dd>
+<dt>Paraméterek</dt><dd>
+| Paraméter | Leírás |
+| pin | tüske száma |
+| value | 1 magasra kapcsolja a tüskét, 0 alacsonyra. |
+</dd>
+<dt>Visszatérési érték</dt><dd>
+1-el tér vissza, ha sikeres volt, 0-ával hiba esetén (a GPIO tüske nincs támogatva a platformon).
+</dd>
+<dt>Lásd még</dt><dd>
+[gpio_conf], [gpio_get]
+</dd>
+
 # Grafika
 
 ## cls
