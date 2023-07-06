@@ -23,147 +23,133 @@
  */
 
 #include "meg4.h"
+
+#ifdef __linux__
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
+#include <linux/gpio.h>
 
-#define GPIO_PREFIX "/sys/class/gpio"
+#define GPIO_DEV "/dev/gpiochip0"
 
-/* Pin layouts. More might be added in the future */
-static int gpio_layout_old[] = { 0, 0, 3, 5, 7, 0, 0, 26, 24, 21, 19, 23, 0, 0, 0, 0, 0, 11, 12, 0, 0, 0, 15, 16, 18, 22, 0, 13 };
-static int gpio_layout_j8[] =  { 0, 0, 3, 5, 7, 29, 31, 26, 24, 21, 19, 23, 32, 33, 8, 10, 36, 11, 12, 35, 38, 40, 15, 16, 18, 22, 37, 13 };
-
-/* the current layout (NULL = GPIO not initialized) and board's revision */
-static int *gpio_layout = NULL;
-static uint32_t gpio_rev = 0;
-
-/**
- * Initialize the GPIO
- */
-static int meg4_gpio_init(void)
-{
-    char tmp[4096], *ptr;
-    int i, f;
-
-    if(gpio_layout) return 1;
-    /* get board's revision number */
-    gpio_rev = 0;
-    f = open("/proc/cpuinfo", O_RDONLY);
-    if(f < 0) return 0;
-    memset(tmp, 0, sizeof(tmp));
-    if(read(f, tmp, sizeof(tmp) - 1) < 1 || !strstr(tmp, "Raspberry Pi") || !(ptr = strstr(tmp, "\nRevision"))) { close(f); return 0; }
-    close(f);
-    for(; *ptr && *ptr != ':'; ptr++);
-    if(*ptr != ':') return 0;
-    for(ptr++; *ptr == ' '; ptr++);
-    for(; *ptr && *ptr != '\n'; ptr++) {
-        if(*ptr >= '0' && *ptr <= '9') {      gpio_rev <<= 4; gpio_rev += (uint32_t)(*ptr-'0'); }
-        else if(*ptr >= 'a' && *ptr <= 'f') { gpio_rev <<= 4; gpio_rev += (uint32_t)(*ptr-'a'+10); }
-        else if(*ptr >= 'A' && *ptr <= 'F') { gpio_rev <<= 4; gpio_rev += (uint32_t)(*ptr-'A'+10); }
-        else break;
-    }
-    if(!gpio_rev) return 0;
-    /* determine pin layout */
-    gpio_layout = (gpio_rev < 16 ? gpio_layout_old : gpio_layout_j8);
-    /* export pins and reset them to output mode */
-    strcpy(tmp, GPIO_PREFIX); ptr = tmp + strlen(tmp);
-    for(i = 0; i < (int)(sizeof(gpio_layout_j8)/sizeof(gpio_layout_j8[0])); i++)
-        if(gpio_layout[i]) {
-            f = open(GPIO_PREFIX "/export", O_WRONLY);
-            if(f >= 0) {
-                if(gpio_layout[i] < 10) { ptr[0] = gpio_layout[i] + '0'; ptr[1] = 0; write(f, ptr, 1); }
-                else { ptr[0] = (gpio_layout[i] / 10) + '0'; ptr[1] = (gpio_layout[i] % 10) + '0'; ptr[2] = 0; write(f, ptr, 2); }
-                close(f);
-                strcat(ptr, "/direction");
-                f = open(ptr, O_WRONLY);
-                if(f >= 0) { write(f, "out", 3); close(f); }
-            } else { gpio_layout = NULL; return 0; }
-        }
-    return 1;
-}
+/* physical GPIO pin to GPIO offset assignment RPi3B+ */
+static int gpio_layout[] = { -1,
+    /* 3.3v */ -1, -1, /* 5v */
+                2, -1, /* 5v */
+                3, -1, /* gnd */
+                4, 14,
+     /* gnd */ -1, 15,
+               17, 18,
+               27, -1, /* gnd */
+               22, 23,
+    /* 3.3v */ -1, 24,
+               10, -1, /* gnd */
+                9, 25,
+               11, 8,
+     /* gnd */ -1, 7,
+                0, 1,
+                5, -1, /* gnd */
+                6, 12,
+               13, -1, /* gnd */
+               19, 16,
+               26, 20,
+     /* gnd */ -1, 21 };
+#endif
 
 /**
- * Query the GPIO board's revision number. Returns 0 if GPIO isn't supported on the platform.
- * @return Board's revision number.
+ * Query the GPIO board's revision number. Returns 0 if the platform isn't GPIO capable.
+ * @return Board's revision number or 0 if not supported.
  */
 uint32_t meg4_api_gpio_rev(void)
 {
-    if(!gpio_layout) meg4_gpio_init();
-    return gpio_rev;
-}
-
-/**
- * Configure the direction of a pin.
- * @param pin pin number
- * @param dir 0=output, 1=input
- * @return Returns 1 on success, 0 on error (GPIO pin not supported on platform).
- * @see [gpio_get], [gpio_set]
- */
-int meg4_api_gpio_conf(uint8_t pin, uint8_t dir)
-{
-    char tmp[128], *ptr;
+    uint32_t rev = 0;
+#ifdef __linux__
+    char tmp[4096], *ptr;
     int f;
 
-    if(pin > sizeof(gpio_layout_j8)/sizeof(gpio_layout_j8[0]) || (!gpio_layout && !meg4_gpio_init())) return 0;
-    if(!gpio_layout || !gpio_layout[(int)pin]) return 0;
-    strcpy(tmp, GPIO_PREFIX); ptr = tmp + strlen(tmp);
-    if(gpio_layout[(int)pin] < 10) { ptr[0] = gpio_layout[(int)pin] + '0'; ptr[1] = 0; }
-    else { ptr[0] = (gpio_layout[(int)pin] / 10) + '0'; ptr[1] = (gpio_layout[(int)pin] % 10) + '0'; ptr[2] = 0; }
-    strcat(ptr, "/direction");
-    f = open(ptr, O_WRONLY);
-    if(f >= 0) { write(f, dir ? "in" : "out", dir ? 2 : 3); close(f); return 1; }
-    return 0;
+    /* get board's revision number */
+    rev = 0;
+    f = open("/proc/cpuinfo", O_RDONLY);
+    if(f >= 0) {
+        memset(tmp, 0, sizeof(tmp));
+        if(read(f, tmp, sizeof(tmp) - 1) < 1 || !strstr(tmp, "Raspberry Pi") || !(ptr = strstr(tmp, "\nRevision"))) { close(f); return 0; }
+        close(f);
+        for(; *ptr && *ptr != ':'; ptr++);
+        if(*ptr != ':') return 0;
+        for(ptr++; *ptr == ' '; ptr++);
+        for(; *ptr && *ptr != '\n'; ptr++) {
+            if(*ptr >= '0' && *ptr <= '9') {      rev <<= 4; rev += (uint32_t)(*ptr-'0'); }
+            else if(*ptr >= 'a' && *ptr <= 'f') { rev <<= 4; rev += (uint32_t)(*ptr-'a'+10); }
+            else if(*ptr >= 'A' && *ptr <= 'F') { rev <<= 4; rev += (uint32_t)(*ptr-'A'+10); }
+            else break;
+        }
+    }
+#endif
+    return rev;
 }
 
 /**
- * Read the value of a GPIO input pin.
- * @param pin pin number
- * @return Returns 1 if the pin is high, 0 if it's low.
- * @see [gpio_conf], [gpio_set]
+ * Read the value of a GPIO pin.
+ * @param pin physical pin number, 1 to 40
+ * @return Returns 1 if the pin is high, 0 if it's low, -1 on error (GPIO pin not supported).
+ * @see [gpio_set]
  */
 int meg4_api_gpio_get(uint8_t pin)
 {
-    char tmp[128], *ptr;
-    int f, ret = 0;
+#ifdef __linux__
+    struct gpiohandle_request rq;
+    struct gpiohandle_data data;
+    int fd, ret;
 
-    if(pin > sizeof(gpio_layout_j8)/sizeof(gpio_layout_j8[0]) || (!gpio_layout && !meg4_gpio_init())) return 0;
-    if(!gpio_rev || !gpio_layout || !gpio_layout[(int)pin]) return 0;
-    strcpy(tmp, GPIO_PREFIX); ptr = tmp + strlen(tmp);
-    if(gpio_layout[(int)pin] < 10) { ptr[0] = gpio_layout[(int)pin] + '0'; ptr[1] = 0; }
-    else { ptr[0] = (gpio_layout[(int)pin] / 10) + '0'; ptr[1] = (gpio_layout[(int)pin] % 10) + '0'; ptr[2] = 0; }
-    strcat(ptr, "/value");
-    f = open(ptr, O_RDONLY);
-    if(f >= 0) {
-        if(read(f, tmp, 1) == 1 && tmp[0] != '0') ret = 1;
-        close(f);
-        return ret;
+    if(pin < 1 || pin > 40 || gpio_layout[(int)pin] == -1 || (fd = open(GPIO_DEV, O_RDWR)) < 0) return -1;
+    memset(&rq, 0, sizeof(rq));
+    memset(&data, 0, sizeof(data));
+    rq.lineoffsets[0] = gpio_layout[(int)pin];
+    rq.lines = 1;
+    rq.flags = GPIOHANDLE_REQUEST_INPUT;
+    ret = ioctl(fd, GPIO_GET_LINEHANDLE_IOCTL, &rq);
+    close(fd);
+    if(!ret && rq.fd >= 0) {
+        ret = ioctl(rq.fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL, &data);
+        close(rq.fd);
+        return !ret ? data.values[0] : -1;
     }
-    return 0;
+#else
+    (void)pin;
+#endif
+    return -1;
 }
 
 /**
- * Write the value of a GPIO output pin.
- * @param pin pin number
+ * Write the value to a GPIO pin.
+ * @param pin physical pin number, 1 to 40
  * @param value 1 to set the pin high, 0 for low.
- * @return Returns 1 on success, 0 on error (GPIO pin not supported on platform).
- * @see [gpio_conf], [gpio_get]
+ * @return Returns 1 on success, 0 on error (GPIO pin not supported).
+ * @see [gpio_get]
  */
 int meg4_api_gpio_set(uint8_t pin, int value)
 {
-    char tmp[128], *ptr;
-    int f, ret = 0;
+#ifdef __linux__
+    struct gpiohandle_request rq;
+    struct gpiohandle_data data;
+    int fd, ret;
 
-    if(pin > sizeof(gpio_layout_j8)/sizeof(gpio_layout_j8[0]) || (!gpio_layout && !meg4_gpio_init())) return 0;
-    if(!gpio_rev || !gpio_layout || !gpio_layout[(int)pin]) return 0;
-    strcpy(tmp, GPIO_PREFIX); ptr = tmp + strlen(tmp);
-    if(gpio_layout[(int)pin] < 10) { ptr[0] = gpio_layout[(int)pin] + '0'; ptr[1] = 0; }
-    else { ptr[0] = (gpio_layout[(int)pin] / 10) + '0'; ptr[1] = (gpio_layout[(int)pin] % 10) + '0'; ptr[2] = 0; }
-    strcat(ptr, "/value");
-    f = open(ptr, O_WRONLY);
-    if(f >= 0) {
-        tmp[0] = value ? '1' : '0';
-        if(write(f, tmp, 1) == 1) ret = 1;
-        close(f);
-        return ret;
+    if(pin < 1 || pin > 40 || gpio_layout[(int)pin] == -1 || (fd = open(GPIO_DEV, O_RDWR)) < 0) return 0;
+    memset(&rq, 0, sizeof(rq));
+    memset(&data, 0, sizeof(data));
+    rq.lineoffsets[0] = gpio_layout[(int)pin];
+    rq.lines = 1;
+    rq.flags = GPIOHANDLE_REQUEST_OUTPUT;
+    ret = ioctl(fd, GPIO_GET_LINEHANDLE_IOCTL, &rq);
+    close(fd);
+    if(!ret && rq.fd >= 0) {
+        data.values[0] = !!value;
+        ret = ioctl(rq.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
+        close(rq.fd);
+        return !ret;
     }
+#else
+    (void)pin; (void)value;
+#endif
     return 0;
 }

@@ -177,7 +177,6 @@
         </ul></li>
         <li rel="gpio"><label class="toc" for="_gpio">GPIO</label><div class="current">GPIO</div><ul>
           <li class="h2"><a href="#gpio_rev" onclick="m()">gpio_rev</a></li>
-          <li class="h2"><a href="#gpio_conf" onclick="m()">gpio_conf</a></li>
           <li class="h2"><a href="#gpio_get" onclick="m()">gpio_get</a></li>
           <li class="h2"><a href="#gpio_set" onclick="m()">gpio_set</a></li>
         </ul></li>
@@ -2268,47 +2267,34 @@ Lejátszik egy zenesávot.</dd>
 <h2 id="gpio_rev">gpio_rev<a href="#gpio_rev"></a></h2>
 <div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">uint32_t</span> <span class="hl_f">gpio_rev</span>(<span class="hl_t">void</span>)</code></div>
 <dt>Leírás</dt><dd>
-Lekérdezi a GPIO board revíziós számát. 0-át ad vissza, ha a GPIO nem támogatott a platformon.</dd>
+Lekérdezi a GPIO board revíziós számát. 0-át ad vissza, ha a platformon nincs GPIO.</dd>
 <dt>Visszatérési érték</dt><dd>
-Board revíziós szám.</dd>
-<hr>
-<h2 id="gpio_conf">gpio_conf<a href="#gpio_conf"></a></h2>
-<div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">int</span> <span class="hl_f">gpio_conf</span>(<span class="hl_t">uint8_t</span> <span class="hl_v">pin</span>, <span class="hl_t">uint8_t</span> <span class="hl_v">dir</span>)</code></div>
-<dt>Leírás</dt><dd>
-A tüske irányának bekonfigurálása.</dd>
-<dt>Paraméterek</dt><dd>
-<div class="table"><table><tr><th>Paraméter </th><th>Leírás </th></tr>
-<tr><td>pin </td><td>tüske száma </td></tr>
-<tr><td>dir </td><td>0=kimenet, 1=bemenet </td></tr></table></div></dd>
-<dt>Visszatérési érték</dt><dd>
-1-el tér vissza, ha sikeres volt, 0-ával hiba esetén (a GPIO tüske nincs támogatva a platformon).</dd>
-<dt>Lásd még</dt><dd>
-<a href="#gpio_get" onclick="c('gpio_get')">gpio_get</a>, <a href="#gpio_set" onclick="c('gpio_set')">gpio_set</a></dd>
+Board revíziós szám, vagy 0 ha nem támogatott.</dd>
 <hr>
 <h2 id="gpio_get">gpio_get<a href="#gpio_get"></a></h2>
 <div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">int</span> <span class="hl_f">gpio_get</span>(<span class="hl_t">uint8_t</span> <span class="hl_v">pin</span>)</code></div>
 <dt>Leírás</dt><dd>
-Kiolvassa egy bementre programozott GPIO tüske értékét.</dd>
+Kiolvassa egy GPIO tüske értékét.</dd>
 <dt>Paraméterek</dt><dd>
 <div class="table"><table><tr><th>Paraméter </th><th>Leírás </th></tr>
-<tr><td>pin </td><td>tüske száma </td></tr></table></div></dd>
+<tr><td>pin </td><td>fizikai tüske száma, 1-től 40-ig </td></tr></table></div></dd>
 <dt>Visszatérési érték</dt><dd>
-1-el tér vissza, ha a tüske magas, 0-ával ha alacsony.</dd>
+1-el tér vissza, ha a tüske magas, 0-ával ha alacsony, -1 ha hiba történt (a GPIO tüske nem támogatott).</dd>
 <dt>Lásd még</dt><dd>
-<a href="#gpio_conf" onclick="c('gpio_conf')">gpio_conf</a>, <a href="#gpio_set" onclick="c('gpio_set')">gpio_set</a></dd>
+<a href="#gpio_set" onclick="c('gpio_set')">gpio_set</a></dd>
 <hr>
 <h2 id="gpio_set">gpio_set<a href="#gpio_set"></a></h2>
 <div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">int</span> <span class="hl_f">gpio_set</span>(<span class="hl_t">uint8_t</span> <span class="hl_v">pin</span>, <span class="hl_t">int</span> <span class="hl_v">value</span>)</code></div>
 <dt>Leírás</dt><dd>
-Beállítja egy kimenetre programozott GPIO tüske értékét.</dd>
+Beállítja egy GPIO tüske értékét.</dd>
 <dt>Paraméterek</dt><dd>
 <div class="table"><table><tr><th>Paraméter </th><th>Leírás </th></tr>
-<tr><td>pin </td><td>tüske száma </td></tr>
+<tr><td>pin </td><td>fizikai tüske száma, 1-től 40-ig </td></tr>
 <tr><td>value </td><td>1 magasra kapcsolja a tüskét, 0 alacsonyra. </td></tr></table></div></dd>
 <dt>Visszatérési érték</dt><dd>
-1-el tér vissza, ha sikeres volt, 0-ával hiba esetén (a GPIO tüske nincs támogatva a platformon).</dd>
+1-el tér vissza, ha sikeres volt, 0-ával hiba esetén (a GPIO tüske nem támogatott).</dd>
 <dt>Lásd még</dt><dd>
-<a href="#gpio_conf" onclick="c('gpio_conf')">gpio_conf</a>, <a href="#gpio_get" onclick="c('gpio_get')">gpio_get</a></dd><br style="clear:both;"><label class="btn prev" accesskey="p" for="_audio" title="Audió">Előző</label><label class="btn next" accesskey="n" for="_grafika" title="Grafika">Következő</label></div>
+<a href="#gpio_get" onclick="c('gpio_get')">gpio_get</a></dd><br style="clear:both;"><label class="btn prev" accesskey="p" for="_audio" title="Audió">Előző</label><label class="btn next" accesskey="n" for="_grafika" title="Grafika">Következő</label></div>
 <div class="page" rel="grafika"><div><ul class="breadcrumbs"><li><label class="home" for="_" title="Főoldal"></label>&nbsp;»</li><li>&nbsp;Grafika</li></ul><hr></div>
 <h1 id="grafika">Grafika<a href="#grafika"></a></h1>
 <h2 id="cls">cls<a href="#cls"></a></h2>

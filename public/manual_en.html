@@ -177,7 +177,6 @@
         </ul></li>
         <li rel="gpio"><label class="toc" for="_gpio">GPIO</label><div class="current">GPIO</div><ul>
           <li class="h2"><a href="#gpio_rev" onclick="m()">gpio_rev</a></li>
-          <li class="h2"><a href="#gpio_conf" onclick="m()">gpio_conf</a></li>
           <li class="h2"><a href="#gpio_get" onclick="m()">gpio_get</a></li>
           <li class="h2"><a href="#gpio_set" onclick="m()">gpio_set</a></li>
         </ul></li>
@@ -2249,47 +2248,34 @@ Plays a music track.</dd>
 <h2 id="gpio_rev">gpio_rev<a href="#gpio_rev"></a></h2>
 <div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">uint32_t</span> <span class="hl_f">gpio_rev</span>(<span class="hl_t">void</span>)</code></div>
 <dt>Description</dt><dd>
-Query the GPIO board's revision number. Returns 0 if GPIO isn't supported on the platform.</dd>
+Query the GPIO board's revision number. Returns 0 if the platform isn't GPIO capable.</dd>
 <dt>Return Value</dt><dd>
-Board's revision number.</dd>
-<hr>
-<h2 id="gpio_conf">gpio_conf<a href="#gpio_conf"></a></h2>
-<div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">int</span> <span class="hl_f">gpio_conf</span>(<span class="hl_t">uint8_t</span> <span class="hl_v">pin</span>, <span class="hl_t">uint8_t</span> <span class="hl_v">dir</span>)</code></div>
-<dt>Description</dt><dd>
-Configure the direction of a pin.</dd>
-<dt>Parameters</dt><dd>
-<div class="table"><table><tr><th>Argument </th><th>Description </th></tr>
-<tr><td>pin </td><td>pin number </td></tr>
-<tr><td>dir </td><td>0=output, 1=input </td></tr></table></div></dd>
-<dt>Return Value</dt><dd>
-Returns 1 on success, 0 on error (GPIO pin not supported on platform).</dd>
-<dt>See Also</dt><dd>
-<a href="#gpio_get" onclick="c('gpio_get')">gpio_get</a>, <a href="#gpio_set" onclick="c('gpio_set')">gpio_set</a></dd>
+Board's revision number or 0 if not supported.</dd>
 <hr>
 <h2 id="gpio_get">gpio_get<a href="#gpio_get"></a></h2>
 <div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">int</span> <span class="hl_f">gpio_get</span>(<span class="hl_t">uint8_t</span> <span class="hl_v">pin</span>)</code></div>
 <dt>Description</dt><dd>
-Read the value of a GPIO input pin.</dd>
+Read the value of a GPIO pin.</dd>
 <dt>Parameters</dt><dd>
 <div class="table"><table><tr><th>Argument </th><th>Description </th></tr>
-<tr><td>pin </td><td>pin number </td></tr></table></div></dd>
+<tr><td>pin </td><td>physical pin number, 1 to 40 </td></tr></table></div></dd>
 <dt>Return Value</dt><dd>
-Returns 1 if the pin is high, 0 if it's low.</dd>
+Returns 1 if the pin is high, 0 if it's low, -1 on error (GPIO pin not supported).</dd>
 <dt>See Also</dt><dd>
-<a href="#gpio_conf" onclick="c('gpio_conf')">gpio_conf</a>, <a href="#gpio_set" onclick="c('gpio_set')">gpio_set</a></dd>
+<a href="#gpio_set" onclick="c('gpio_set')">gpio_set</a></dd>
 <hr>
 <h2 id="gpio_set">gpio_set<a href="#gpio_set"></a></h2>
 <div class="pre"><pre class="lineno">1<br></pre><code><span class="hl_t">int</span> <span class="hl_f">gpio_set</span>(<span class="hl_t">uint8_t</span> <span class="hl_v">pin</span>, <span class="hl_t">int</span> <span class="hl_v">value</span>)</code></div>
 <dt>Description</dt><dd>
-Write the value of a GPIO output pin.</dd>
+Write the value to a GPIO pin.</dd>
 <dt>Parameters</dt><dd>
 <div class="table"><table><tr><th>Argument </th><th>Description </th></tr>
-<tr><td>pin </td><td>pin number </td></tr>
+<tr><td>pin </td><td>physical pin number, 1 to 40 </td></tr>
 <tr><td>value </td><td>1 to set the pin high, 0 for low. </td></tr></table></div></dd>
 <dt>Return Value</dt><dd>
-Returns 1 on success, 0 on error (GPIO pin not supported on platform).</dd>
+Returns 1 on success, 0 on error (GPIO pin not supported).</dd>
 <dt>See Also</dt><dd>
-<a href="#gpio_conf" onclick="c('gpio_conf')">gpio_conf</a>, <a href="#gpio_get" onclick="c('gpio_get')">gpio_get</a></dd><br style="clear:both;"><label class="btn prev" accesskey="p" for="_audio" title="Audio">Previous</label><label class="btn next" accesskey="n" for="_graphics" title="Graphics">Next</label></div>
+<a href="#gpio_get" onclick="c('gpio_get')">gpio_get</a></dd><br style="clear:both;"><label class="btn prev" accesskey="p" for="_audio" title="Audio">Previous</label><label class="btn next" accesskey="n" for="_graphics" title="Graphics">Next</label></div>
 <div class="page" rel="graphics"><div><ul class="breadcrumbs"><li><label class="home" for="_" title="Home"></label>&nbsp;»</li><li>&nbsp;Graphics</li></ul><hr></div>
 <h1 id="graphics">Graphics<a href="#graphics"></a></h1>
 <h2 id="cls">cls<a href="#cls"></a></h2>

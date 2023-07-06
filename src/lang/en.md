@@ -571,30 +571,10 @@ Plays a music track.
 uint32_t gpio_rev(void)
 ```
 <dt>Description</dt><dd>
-Query the GPIO board's revision number. Returns 0 if GPIO isn't supported on the platform.
+Query the GPIO board's revision number. Returns 0 if the platform isn't GPIO capable.
 </dd>
 <dt>Return Value</dt><dd>
-Board's revision number.
-</dd>
-<hr>
-## gpio_conf
-
-```c
-int gpio_conf(uint8_t pin, uint8_t dir)
-```
-<dt>Description</dt><dd>
-Configure the direction of a pin.
-</dd>
-<dt>Parameters</dt><dd>
-| Argument | Description |
-| pin | pin number |
-| dir | 0=output, 1=input |
-</dd>
-<dt>Return Value</dt><dd>
-Returns 1 on success, 0 on error (GPIO pin not supported on platform).
-</dd>
-<dt>See Also</dt><dd>
-[gpio_get], [gpio_set]
+Board's revision number or 0 if not supported.
 </dd>
 <hr>
 ## gpio_get
@@ -603,17 +583,17 @@ Returns 1 on success, 0 on error (GPIO pin not supported on platform).
 int gpio_get(uint8_t pin)
 ```
 <dt>Description</dt><dd>
-Read the value of a GPIO input pin.
+Read the value of a GPIO pin.
 </dd>
 <dt>Parameters</dt><dd>
 | Argument | Description |
-| pin | pin number |
+| pin | physical pin number, 1 to 40 |
 </dd>
 <dt>Return Value</dt><dd>
-Returns 1 if the pin is high, 0 if it's low.
+Returns 1 if the pin is high, 0 if it's low, -1 on error (GPIO pin not supported).
 </dd>
 <dt>See Also</dt><dd>
-[gpio_conf], [gpio_set]
+[gpio_set]
 </dd>
 <hr>
 ## gpio_set
@@ -622,18 +602,18 @@ Returns 1 if the pin is high, 0 if it's low.
 int gpio_set(uint8_t pin, int value)
 ```
 <dt>Description</dt><dd>
-Write the value of a GPIO output pin.
+Write the value to a GPIO pin.
 </dd>
 <dt>Parameters</dt><dd>
 | Argument | Description |
-| pin | pin number |
+| pin | physical pin number, 1 to 40 |
 | value | 1 to set the pin high, 0 for low. |
 </dd>
 <dt>Return Value</dt><dd>
-Returns 1 on success, 0 on error (GPIO pin not supported on platform).
+Returns 1 on success, 0 on error (GPIO pin not supported).
 </dd>
 <dt>See Also</dt><dd>
-[gpio_conf], [gpio_get]
+[gpio_get]
 </dd>
 
 # Graphics
