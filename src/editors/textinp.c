@@ -169,7 +169,7 @@ void textinp_view(uint32_t *dst, int dp)
 
     if(!textinp_buf || !textinp_cur || !dst || dp < 4) return;
     x0 = meg4.mmio.cropx0; meg4.mmio.cropx0 = htole16(textinp_dx); x1 = meg4.mmio.cropx1; meg4.mmio.cropx1 = htole16(textinp_dx + textinp_dw);
-    y0 = meg4.mmio.cropy0; meg4.mmio.cropy0 = htole16(textinp_dy); y1 = meg4.mmio.cropy1; meg4.mmio.cropy1 = htole16(textinp_dy + textinp_ft * 8);
+    y0 = meg4.mmio.cropy0; meg4.mmio.cropy0 = htole16(textinp_dy); y1 = meg4.mmio.cropy1; meg4.mmio.cropy1 = htole16(textinp_dy + textinp_ft * 8 + 1);
     if(textinp_scr) {
         i = meg4_width(textinp_font, textinp_ft, textinp_buf, textinp_cur);
         if(i > textinp_dw - 4) i -= textinp_dw - 4; else i = 0;
