@@ -124,7 +124,7 @@ int meg4_api_gpio_get(uint8_t pin)
  * Write the value to a GPIO pin.
  * @param pin physical pin number, 1 to 40
  * @param value 1 to set the pin high, 0 for low.
- * @return Returns 1 on success, 0 on error (GPIO pin not supported).
+ * @return Returns 0 on success, -1 on error (GPIO pin not supported).
  * @see [gpio_get]
  */
 int meg4_api_gpio_set(uint8_t pin, int value)
@@ -134,7 +134,7 @@ int meg4_api_gpio_set(uint8_t pin, int value)
     struct gpiohandle_data data;
     int fd, ret;
 
-    if(pin < 1 || pin > 40 || gpio_layout[(int)pin] == -1 || (fd = open(GPIO_DEV, O_RDWR)) < 0) return 0;
+    if(pin < 1 || pin > 40 || gpio_layout[(int)pin] == -1 || (fd = open(GPIO_DEV, O_RDWR)) < 0) return -1;
     memset(&rq, 0, sizeof(rq));
     memset(&data, 0, sizeof(data));
     rq.lineoffsets[0] = gpio_layout[(int)pin];
@@ -146,10 +146,10 @@ int meg4_api_gpio_set(uint8_t pin, int value)
         data.values[0] = !!value;
         ret = ioctl(rq.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
         close(rq.fd);
-        return !ret;
+        return ret;
     }
 #else
     (void)pin; (void)value;
 #endif
-    return 0;
+    return -1;
 }

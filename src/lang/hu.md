@@ -608,7 +608,7 @@ Beállítja egy GPIO tüske értékét.
 | value | 1 magasra kapcsolja a tüskét, 0 alacsonyra. |
 </dd>
 <dt>Visszatérési érték</dt><dd>
-1-el tér vissza, ha sikeres volt, 0-ával hiba esetén (a GPIO tüske nem támogatott).
+0-val tér vissza, ha sikeres volt, -1-el hiba esetén (a GPIO tüske nem támogatott).
 </dd>
 <dt>Lásd még</dt><dd>
 [gpio_get]

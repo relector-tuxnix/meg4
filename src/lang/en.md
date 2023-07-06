@@ -610,7 +610,7 @@ Write the value to a GPIO pin.
 | value | 1 to set the pin high, 0 for low. |
 </dd>
 <dt>Return Value</dt><dd>
-Returns 1 on success, 0 on error (GPIO pin not supported).
+Returns 0 on success, -1 on error (GPIO pin not supported).
 </dd>
 <dt>See Also</dt><dd>
 [gpio_get]
