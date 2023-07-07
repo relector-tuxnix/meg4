@@ -16,13 +16,13 @@ válasszuk a `Tracks` > `Mix` > `Mix Stereo Down to Mono` menüpontot a konvert�
 Hangmagasság és hangerő
 -----------------------
 
-Mivel a MEG-4 magától hangolja a mintákat, ezért az importált mintának egy adott hangmagasságúnak kell lennie. Üsd le a <kbd>Ctrl</kbd>+<kbd>A</kbd>-t
-a teljes hullám kijelöléséhez, majd menj az `Analyze` > `Plot Spectrum...` menüpontra.
+Mivel a MEG-4 magától hangolja a mintákat, ezért az importált mintának egy adott hangmagasságúnak kell lennie. Valamiért a hangmagasságérzékelés bugos az Audacity-ben,
+ezért kézzel kell elvégezni. Üsd le a <kbd>Ctrl</kbd>+<kbd>A</kbd>-t a teljes hullám kijelöléséhez, majd menj az `Analyze` > `Plot Spectrum...` menüpontra.
 
 <imgc ../img/tut_snd2.png><fig>Spektrumanalízis</fig>
 
-Valamiért a csúcsérzékelés az Audacity-ben bugos, ezért kézzel kell elvégezni. Mozgasd az egeredet a legnagyobb csúcs fölé, és az aktuális hangmagasság alul
-meg fog jelenni (a példánkban ez C3). Ha a hangjegy nem C-4, akkor válaszd az `Effect` > `Pitch and Tempo` > `Change Pitch...` menüpontot.
+Mozgasd az egeredet a legnagyobb csúcs fölé, és az aktuális hangmagasság alul meg fog jelenni (a példánkban ez `C3`). Ha a hangjegy nem `C4`, akkor válaszd az `Effect` >
+`Pitch and Tempo` > `Change Pitch...` menüpontot.
 
 <imgc ../img/tut_snd3.png><fig>Hangmagasság állítása</fig>
 
@@ -30,29 +30,38 @@ A "from" mezőbe írd azt a hangjegyet amit a spektrumanalízisnél láttál, a 
 
 <imgc ../img/tut_snd4.png><fig>Hangerő állítása</fig>
 
-A következő a hangerő normalizálása. Menj az `Effect` > `Volume and Compression` > `Amplify...` menüpontra. a felugró ablakban kattints az "Apply" gombra
+A következő a hangerő normalizálása. Menj az `Effect` > `Volume and Compression` > `Amplify...` menüpontra. A felugró ablakban kattints az "Apply" gombra
 (minden beállítást helyesen detektál, nem kell állítani semmit).
 
 Minták száma
 ------------
 
-A MEG-4 nem kezel több, mint 16376 mintát egy hullámban. A hullámminta képe alatt láthatod a kijelölést századmásodpercekben, kattints itt az "s"-re, és váltsd át "samples"-re.
+A MEG-4 nem kezel több, mint 16376 mintát egy hullámban. Ha eleve ennél kevesebb mintából áll a hullámod, akkor ez a lépés kihagyható.
+
+A hullámminta képe alatt láthatod a kijelölést századmásodpercekben, kattints itt az "s"-re, és váltsd át "samples"-re.
 
 <imgc ../img/tut_snd5.png><fig>Mértékegység megváltoztatása</fig>
 
-A példánkban ez több, mint a megengedett maximum. A minták száma úgy számítódik, hogy a "Project Rate (Hz)" alatti értéket megszorozzuk a hullámunk időtartamával. Szóval
-hogy csökkentsük a mintaszámot, vagy csökkentjük a frekvenciát, vagy lecsapunk a hullámunk végéből. Ebben az oktatóanyagban mindkettőt megtesszük.
+A példánkban ez több, mint a megengedett maximum. A minták száma úgy számítódik, hogy a mintavételezési ráta értéket megszorozzuk a hullámunk időtartamával. Szóval
+hogy csökkentsük a mintaszámot, vagy csökkentjük a rátát, vagy lecsapunk a hullámunk végéből. Ebben az oktatóanyagban mindkettőt megtesszük.
 
-Kijelöltem mindent 1.0 után, majd a <kbd>Del</kbd> leütésével töröltem. Ez működik, viszont a hullám vége hirtelen vágódik el és csúnya hangja lesz. Hogy ezt kiigazítsuk,
-jelöljünk ki a hullám végéből egy valamekkora darabot, majd válasszuk az `Effect` > `Fading` > `Fade Out` menüpontot. Ennek hatására a hullám vége szépen elhalkul.
+Kijelöltem mindent mondjuk úgy 1.0 után, majd a <kbd>Del</kbd> leütésével töröltem. Ez működik, viszont a hullám vége hirtelen vágódik el és csúnya hangja lesz. Hogy ezt
+kiigazítsuk, jelöljünk ki a hullám végéből egy valamekkora darabot, majd válasszuk az `Effect` > `Fading` > `Fade Out` menüpontot. Ennek hatására a hullám vége szépen elhalkul.
 
 <imgc ../img/tut_snd6.png><fig>Hullám levágása és a vég elhalkítása</fig>
 
-A hullámunk még mindig túl hosszú, de többet már nem lehet levágni belőle. Itt jön a "Project Rate (Hz)" a képbe. Csökkentsük addig, míg a minták száma nem csökken 16376 alá.
+A hullámunk még mindig túl hosszú (44380 minta), de többet már nem lehet levágni belőle annélkül, hogy elrontanánk. Itt jön képbe a mintavételezési ráta. Az Audacity korábbi
+verzióiban ez kényelmesen alul az eszköztáron látszott, mint "Project Rate (Hz)". De többé már nem, az újabb Audacity-nél ez sokkal macerásabb lett. Először is kattintsunk
+az `Audio Setup` gombra az eszköztáron, majd válasszuk ki a `Audio Settings...`-et. A felugró ablakban keressük meg a "Quality" / "Project Sample Rate" sort, és mellette állítsuk
+az opciólistát "Other..."-re, hogy a tényleges mező szerkeszthetővé váljon.
+
+WARNING: Bizonyosodj meg róla, hogy jó számot adsz meg! Az Audacity nem képes visszavonni ezt a lépést, ezért nem próbálkozhatsz újra!
+
+Ide egy olyan számot kell beírni, ami 16376 osztva a hullámunk időtartamával (1.01 másodperc a példánkban), majd kattintsunk az "OK"-ra.
 
 <imgc ../img/tut_snd7.png><fig>Mintaszám csökkentése</fig>
 
-Ha ennél kevesebb mintából áll a hullámod, akkor ez a lépés kihagyható.
+Jelöljünk ki az egész hullámmintát (<kbd>Ctrl</kbd>+<kbd>A</kbd> leütésével), és alul a kijelölés végénél az kell látnunk, hogy az kevesebb, mint 16376.
 
 Elmentés és beimportálás
 ------------------------

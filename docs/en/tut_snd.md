@@ -16,13 +16,13 @@ We can see right away that there are two waves, meaning our sound sample is ster
 Tuning and Volume
 -----------------
 
-Now MEG-4 does tune the samples on its own, and for that to work, all imported waves must be tuned to a specific pitch. Press <kbd>Ctrl</kbd>+<kbd>A</kbd>
-to select the wave, and then go to `Analyze` > `Plot Spectrum...`.
+Now MEG-4 does tune the samples on its own, and for that to work, all imported waves must be tuned to a specific pitch. For some reason pitch detection is broken in Audacity,
+so you'll have to do it manually. Press <kbd>Ctrl</kbd>+<kbd>A</kbd> to select the wave, and then go to `Analyze` > `Plot Spectrum...`.
 
 <imgc ../img/tut_snd2.png><fig>Analyzing the spectrum</fig>
 
-For some reason peak detection is broken in Audacity, so you'll have to do it manually. Move your cursor above the biggest peak, and the current pitch
-will show up below (which is C3 in this example). If the shown note isn't C-4, then select `Effect` > `Pitch and Tempo` > `Change Pitch...`.
+Move your cursor above the biggest peak, and the current pitch will show up below (which is `C3` in this example). If the shown note isn't `C4`, then select `Effect` >
+`Pitch and Tempo` > `Change Pitch...`.
 
 <imgc ../img/tut_snd3.png><fig>Changing the pitch</fig>
 
@@ -30,28 +30,38 @@ In the "from" field, enter the value that you saw in the spectrum window, and in
 
 <imgc ../img/tut_snd4.png><fig>Changing the volume</fig>
 
-Next thing is to normalize the volume. Go to `Effect` > `Volume and Compression` > `Amplify...`. In the popup window just press "Apply" (everything is autodetected correctly).
+Next thing is to normalize the volume. Go to `Effect` > `Volume and Compression` > `Amplify...`. In the popup window just press "Apply" (everything is autodetected correctly, no
+need to change anything).
 
 Number of Samples
 -----------------
 
-MEG-4 supports no more than 16376 samples per waves. Under the waveform you'll see the selection in milliseconds, click on that small "s" and change it to "samples".
+MEG-4 supports no more than 16376 samples per waves. If you have fewer samples than this in the first place, then you can skip this step.
+
+Under the waveform you'll see the selection in milliseconds, click on that small "s" and change it to "samples".
 
 <imgc ../img/tut_snd5.png><fig>Changing the unit</fig>
 
-In our example that's more than the allowed maximum. The number of samples is calculated as the value under "Project Rate (Hz)" multiplied by the length. So to lower the
+In our example that's more than the allowed maximum. The number of samples is calculated as the value under "Project Sample Rate" multiplied by the length. So to lower the
 number of samples, either we lower the rate or we cut off the end of the wave. In this tutorial we'll do both.
 
-Select everything after 1.0, and press <kbd>Del</kbd> to delete. This does the trick, but makes the ending sound harsh. To fix that, select a reasonable portion at the end
-and go to `Effect` > `Fading` > `Fade Out`. This will make the wave end nicely.
+Select everything let's say after 1.0, and press <kbd>Del</kbd> to delete. This does the trick, but makes the ending sound harsh. To fix that, select a reasonable portion at
+the end and go to `Effect` > `Fading` > `Fade Out`. This will make the wave end nicely.
 
 <imgc ../img/tut_snd6.png><fig>Chopping off and fading out the end</fig>
 
-Our wave is still too long, but we can't cut off more. This is where the "Project Rate (Hz)" comes in. Lower it until the number of samples goes below 16376.
+Our wave is still too long (44380 samples), but we can't cut off more without ruining the sample. This is where the sample rate comes in. In previous versions of Audacity, this
+was comfortably displayed at the bottom on the toolbar as "Project Rate (Hz)". But not any more, on newer Audacity it is a lot more complicated. First, click `Audio Setup` on the
+toolbar and select `Audio Settings...`. In the popup window, look for "Quality" / "Project Sample Rate", and from the drop-down select "Other..." to make the actual input field
+editable.
 
+WARNING: Make sure you calculate the number correctly. Audacity is incapable of undoing this step, so you can't give it another try!
+
+Enter a number here, which is 16376 divided by the length of your wave (1.01 secs in our example) and press "OK".
+ 
 <imgc ../img/tut_snd7.png><fig>Lowering the number of samples</fig>
 
-If you have fewer samples, you can skip this step.
+Select the entire wave (press <kbd>Ctrl</kbd>+<kbd>A</kbd>) then you should see that the end of the selection is below 16376.
 
 Save and Import
 ---------------

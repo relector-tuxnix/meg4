@@ -46,7 +46,7 @@ void loop()
 
 The centre of the screen is at 160, 100 but our character is 4 x 4 sprites in size (32 x 32 pixels), so we have to subtract the
 half of that. Then comes 0 for `sprite`, meaning the first sprite, followed by 4, 4 because we want to display that many sprites.
-The last two parameters are 0, 0 because we don't want to scale nor transform, ee want the sprites to be displayed exactly as they
+The last two parameters are 0, 0 because we don't want to scale nor transform, we want the sprites to be displayed exactly as they
 appear in the [Sprite Editor].
 
 Changing Directions
