@@ -16,7 +16,7 @@ Installation
 | Linux      | [meg4-x86_64-linux-sdl.tgz](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64-linux-sdl.tgz)<br>[meg4-x86_64-linux-glfw.tgz](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64-linux-glfw.tgz)<br>[meg4-x86_64-linux-fbdev.tgz](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64-linux-fbdev.tgz) |
 | Ubuntu     | [meg4_0.0.1-amd64.deb](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4_0.0.1-amd64.deb)                       |
 | RaspiOS    | [meg4_0.0.1-armhf.deb](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4_0.0.1-armhf.deb)                       |
-| Emscripten | [meg4-wasm-emscripten.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-wasm-emscripten.zip)               |
+| Web        | [meg4-wasm-emscripten.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-wasm-emscripten.zip)               |
 
 Extract to: `/usr` (Linux, BSDs), `C:\Program Files` (Windows); or in a webserver's public folder (Emscripten).
 
