@@ -137,6 +137,7 @@ void meg4_poweron(char *region)
 #ifndef NOEDITORS
     int i;
 #endif
+    if(!region || !*region) region = "en";
     meg4_locale[0] = region[0]; meg4_locale[1] = region[1];
     memset(&meg4, 0 , sizeof(meg4));
     memset(&meg4_title, 0 , sizeof(meg4_title));
@@ -158,8 +159,8 @@ void meg4_poweron(char *region)
     /* compiled with editors, load language dictionary and switch to loader mode */
     meg4_defwaves = NULL;
     memset(&meg4_edicons, 0 , sizeof(meg4_edicons));
-    for(i = 0; i < NUMLANGS; i++) if(!strcmp(region, dict[i][0])) break;
-    if(i >= NUMLANGS) { main_log(1, "no '%s' language dictionary, fallback to 'en'", region); i = 0; }
+    for(i = 0; i < NUMLANGS; i++) if(region[0] == dict[i][0][0] && region[1] == dict[i][0][1]) break;
+    if(i >= NUMLANGS) { main_log(1, "no '%c%c' language dictionary, fallback to 'en'", region[0], region[1]); i = 0; }
     lang = &dict[i][1];
     if((buf = main_cfgload("theme.gpl", &len))) { meg4_theme(buf, len); free(buf); }
     pro_init();
