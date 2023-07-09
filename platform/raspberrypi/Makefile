@@ -30,12 +30,11 @@ FLOPPYDEV?=/dev/mmcblk0p1
 all: meg4.iso
 
 ### compile MEG-4 as an init process ###
-../fbdev_alsa/meg4:
-	USE_INIT=1 KBDMAP=$(KBDMAP) LANG=$(LANG) FLOPPYDEV=$(FLOPPYDEV) make --no-print-directory -C ../fbdev_alsa all
-
-rootfs/init: ../fbdev_alsa/meg4
+rootfs/init:
+	USE_INIT=1 KBDMAP=$(KBDMAP) LANG=$(LANG) FLOPPYDEV=$(FLOPPYDEV) make --no-print-directory -C ../fbdev_alsa clean all
 	@mkdir -p rootfs 2>/dev/null || true
 	cp -f ../fbdev_alsa/meg4 rootfs/init
+	strip rootfs/init
 
 ### get Raspberrypi firmware ###
 firmware.zip:
@@ -53,7 +52,8 @@ boot/kernel8.img: firmware.zip
 
 ### create initial ramdisk ###
 boot/initrd: rootfs/init
-	@mkdir rootfs/dev rootfs/mnt rootfs/proc rootfs/sys rootfs/tmp
+	@mkdir rootfs/dev rootfs/mnt rootfs/proc rootfs/sys rootfs/tmp 2>/dev/null || true
+	@chmod +x rootfs/init
 	cd rootfs && find . | cpio -R root:root -H newc -o | gzip > ../boot/initrd
 
 ### construct disk image ###
@@ -63,11 +63,11 @@ meg4.iso: boot/kernel8.img boot/initrd
 	@mkdir -p boot/MEG-4 2>/dev/null || true
 	@cp -r ../../public/floppies/* boot/MEG-4
 	dd if=/dev/zero of=meg4.iso count=$(IMGSIZE) bs=1048576
-	printf "n\np\n1\n2048\n\nt 1\nc\nw\nq\n" | fdisk meg4.iso
+	printf "n\np\n1\n2048\n\nt 1\nc\na\nw\nq\n" | fdisk meg4.iso
 	mkfs.vfat -F 32 -n "MEG-4 OS" --offset 2048 meg4.iso
 ifneq ($(wildcard /usr/bin/mcopy),)
 	@# if mtools is installed, use that (available to all users)
-	cd boot && mcopy -i ../meg4.iso@@1M * ::
+	cd boot && mcopy -i ../meg4.iso@@1M -s * ::
 else
 	@# use standard Linux tools otherwise (unfortunately requires root priviledge...)
 	@mkdir mnt 2>/dev/null
@@ -76,6 +76,9 @@ else
 	sudo umount mnt
 	rm -rf mnt
 endif
+
+package: meg4.iso
+	tar -czvf ../../meg4-rpi.iso.tgz meg4.iso
 
 clean:
 	rm -rf rootfs boot firmware.zip meg4.iso 2>/dev/null || true

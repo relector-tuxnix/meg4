@@ -944,7 +944,7 @@ noaudio:
         /* run the emulator and display screen */
         meg4_run();
         meg4_redraw(scrbuf, 640, 400, 640 * 4);
-        if(win_f) main_arb_scaler();
+        if(win_f && ((win_w % 320) || (win_h % 200))) main_arb_scaler();
         else main_fix_scaler();
         /* delay to run loop at 60 FPS */
         clock_gettime(CLOCK_MONOTONIC, &ts);

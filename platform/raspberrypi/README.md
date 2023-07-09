@@ -12,6 +12,7 @@ Compilation options
 | Command               | Description                                                |
 |-----------------------|------------------------------------------------------------|
 | `make`                | Generate the `meg4.iso` disk image file                    |
+| `make package`        | Create a package from the compiled disk image              |
 | `IMGSIZE=x make`      | Specify the disk image's size in Megabytes (default 256 M) |
 | `FLOPPYDEV=xx make`   | Select the floppy device (default `/dev/mmcblk0p1`)        |
 | `LANG=xx make`        | Select interface's language (default `en`, English)        |
