@@ -60,19 +60,23 @@ int16_t ibuf[2*ALSA_BUFFER_SIZE];
 pthread_t th = 0;
 void sync(void);
 
-int main_w = 0, main_h = 0, main_exit = 0, main_alt = 0, main_sh = 0, main_meta = 0, main_caps = 0, main_keymap[512];
+int main_w = 0, main_h = 0, main_exit = 0, main_alt = 0, main_sh = 0, main_meta = 0, main_caps = 0, main_keymap[512], main_kbd = 0;
 int win_f = 1, win_w, win_h, win_fw, win_fh, win_dp, win_dp2, win_dp3, win_dp4, win_dp5, win_dp6, win_dp7, win_dp8;
 void main_delay(int msec);
 /* keyboard layout mapping */
-char *main_kbdlayout[128*4] = {
-/* KEY_RESERVED     0 */ "", "", "", "",
+const char *main_kbdlayout[2][128*4] = { {
+/* KEY_RESERVED     0 */ "", "", "", "",    /* first layout is user configurable */
 /* KEY_ESC          1 */ "", "", "", "",
 #ifdef KBDMAP
 #include KBDMAP
 #else
 #include "us.h"
 #endif
-};
+}, {
+/* KEY_RESERVED     0 */ "", "", "", "",    /* second layout is always International */
+/* KEY_ESC          1 */ "", "", "", "",
+#include "us.h"
+} };
 /* interface's language */
 #ifndef LANG
 #define LANG "en"
@@ -179,8 +183,9 @@ void main_quit(void)
     if(fb >= 0) {
         if(fb_orig.bits_per_pixel != 32) ioctl(fb, FBIOPUT_VSCREENINFO, &fb_orig);
         close(fb);
+        fprintf(stdout, "\x1b[H\x1b[2J");
     }
-    fprintf(stdout, "\x1b[H\x1b[2J\x1b[?25h"); fflush(stdout);
+    fprintf(stdout, "\x1b[?25h"); fflush(stdout);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &oldt);
 #ifdef USE_INIT
     /* if we're running as init, make sure everything is written out to disk, and then power off the machine */
@@ -202,7 +207,13 @@ void main_win(void)
     struct dirent *de;
     /* Linux kernel limits device names in 256 bytes, so this must be enough even with the path prefix */
     char dev[512] = "/dev/input/by-path";
-    int l, x, y;
+    int l, x, y, k = 0;
+
+    tcgetattr(STDIN_FILENO, &oldt);
+    memcpy(&newt, &oldt, sizeof(newt));
+    oldt.c_lflag |= ECHO;
+    newt.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &newt);
 
     /* get keyboard and mouse event device */
     dh = opendir(dev); en = 0; memset(ed, 0, sizeof(ed)); dev[18] = '/';
@@ -211,7 +222,7 @@ void main_win(void)
         if(l > 9 && !strcmp(de->d_name + l - 9, "event-kbd")) {
             strcpy(dev + 19, de->d_name);
             ed[en] = open(dev, O_RDONLY | O_NDELAY | O_NONBLOCK); ed[en + 1] = KBD;
-            if(ed[en] > 0) en += 2;
+            if(ed[en] > 0) { en += 2; k++; }
         }
         if(l > 11 && !strcmp(de->d_name + l - 11, "event-mouse")) {
             strcpy(dev + 19, de->d_name);
@@ -220,16 +231,15 @@ void main_win(void)
         }
     }
     closedir(dh);
+    if(k < 1) { main_log(0, "no keyboard device"); return; }
 
     /* get video device */
-    tcgetattr(STDIN_FILENO, &oldt);
-    memcpy(&newt, &oldt, sizeof(newt));
-    newt.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &newt);
-    fprintf(stdout, "\x1b[H\x1b[2J\x1b[?25l"); fflush(stdout);
     fb = open("/dev/fb0", O_RDWR);
     if(fb < 0) fb = open("/dev/graphics/fb0", O_RDWR);
     if(fb < 0) return;
+    /* clear screen and hide cursor */
+    fprintf(stdout, "\x1b[H\x1b[2J\x1b[?25l"); fflush(stdout);
+    /* configure framebuffer */
     if(ioctl(fb, FBIOGET_VSCREENINFO, &fb_var) != 0 || fb_var.xres < 640 || fb_var.yres < 400) { close(fb); fb = -1; return; }
     memcpy(&fb_orig, &fb_var, sizeof(struct fb_var_screeninfo));
     if(fb_var.bits_per_pixel != 32) {
@@ -564,7 +574,7 @@ int main(int argc, char **argv)
     struct snd_ctl_elem_value av;
     struct input_event ev[64];
     struct timespec ts;
-    int i, j, k, n, mx = 160, my = 100;
+    int i, j, k, n, mx = 160, my = 100, emptyalt = 0;
     char *infile = NULL, *fn;
     char s[5];
     uint32_t rrate = 44100;
@@ -768,9 +778,8 @@ noaudio:
     }
     main_win();
     if(fbuf == NULL) {
-        tcsetattr(STDIN_FILENO, TCSAFLUSH, &oldt);
-        free(scrbuf);
         main_log(0, "unable to initialize framebuffer");
+        main_quit();
         return 1;
     }
 
@@ -836,6 +845,8 @@ noaudio:
                                         if(ev[i].code == KEY_LEFTMETA || ev[i].code == KEY_RIGHTMETA || ev[i].code == KEY_RIGHTALT) main_meta = 0;
                                         if(ev[i].code == KEY_LEFTSHIFT || ev[i].code == KEY_RIGHTSHIFT) main_sh = 0;
                                         if(ev[i].code == KEY_CAPSLOCK) main_caps = 0;
+                                        if(ev[i].code == KEY_LEFTALT && main_sh && emptyalt) main_kbd ^= 1;
+                                        emptyalt = 0;
                                         meg4_clrkey(main_keymap[ev[i].code]);
                                     } else
                                     if(ev[i].value == 1) {
@@ -844,6 +855,7 @@ noaudio:
                                         if(ev[i].code == KEY_LEFTMETA || ev[i].code == KEY_RIGHTMETA || ev[i].code == KEY_RIGHTALT) main_meta = 1;
                                         if(ev[i].code == KEY_LEFTSHIFT || ev[i].code == KEY_RIGHTSHIFT) main_sh = 1;
                                         if(ev[i].code == KEY_CAPSLOCK) main_caps = 1;
+                                        emptyalt = ev[i].code == KEY_LEFTALT;
                                         switch(ev[i].code) {
                                             case KEY_ESC: if(main_alt) main_exit = 1; else meg4_pushkey("\x1b\0\0"); break;
                                             case KEY_F1: meg4_pushkey("F1\0"); break;
@@ -876,9 +888,9 @@ noaudio:
                                             case KEY_INSERT: meg4_pushkey("Ins"); break;
                                             case KEY_DELETE: meg4_pushkey("Del"); break;
                                             default:
-                                                if(ev[i].code < sizeof(main_kbdlayout)/(sizeof(main_kbdlayout[0])*4)) {
+                                                if(ev[i].code < sizeof(main_kbdlayout[0])/(sizeof(main_kbdlayout[0][0])*4)) {
                                                     memset(s, 0, sizeof(s));
-                                                    strncpy(s, main_kbdlayout[(ev[i].code << 2) | (main_meta << 1) | (main_caps ^ main_sh)], 4);
+                                                    strncpy(s, main_kbdlayout[main_kbd][(ev[i].code << 2) | (main_meta << 1) | (main_caps ^ main_sh)], 4);
                                                     if(s[0]) meg4_pushkey(s);
                                                     if(main_alt && s[0] == 'q' && !s[1]) main_exit = 1;
                                                 }

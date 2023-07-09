@@ -29,8 +29,11 @@ language (specified in the `LANG` environment variable) is also taken at compila
 The Linux kernel's event interface does not and cannot support switchable X11 keyboard layouts, so you must compile in
 a keyboard mapping manually. You can choose any of the existing header files, for example `KBDMAP=gb make`. To create a
 new layout mapping, just copy us.h and edit it. You only have to fill in keys for which you want an UTF-8 character
-to be produced, special keys like <kbd>Esc</kbd>, <kbd>F1</kbd> etc. are handled regardless. If not specified, defaults
-to US / International keyboard mapping.
+to be produced, special keys like <kbd>Esc</kbd>, <kbd>Enter</kbd>, <kbd>F1</kbd> etc. are handled regardless. If not
+specified, defaults to US / International keyboard mapping.
+
+No matter what layout you choose, you can always switch to US / International layout by pressing <kbd>Shift</kbd>+<kbd>Alt</kbd>
+in run-time (that layout has Latin letters and all the symbols necessary for programming in the C and BASIC languages).
 
 To sum it up: `USE_INIT=1 KBDMAP=hu LANG=hu FLOPPYDEV=/dev/sda1 make`
 
