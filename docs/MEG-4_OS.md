@@ -1,8 +1,8 @@
 MEG-4 Operating System
 ======================
 
-It is possible to run MEG-4 as a standalone Operating System. See [raspberrypi](../platform/raspberrypi) for an example.
-Here are the required steps:
+It is possible to run MEG-4 as a standalone Operating System. See [raspberrypi](../platform/raspberrypi) and
+[baremetal](../platform/baremetal) for an example. Here are the required steps:
 
 Step 1: compile `meg4` as an init process
 -----------------------------------------
@@ -15,21 +15,22 @@ Step 2: compile the Linux kernel
 --------------------------------
 
 Download, configure and compile the [Linux kernel](https://github.com/torvalds/linux) for your desired hardware. This
-should result in a kernel file, named `vmlinuz` (or more likely `bzImage` these days) and a directory with the available
-kernel modules.
+should result in a kernel file, named `vmlinuz` (or more likely `bzImage` these days) and directories with the available
+kernel modules (.ko files).
 
 Step 3: create an initrd
 ------------------------
 
 First, create a temporary directory, copy `meg4` (from step 1) as `init` into. Make sure that it's executable `chmod +x init`.
-Then create the directory `lib/modules/(kernel version)/` under it, and copy the kernel modules you compiled in step 2 there.
-Create some more directories for mount points: `dev`, `proc`, `sys`, `tmp` and `mnt`. Finally, using `cpio -H newc > initrd`,
-create an archive file from the contents of that temporary directory.
+Then create the directory `lib/modules/(kernel version)/` under it, and copy the kernel modules you compiled in step 2 there
+(you might want to use `make INSTALL_MOD_PATH=(your temp dir) modules_install` for that). Create some more directories for mount
+points: `dev`, `proc`, `sys`, `tmp` and `mnt`. Finally, using `cpio -H newc > initrd`, create an archive file from the contents
+of that temporary directory.
 
 ```
 initrd archive:
   dev/
-  lib/
+  lib/modules/*
   mnt/
   proc/
   sys/
@@ -43,13 +44,13 @@ Step 4: create boot partition
 In theory you can use whatever partitioning scheme and file system you wish, but in practice this is going to be a FAT32
 partition with a GPT partitioning table referencing it as "EFI System Partition".
 
-Copy the `bzImage` kernel file (from step 2) and the `initrd` archive file (from step 3) into the root directory of this
+Copy the `vmlinuz` kernel file (from step 2) and the `initrd` archive file (from step 3) into the root directory of this
 partition. Also create a directory named `MEG-4` there (you can place demo floppy images into this directory if you'd like).
 
 ```
 partition's root directory:
   MEG-4/
-  bzImage
+  vmlinuz
   initrd
 ```
 

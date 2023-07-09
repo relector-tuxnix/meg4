@@ -20,10 +20,13 @@ platform/sdl/SDL*
 platform/glfw_pa/glfw*
 platform/glfw_pa/portaudio*
 platform/raylib/raylib*
-platform/fbdev_alsa/alsa-lib*
 platform/raspberrypi/rootfs
 platform/raspberrypi/boot
 platform/raspberrypi/firmware.zip
+platform/baremetal/rootfs
+platform/baremetal/boot
+platform/baremetal/linux-*
+platform/baremetal/*.tar.xz
 src/editors/pro.*
 data.c
 data.h
