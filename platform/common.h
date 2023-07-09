@@ -833,14 +833,18 @@ int main_cfgsave(char *cfg, uint8_t *buf, int len)
 #ifdef USE_INIT
         "/mnt/MEG-4";
 #else
-#ifdef __ANDROID__
+# ifdef __ANDROID__
         SDL_AndroidGetExternalStoragePath();
-#else
+# else
+#  ifdef __LIBRETRO__
+        main_floppydir;
+#  else
         getenv("HOME");
-#endif
+#  endif
+# endif
 #endif
     int ret = 0, i;
-    if(tmp) {
+    if(tmp && *tmp) {
         strcpy(file, tmp);
         strcat(file, "/.config"); mkdir(file, 0755);
         strcat(file, "/MEG-4"); mkdir(file, 0700);
@@ -861,13 +865,17 @@ uint8_t *main_cfgload(char *cfg, int *len)
 #ifdef USE_INIT
         "/mnt/MEG-4";
 #else
-#ifdef __ANDROID__
+# ifdef __ANDROID__
         SDL_AndroidGetExternalStoragePath();
-#else
+# else
+#  ifdef __LIBRETRO__
+        main_floppydir;
+#  else
         getenv("HOME");
+#  endif
+# endif
 #endif
-#endif
-    if(tmp) {
+    if(tmp && *tmp) {
         strcpy(file, tmp);
         strcat(file, "/.config/MEG-4/"); strcat(file, cfg);
         ret = main_readfile(file, len);

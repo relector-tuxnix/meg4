@@ -246,13 +246,15 @@ diff -r a/lbaselib.c lua/lbaselib.c
 <   {"loadfile", luaB_loadfile},
 518d474
 <   {"print", luaB_print},
+Only in a: ldblib.c
 diff -r a/linit.c lua/linit.c
 44,45d43
 <   {LUA_LOADLIBNAME, luaopen_package},
 <   {LUA_COLIBNAME, luaopen_coroutine},
-47,48d44
+47,49d44
 <   {LUA_IOLIBNAME, luaopen_io},
 <   {LUA_OSLIBNAME, luaopen_os},
+<   {LUA_DBLIBNAME, luaopen_debug},
 Only in a: liolib.c
 Only in a: loadlib.c
 Only in a: loslib.c
@@ -320,7 +322,7 @@ diff -r a/Makefile lua/Makefile
 < LIB_O=	lbaselib.o ldblib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o \
 < 	lutf8lib.o loadlib.o lcorolib.o linit.o
 ---
-> LIB_O=	lbaselib.o ldblib.o lmathlib.o ltablib.o lstrlib.o \
+> LIB_O=	lbaselib.o lmathlib.o ltablib.o lstrlib.o \
 > 	lutf8lib.o lcorolib.o linit.o
 100,101c100,101
 < LUA_T=	lua
