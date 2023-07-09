@@ -26,7 +26,7 @@
 #include "meg4.h"
 #include "cpu.h"
 
-int verbose = 2;
+int verbose = 2, strace = 0;
 
 /**
  * Hooks that libmeg4.a might call and a platform must provide
@@ -211,11 +211,11 @@ int main(int argc, char **argv)
         }
     } else {
         /* simulate a few calls for testing, in reality this should run at 60 FPS infinitely */
-        for(i = 0; i < 8; i++) {
+        for(i = 0; i < 16; i++) {
             printf("\r\n----- iteration %d: setup done %d blocked io %d tmr %d critical %d -----\r\n", i, meg4.flg & 1, meg4.flg & 2, meg4.flg & 4, meg4.flg & 8);
             meg4_run();
             print_error();
-            if(i == 3 || i == 5) meg4_pushkey("a");
+            if(i == 2 || i == 4) meg4_pushkey("a");
         }
 
         if(re) {
@@ -224,7 +224,7 @@ int main(int argc, char **argv)
             printf("meg4: recompiled, cpu_compile() = %d\r\n", i);
             if(!i) print_error();
             else {
-                for(i = 0; i < 4; i++) {
+                for(i = 0; i < 16; i++) {
                     printf("\r\n----- iteration %d: setup done %d blocked io %d tmr %d critical %d -----\r\n", i, meg4.flg & 1, meg4.flg & 2, meg4.flg & 4, meg4.flg & 8);
                     meg4_run();
                     print_error();

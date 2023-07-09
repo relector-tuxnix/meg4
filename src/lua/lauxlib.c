@@ -241,7 +241,6 @@ LUALIB_API int luaL_error (lua_State *L, const char *fmt, ...) {
   return lua_error(L);
 }
 
-
 #if !defined(l_inspectstat)	/* { */
 
 #if defined(LUA_USE_POSIX)
@@ -820,7 +819,6 @@ LUALIB_API int luaL_getsubtable (lua_State *L, int idx, const char *fname) {
     return 0;  /* false, because did not find table there */
   }
 }
-
 
 
 /*

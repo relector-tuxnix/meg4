@@ -20,6 +20,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
+
 /*
 ** Creates a warning with all given arguments.
 ** Check first for errors; otherwise an error may interrupt
@@ -318,7 +319,6 @@ static int load_aux (lua_State *L, int status, int envidx) {
     return 2;  /* return fail plus error message */
   }
 }
-
 
 
 /*

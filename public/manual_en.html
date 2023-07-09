@@ -1780,7 +1780,7 @@ sw (value), (label to jump to otherwise),
 <p>Unlike the other languages, this isn't integral part of MEG-4, rather provided by a thrid party library. Due to that it does
 not (and cannot) have perfect integration (no debugger and no translated error messages for example). Its runner is bloated
 and much slower compared to the other languages, but it works, and you can use it.</p>
-<p>The embedded version is Lua 5.4.5, with modifications. For security reasons it lacks concurrency, as well as module loading, file
+<p>The embedded version is Lua 5.4.6, with modifications. For security reasons it lacks concurrency, as well as module loading, file
 access, pipes, command execution. The <samp>coroutine</samp>, <samp>io</samp> and <samp>os</samp> modules and their functions aren't available (but the language
 features and all the other parts of the baselib are still there). Instead of these, it has the MEG-4 API, which can be used as in
 any other language, with some slight, minor differences for better integration.</p>
