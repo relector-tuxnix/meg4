@@ -185,7 +185,7 @@ void main_quit(void)
         close(fb);
         fprintf(stdout, "\x1b[H\x1b[2J");
     }
-    fprintf(stdout, "\x1b[?25h"); fflush(stdout);
+    fprintf(stdout, "\x1b[?0c\x1b[?1q\x1b[?25h"); fflush(stdout);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &oldt);
 #ifdef USE_INIT
     /* if we're running as init, make sure everything is written out to disk, and then power off the machine */
@@ -206,8 +206,9 @@ void main_win(void)
     DIR *dh;
     struct dirent *de;
     /* Linux kernel limits device names in 256 bytes, so this must be enough even with the path prefix */
-    char dev[512] = "/dev/input/by-path";
-    int l, x, y, k = 0;
+    char dev[512] = "/dev/input";
+    int l, x, y, k = 0, c = 0;
+    uint64_t ev_type, key_type[KEY_MAX/64 + 1];
 
     tcgetattr(STDIN_FILENO, &oldt);
     memcpy(&newt, &oldt, sizeof(newt));
@@ -215,22 +216,28 @@ void main_win(void)
     newt.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &newt);
 
-    /* get keyboard and mouse event device */
-    dh = opendir(dev); en = 0; memset(ed, 0, sizeof(ed)); dev[18] = '/';
-    while(en < 256 && (de = readdir(dh)) != NULL) {
-        l = strlen(de->d_name);
-        if(l > 9 && !strcmp(de->d_name + l - 9, "event-kbd")) {
-            strcpy(dev + 19, de->d_name);
-            ed[en] = open(dev, O_RDONLY | O_NDELAY | O_NONBLOCK); ed[en + 1] = KBD;
-            if(ed[en] > 0) { en += 2; k++; }
+    /* get keyboard, mouse and gamepad event devices */
+    dh = opendir(dev); en = 0; memset(ed, 0, sizeof(ed)); dev[10] = '/';
+    if(dh) {
+        while(en < 256 && (de = readdir(dh)) != NULL) {
+            if(memcmp(de->d_name, "event", 5)) continue;
+            strcpy(dev + 11, de->d_name);
+            ed[en] = open(dev, O_RDONLY | O_NDELAY | O_NONBLOCK);
+            if(ed[en] > 0) {
+                /* detect event device's type */
+                ev_type = 0; memset(key_type, 0, sizeof(key_type));
+                if(ioctl(ed[en], EVIOCGBIT(0, sizeof(ev_type)), &ev_type) >= 0 && (ev_type & (1 << EV_KEY)) &&
+                  ioctl(ed[en], EVIOCGBIT(EV_KEY, KEY_MAX+1), &key_type) >= 0) {
+                    /* let's see what keys are produced with EV_KEY events */
+                    if(key_type[BTN_GAMEPAD / 64] & (1UL << (BTN_GAMEPAD & 63))) { ed[en + 1] = PAD + c; c++; en += 2; } else
+                    if(key_type[BTN_MOUSE / 64] & (1UL << (BTN_MOUSE & 63))) { ed[en + 1] = MOUSE; en += 2; } else
+                    if(key_type[KEY_ENTER / 64] & (1UL << (KEY_ENTER & 63))) { ed[en + 1] = KBD; k++; en += 2; } else ev_type = 0;
+                }
+                if(!ev_type) { close(ed[en]); ed[en] = -1; }
+            }
         }
-        if(l > 11 && !strcmp(de->d_name + l - 11, "event-mouse")) {
-            strcpy(dev + 19, de->d_name);
-            ed[en] = open(dev, O_RDONLY | O_NDELAY | O_NONBLOCK); ed[en + 1] = MOUSE;
-            if(ed[en] > 0) en += 2;
-        }
+        closedir(dh);
     }
-    closedir(dh);
     if(k < 1) { main_log(0, "no keyboard device"); return; }
 
     /* get video device */
@@ -238,13 +245,16 @@ void main_win(void)
     if(fb < 0) fb = open("/dev/graphics/fb0", O_RDWR);
     if(fb < 0) return;
     /* clear screen and hide cursor */
-    fprintf(stdout, "\x1b[H\x1b[2J\x1b[?25l"); fflush(stdout);
+    fprintf(stdout, "\x1b[H\x1b[2J\x1b[?12l\x1b[?17c\x1b[?2q\x1b[?25l"); fflush(stdout);
+    l = open("/sys/class/graphics/fbcon/cursor_blink", O_WRONLY);
+    if(l > 0) { write(l, "0\n", 2); close(l); }
     /* configure framebuffer */
     if(ioctl(fb, FBIOGET_VSCREENINFO, &fb_var) != 0 || fb_var.xres < 640 || fb_var.yres < 400) { close(fb); fb = -1; return; }
     memcpy(&fb_orig, &fb_var, sizeof(struct fb_var_screeninfo));
     if(fb_var.bits_per_pixel != 32) {
         fb_var.bits_per_pixel = 32;
-        if(ioctl(fb, FBIOPUT_VSCREENINFO, &fb_var) != 0) { close(fb); fb = -1; return; }
+        if(ioctl(fb, FBIOPUT_VSCREENINFO, &fb_var) != 0 ||
+           ioctl(fb, FBIOGET_VSCREENINFO, &fb_var) != 0 || fb_var.bits_per_pixel != 32) { close(fb); fb = -1; return; }
     }
     if(ioctl(fb, FBIOGET_FSCREENINFO, &fb_fix) != 0 || fb_fix.type != FB_TYPE_PACKED_PIXELS) { close(fb); fb = -1; return; }
     fbuf = (uint8_t*)mmap(0, fb_fix.smem_len, PROT_READ | PROT_WRITE, MAP_SHARED, fb, 0);
@@ -582,19 +592,17 @@ int main(int argc, char **argv)
     int32_t tickdiff;
     uint64_t ticks;
 #ifdef USE_INIT
-    char *lng = LANG;
+    char *lng = LANG, *fstype[] = { "vfat", "fat", "ext4", "ext3", "ext2", "auto" };
     (void)argc; (void)argv;
     /* we must do some housekeeping when we run as the init process. Assume read-only root fs */
     mount("none", "/dev", "devtmpfs", 0, NULL);
     mount("none", "/proc", "procfs", 0, NULL);
     mount("none", "/sys", "sysfs", 0, NULL);
     mount("none", "/tmp", "tmpfs", 0, NULL);
-    mount(FLOPPYDEV, "/mnt", "auto", MS_SYNCHRONOUS | MS_NODEV | MS_NOEXEC, NULL);
-    open("/dev/stdin", O_RDONLY);
-    open("/dev/stdout", O_WRONLY);
-    open("/dev/stderr", O_WRONLY);
+    for(i = 0; i < (int)(sizeof(fstype)/sizeof(fstype[0])) &&
+      mount(FLOPPYDEV, "/mnt", fstype[i], MS_SYNCHRONOUS | MS_NODEV | MS_NOEXEC, NULL); i++);
     main_floppydir = "/mnt/MEG-4"; mkdir(main_floppydir, 0777);
-    verbose = 0;
+    verbose = 1;
 #else
     char *lng = getenv("LANG");
     main_parsecommandline(argc, argv, &lng, &infile);
@@ -901,9 +909,35 @@ noaudio:
                                 }
                             }
                         break;
-                        case PAD:
+                        default:
                             /* controller events */
-                            /* TODO: handle gamepads */
+                            j = ed[n + 1] - PAD;
+                            if(j < 4 && ev[i].type == EV_KEY) {
+                                if(ev[i].value == 0) {
+                                    switch(ev[i].code) {
+                                        case BTN_DPAD_DOWN: meg4_clrpad(j, MEG4_BTN_D); break;
+                                        case BTN_DPAD_UP:   meg4_clrpad(j, MEG4_BTN_U); break;
+                                        case BTN_DPAD_LEFT: meg4_clrpad(j, MEG4_BTN_L); break;
+                                        case BTN_DPAD_RIGHT:meg4_clrpad(j, MEG4_BTN_R); break;
+                                        case BTN_A:         meg4_clrpad(j, MEG4_BTN_A); break;
+                                        case BTN_B:         meg4_clrpad(j, MEG4_BTN_B); break;
+                                        case BTN_X:         meg4_clrpad(j, MEG4_BTN_X); break;
+                                        case BTN_Y:         meg4_clrpad(j, MEG4_BTN_Y); break;
+                                    }
+                                } else
+                                if(ev[i].value == 1) {
+                                    switch(ev[i].code) {
+                                        case BTN_DPAD_DOWN: meg4_setpad(j, MEG4_BTN_D); break;
+                                        case BTN_DPAD_UP:   meg4_setpad(j, MEG4_BTN_U); break;
+                                        case BTN_DPAD_LEFT: meg4_setpad(j, MEG4_BTN_L); break;
+                                        case BTN_DPAD_RIGHT:meg4_setpad(j, MEG4_BTN_R); break;
+                                        case BTN_A:         meg4_setpad(j, MEG4_BTN_A); break;
+                                        case BTN_B:         meg4_setpad(j, MEG4_BTN_B); break;
+                                        case BTN_X:         meg4_setpad(j, MEG4_BTN_X); break;
+                                        case BTN_Y:         meg4_setpad(j, MEG4_BTN_Y); break;
+                                    }
+                                }
+                            }
                         break;
                     }
             }
