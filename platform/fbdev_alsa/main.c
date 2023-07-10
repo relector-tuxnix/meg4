@@ -61,7 +61,7 @@ pthread_t th = 0;
 void sync(void);
 
 int main_w = 0, main_h = 0, main_exit = 0, main_alt = 0, main_sh = 0, main_meta = 0, main_caps = 0, main_keymap[512], main_kbd = 0;
-int win_f = 1, win_w, win_h, win_fw, win_fh, win_dp, win_dp2, win_dp3, win_dp4, win_dp5, win_dp6, win_dp7, win_dp8;
+int win_f = 0, win_w, win_h, win_fw, win_fh, win_dp, win_dp2, win_dp3, win_dp4, win_dp5, win_dp6, win_dp7, win_dp8;
 void main_delay(int msec);
 /* keyboard layout mapping */
 const char *main_kbdlayout[2][128*4] = { {
@@ -206,7 +206,7 @@ void main_win(void)
     DIR *dh;
     struct dirent *de;
     /* Linux kernel limits device names in 256 bytes, so this must be enough even with the path prefix */
-    char dev[512] = "/dev/input";
+    char dev[512] = "/dev/input", *fbd;
     int l, x, y, k = 0, c = 0;
     uint64_t ev_type, key_type[KEY_MAX/64 + 1];
 
@@ -241,16 +241,21 @@ void main_win(void)
     if(k < 1) { main_log(0, "no keyboard device"); return; }
 
     /* get video device */
-    fb = open("/dev/fb0", O_RDWR);
-    if(fb < 0) fb = open("/dev/graphics/fb0", O_RDWR);
+    fbd = "/dev/fb0"; fb = open(fbd, O_RDWR);
+    if(fb < 0) { fbd = "/dev/graphics/fb0"; fb = open(fbd, O_RDWR); }
     if(fb < 0) return;
+    /* configure framebuffer */
+    if(ioctl(fb, FBIOGET_VSCREENINFO, &fb_var) != 0 || fb_var.xres < 640 || fb_var.yres < 400) {
+        /* try to set resolution */
+        close(fb);
+        l = open("/sys/class/graphics/fb0/mode", O_WRONLY); if(l > 0) { write(l, "U:1280x800p-0\n", 14); close(l); }
+        fb = open(fbd, O_RDWR); if(fb < 0) return;
+        if(ioctl(fb, FBIOGET_VSCREENINFO, &fb_var) != 0 || fb_var.xres < 640 || fb_var.yres < 400) { close(fb); fb = -1; return; }
+    }
+    memcpy(&fb_orig, &fb_var, sizeof(struct fb_var_screeninfo));
     /* clear screen and hide cursor */
     fprintf(stdout, "\x1b[H\x1b[2J\x1b[?12l\x1b[?17c\x1b[?2q\x1b[?25l"); fflush(stdout);
-    l = open("/sys/class/graphics/fbcon/cursor_blink", O_WRONLY);
-    if(l > 0) { write(l, "0\n", 2); close(l); }
-    /* configure framebuffer */
-    if(ioctl(fb, FBIOGET_VSCREENINFO, &fb_var) != 0 || fb_var.xres < 640 || fb_var.yres < 400) { close(fb); fb = -1; return; }
-    memcpy(&fb_orig, &fb_var, sizeof(struct fb_var_screeninfo));
+    l = open("/sys/class/graphics/fbcon/cursor_blink", O_WRONLY); if(l > 0) { write(l, "0\n", 2); close(l); }
     if(fb_var.bits_per_pixel != 32) {
         fb_var.bits_per_pixel = 32;
         if(ioctl(fb, FBIOPUT_VSCREENINFO, &fb_var) != 0 ||
@@ -790,6 +795,7 @@ noaudio:
         main_quit();
         return 1;
     }
+    win_f = (win_w % 320) || (win_h % 200);
 
     /* turn on the emulator */
     meg4_poweron(lng);
@@ -944,7 +950,7 @@ noaudio:
         /* run the emulator and display screen */
         meg4_run();
         meg4_redraw(scrbuf, 640, 400, 640 * 4);
-        if(win_f && ((win_w % 320) || (win_h % 200))) main_arb_scaler();
+        if(win_f) main_arb_scaler();
         else main_fix_scaler();
         /* delay to run loop at 60 FPS */
         clock_gettime(CLOCK_MONOTONIC, &ts);

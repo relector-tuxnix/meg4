@@ -30,6 +30,8 @@ SYSLINUX?=6.03
 # ----- end of configuration -----
 
 qemu=qemu-system-$(shell uname -m) -m 256 -drive file=meg4.iso,format=raw -device virtio-mouse -serial stdio
+# 1280 x 800 x 32
+FBSET=vga=0x37a
 
 all: meg4.iso
 
@@ -44,8 +46,12 @@ rootfs/init:
 kernel.tar.xz:
 	wget -c http://kernel.org/pub/linux/kernel/v$(word 1,$(subst ., ,$(KERNEL))).x/linux-$(KERNEL).tar.xz -O kernel.tar.xz
 
-linux-$(KERNEL)/.config:
+linux-$(KERNEL)/Kconfig: kernel.tar.xz
 	tar -xvf kernel.tar.xz
+	@# make sure Kconfig is newer than kernel.tar.xz
+	@touch linux-$(KERNEL)/Kconfig
+
+linux-$(KERNEL)/.config: linux-$(KERNEL)/Kconfig
 ifneq ($(wildcard $(KCONFIG)),)
 	cp $(KCONFIG) linux-$(KERNEL)/.config
 else
@@ -54,8 +60,20 @@ else
 	sed -i "s/^CONFIG_DEBUG_KERNEL.*/\\# CONFIG_DEBUG_KERNEL is not set/" linux-$(KERNEL)/.config
 	sed -i "s|.*# CONFIG_KERNEL_XZ is not set.*|CONFIG_KERNEL_XZ=y|" linux-$(KERNEL)/.config
 	sed -i "s|.*CONFIG_KERNEL_GZIP=y.*|# CONFIG_KERNEL_GZIP is not set|" linux-$(KERNEL)/.config
-endif
 	sed -i "s|.*# CONFIG_FB is not set.*|CONFIG_FB=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_FB_VESA is not set.*|CONFIG_FB_VESA=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_FB_EFI is not set.*|CONFIG_FB_EFI=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_FB_SIMPLE is not set.*|CONFIG_FB_SIMPLE=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_DRM is not set*|CONFIG_DRM=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_DRM_FBDEV_EMULATION is not set*|CONFIG_DRM_FBDEV_EMULATION=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_DRM_BOCHS is not set*|CONFIG_DRM_BOCHS=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_DRM_CIRRUS_QEMU is not set*|CONFIG_DRM_CIRRUS_QEMU=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_DRM_VBOXVIDEO is not set*|CONFIG_DRM_VBOXVIDEO=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_DRM_SIMPLEDRM is not set*|CONFIG_DRM_SIMPLEDRM=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_DRM_RADEON is not set*|CONFIG_DRM_RADEON=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_DRM_AMDGPU is not set*|CONFIG_DRM_AMDGPU=y|" linux-$(KERNEL)/.config
+	sed -i "s|.*# CONFIG_DRM_I915 is not set*|CONFIG_DRM_I915=y|" linux-$(KERNEL)/.config
+endif
 	sed -i "s|.*CONFIG_DEFAULT_HOSTNAME=*|CONFIG_DEFAULT_HOSTNAME=\"MEG4\"|" linux-$(KERNEL)/.config
 
 boot/vmlinuz: linux-$(KERNEL)/.config
@@ -79,7 +97,7 @@ syslinux.tar.xz:
 meg4.iso: boot/vmlinuz boot/initrd syslinux.tar.xz
 	@mkdir -p boot/MEG-4 2>/dev/null || true
 	@cp -r ../../public/floppies/* boot/MEG-4
-	@printf "default vmlinuz initrd=/initrd vga=0x37a console=ttyS0,115200 quiet\n" >boot/syslinux.cfg
+	@printf "default vmlinuz initrd=/initrd $(FBSET) console=ttyS0,115200 quiet\n" >boot/syslinux.cfg
 	dd if=/dev/zero of=meg4.iso count=$(IMGSIZE) bs=1048576
 	printf "n\np\n1\n2048\n\nt 1\nc\na\nw\nq\n" | fdisk meg4.iso
 	mkfs.vfat -F 32 -n "MEG-4 OS" --offset 2048 meg4.iso
