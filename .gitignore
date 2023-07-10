@@ -27,6 +27,7 @@ platform/baremetal/rootfs
 platform/baremetal/boot
 platform/baremetal/linux-*
 platform/baremetal/*.tar.xz
+platform/allegro/allegro*
 src/editors/pro.*
 data.c
 data.h
