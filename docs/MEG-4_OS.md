@@ -16,16 +16,18 @@ Step 2: compile the Linux kernel
 
 Download, configure and compile the [Linux kernel](https://github.com/torvalds/linux) for your desired hardware. This
 should result in a kernel file, named `vmlinuz` (or more likely `bzImage` these days) and directories with the available
-kernel modules (.ko files).
+kernel modules. You can copy all .ko files into a directory with
+```
+make INSTALL_MOD_PATH=(destination directory) modules_install
+```
 
 Step 3: create an initrd
 ------------------------
 
 First, create a temporary directory, copy `meg4` (from step 1) as `init` into. Make sure that it's executable `chmod +x init`.
-Then create the directory `lib/modules/(kernel version)/` under it, and copy the kernel modules you compiled in step 2 there
-(you might want to use `make INSTALL_MOD_PATH=(your temp dir) modules_install` for that). Create some more directories for mount
-points: `dev`, `proc`, `sys`, `tmp` and `mnt`. Finally, using `cpio -H newc > initrd`, create an archive file from the contents
-of that temporary directory.
+Then create the directory `lib/modules/(kernel version)/` under it, and copy the kernel modules you compiled in step 2 there.
+Create some more directories for mount points: `dev`, `proc`, `sys`, `tmp` and `mnt`. Finally, using `cpio -H newc > initrd`,
+create an archive file from the contents of that temporary directory.
 
 ```
 initrd archive:
@@ -50,33 +52,40 @@ partition. Also create a directory named `MEG-4` there (you can place demo flopp
 ```
 partition's root directory:
   MEG-4/
-  vmlinuz
   initrd
+  vmlinuz
 ```
 
 Depending on your hardware, you might have to copy other files too to the boot partition (like .dtb definitions for example).
+
+IMPORTANT NOTE: Double check that you've compiled meg4 (in step 1) with `FLOPPYDEV` being the same device file as how the kernel
+sees this boot partition *when it runs* (you can also use the `UUID=` variant with the file system's unique ID instead).
 
 Step 5: install boot loader
 ---------------------------
 
 You'll also have to install a target platform specific boot loader into the image (GRUB, syslinux, isolinux, LILO, whatever). The
 required steps vary from loader to loader, but they usually have a simple text config file to specify what OS to boot. Tell this
-boot loader to load your Linux kernel along with the initial ramdisk from the boot partition. Double check that you've compiled
-meg4 (in step 1) with `FLOPPYDEV` being the same device file as how the kernel sees the boot partition when it runs (you can
-also use the `UUID=` variant with the file system's unique ID instead).
+boot loader to load your Linux kernel along with the initial ramdisk from the boot partition, and pass a command line to the kernel
+to set up the framebuffer.
 
-For example, if your hardware uses UEFI, then you'll probably need the loader in "EFI/BOOT/BOOTX86.EFI". On Raspberry Pi, the
-loader has multiple files, "bootcode.bin" and "start.elf", and you also have to rename your bzImage kernel to "kernel8.img",
-otherwise it won't work. For GRUB, you'll need a directory named grub, with lots of files, among which `grub.cfg` being the
-configuration file, containing something like:
+For example, if your hardware uses UEFI, then you'll probably need the loader in "EFI/BOOT/BOOTX86.EFI" (this could be the kernel
+itself, if compiled with EFI-stub). On legacy BIOS machines, you'll need "ldlinux.sys" and "ldlinux.c32", and in "syslinux.cfg"
+something like:
+```
+default vmlinuz initrd=/initrd vga=0x37a quiet
+```
+On Raspberry Pi, the loader has multiple files too, "bootcode.bin" and "start.elf", you have to specify the initrd in "config.txt",
+and you also have to rename your kernel file to "kernel8.img", otherwise it won't work. For GRUB, you'll need a directory named
+"grub", with lots and lots of files, among which "grub/grub.cfg" being the configuration file, containing something like:
 ```
 menuentry "MEG-4 OS" {
-    linux  /bzImage
+    linux  /vmlinuz vga=0x37a quiet
     initrd /initrd
 }
 ```
 
-This step is very platform and loader specific.
+This step is very platform and loader specific, but the end of the day it just loads the kernel and the initrd.
 
 Step 6: burn the image file to a real disk
 ------------------------------------------
@@ -87,5 +96,5 @@ actual real machine, then there's one more step ahead.
 Pick a storage that your machine can boot from (USB stick probably, but could be an SDCard or an SSD too). Use `dd` or
 [USBImager](https://bztsrc.gitlab.io/usbimager/) to write the created disk image file to that storage, and boot.
 
-IMPORTANT NOTE: just copying the image file to the disk will not do. You MUST use a special tool that low-level writes the data
-in the image file to the disk, sector by sector.
+IMPORTANT NOTE: just copying the image file to the disk will not do. You MUST use a special tool that low-level writes the
+image file's data to the disk, sector by sector, bit by bit.

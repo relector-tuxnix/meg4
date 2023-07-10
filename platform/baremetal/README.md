@@ -2,7 +2,8 @@ MEG-4 OS (Bare Metal)
 =====================
 
 This directory contains a special Makefile which does not integrate MEG-4 with a library, instead it generates a
-[bootable disk image](../../docs/MEG-4_OS.md) using the [fbdev port](../fbdev_alsa).
+[bootable disk image](../../docs/MEG-4_OS.md) using the [fbdev port](../fbdev_alsa). (See [raspberrypi](../raspberrypi)
+about creating an image specifically for the Raspberry Pi.)
 
 IMPORTANT NOTE: no cross-compiler configured, so you must run this under the same architecture as your target's.
 
