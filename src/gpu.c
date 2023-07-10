@@ -929,9 +929,9 @@ void meg4_spr(uint32_t *dst, int dp, int x, int y, int sprite, int scale, int ty
                             case 2: b = s + ((w - j - 1) << p) + ((w - i - 1) << 2); break;
                             case 3: b = s + (i << p) + ((w - j - 1) << 2); break;
                             case 4: b = s + ((w - j - 1) << p) + (i << 2); break;
-                            case 5: b = s + ((w - i - 1) << p) + ((w - j - 1) << 2); break;
+                            case 5: b = s + (i << p) + (j << 2); break;
                             case 6: b = s + (j << p) + ((w - i - 1) << 2); break;
-                            case 7: b = s + ((w - j - 1) << p) + ((w - i - 1) << 2); break;
+                            case 7: b = s + ((w - i - 1) << p) + ((w - j - 1) << 2); break;
                             default: b = s + (j << p) + (i << 2); break;
                         }
                         if(b[3]) {
@@ -951,9 +951,9 @@ void meg4_spr(uint32_t *dst, int dp, int x, int y, int sprite, int scale, int ty
                             case 2: b = s + ((7 - j) << 8) + (7 - i); break;
                             case 3: b = s + (i << 8) + (7 - j); break;
                             case 4: b = s + ((7 - j) << 8) + (i); break;
-                            case 5: b = s + ((7 - i) << 8) + (7 - j); break;
+                            case 5: b = s + (i << 8) + (j); break;
                             case 6: b = s + (j << 8) + (7 - i); break;
-                            case 7: b = s + ((7 - j) << 8) + (7 - i); break;
+                            case 7: b = s + ((7 - i) << 8) + (7 - j); break;
                             default: b = s + (j << 8) + (i); break;
                         }
                         if(b[0]) {
@@ -2293,9 +2293,9 @@ void meg4_api_spr(int16_t x, int16_t y, uint16_t sprite, uint8_t sw, uint8_t sh,
                 case 2: meg4_spr(meg4.vram, 2560, x + (sw - i - 1) * s, y + (sh - j - 1) * s, l, scale, type); break;
                 case 3: meg4_spr(meg4.vram, 2560, x + j * s, y + (sw - i - 1) * s, l, scale, type); break;
                 case 4: meg4_spr(meg4.vram, 2560, X, y + (sh - j - 1) * s, l, scale, type); break;
-                case 5: meg4_spr(meg4.vram, 2560, x + (sh - j - 1) * s, y + (sh - i - 1) * s, l, scale, type); break;
+                case 5: meg4_spr(meg4.vram, 2560, x + j * s, y + i * s, l, scale, type); break;
                 case 6: meg4_spr(meg4.vram, 2560, x + (sw - i - 1) * s, Y, l, scale, type); break;
-                case 7: meg4_spr(meg4.vram, 2560, x + (sh - i - 1) * s, y + (sh - j - 1) * s, l, scale, type); break;
+                case 7: meg4_spr(meg4.vram, 2560, x + (sh - j - 1) * s, y + (sw - i - 1) * s, l, scale, type); break;
                 default: meg4_spr(meg4.vram, 2560, X, Y, l, scale, type); break;
             }
 }
