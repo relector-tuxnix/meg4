@@ -10,6 +10,8 @@ To get the feeling: if those other consoles were the NES, then MEG-4 would be th
 Installation
 ------------
 
+This is not all, just the ones I provide binary release too. Check out the [platform](platform) directory for more!
+
 | Platform   | Link                                                                                                           |
 |------------|----------------------------------------------------------------------------------------------------------------|
 | Windows    | [meg4-i686-win-sdl.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-i686-win-sdl.zip)                     |
@@ -34,7 +36,8 @@ is really that simple. Some Makefiles have additional rules to download optional
 a plain simple `make` will always work.
 
 The build system is created in a way that you can simply remove or add repo directories to enable or disable features. For
-example just rename `src/lua` to `src/lua.disabled` to remove Lua support (and cut overall compilation time in half).
+example just rename `src/lua` to `src/lua.disabled` to remove Lua support (and cut overall compilation time in half). Having
+`platform/sdl/SDL3` will statically link with SDL3, rename it to `SDL3.disabled` to link dynamically.
 
 Documentation
 -------------
