@@ -377,7 +377,7 @@ int main(int argc, char **argv)
     GLint ret;
     GLfloat mvp[16] = { 0 };
 #endif
-    GLfloat vert[16] = { 0 }, x1, y1, x2, y2;
+    GLfloat vert[16] = { 0 }, x2, y2;
     double mx, my;
     const GLFWvidmode *vidmode;
     GLFWgamepadstate state;
@@ -670,14 +670,12 @@ serr:   if(vshdr) glDeleteShader(vshdr);
             if(h > wh) { h = wh; w = (int)meg4.screen.w * wh / (int)meg4.screen.h; }
         }
         w >>= 1; h >>= 1;
-        i = le16toh(meg4.mmio.scrx) > 320 ? 0 : le16toh(meg4.mmio.scrx);
-        x1 = (float)(i) / 640; x2 = (float)(i + meg4.screen.w) / 640;
-        i = le16toh(meg4.mmio.scry) > 200 ? 0 : le16toh(meg4.mmio.scry);
-        y1 = (float)(i) / 400; y2 = (float)(i + meg4.screen.h) / 400;
-        vert[ 0] = -w; vert[ 1] = -h; vert[ 2] = x1; vert[ 3] = y1;
-        vert[ 4] = -w; vert[ 5] =  h; vert[ 6] = x1; vert[ 7] = y2;
+        x2 = (float)meg4.screen.w / 640.0f;
+        y2 = (float)meg4.screen.h / 400.0f;
+        vert[ 0] = -w; vert[ 1] = -h; vert[ 2] =  0; vert[ 3] =  0;
+        vert[ 4] = -w; vert[ 5] =  h; vert[ 6] =  0; vert[ 7] = y2;
         vert[ 8] =  w; vert[ 9] =  h; vert[10] = x2; vert[11] = y2;
-        vert[12] =  w; vert[13] = -h; vert[14] = x2; vert[15] = y1;
+        vert[12] =  w; vert[13] = -h; vert[14] = x2; vert[15] =  0;
         glViewport(0, 0, ww, wh);
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

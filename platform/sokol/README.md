@@ -6,8 +6,8 @@ This directory contains the main executable for the [sokol](https://github.com/f
 Compilation options
 -------------------
 
-Only static linking supported, as sokol is a header library. On the other hand sokol does have a significant number of
-dependencies of its own, which are all dynamically linked.
+Only static linking supported, as sokol is a header library. On the other hand sokol does have some dependencies of its own,
+which are all dynamically linked.
 
 | Command               | Description                                                |
 |-----------------------|------------------------------------------------------------|

@@ -467,7 +467,7 @@ RETRO_API void retro_reset(void)
  */
 RETRO_API void retro_run(void)
 {
-    int i, j, k, offs;
+    int i, j, k;
 
     /* handle events... by polling */
     input_poll_cb();
@@ -582,9 +582,6 @@ RETRO_API void retro_run(void)
     meg4_run();
     meg4_redraw(scrbuf32, 640, 400, 640 * 4);
 
-    /* the buffer is 640 x 400, but it is possible that only a 320 x 200 window is displayed out of it */
-    offs = (le16toh(meg4.mmio.scry) > 200 ? 0 : le16toh(meg4.mmio.scry) * 640) +
-        (le16toh(meg4.mmio.scrx) > 320 ? 0 : le16toh(meg4.mmio.scrx));
     /* Muhahaha, libretro sucks such a big time... on a real hw video channel order is independent to the CPU endianness
      * talking about wasting precious CPU time in a function that runs 60 times every sec... */
     if(pixel_format == RETRO_PIXEL_FORMAT_XRGB8888) {
@@ -592,7 +589,7 @@ RETRO_API void retro_run(void)
         for(i = 0; i < 640 * 400; i++)
             scrbuf32[i] = ((scrbuf32[i] >> 16) & 0xff) | ((scrbuf32[i] & 0xff) << 16) | (scrbuf32[i] & 0xff00);
 #endif
-        video_cb((void*)(scrbuf32 + offs), meg4.screen.w, meg4.screen.h, 640 * sizeof(uint32_t));
+        video_cb((void*)scrbuf32, meg4.screen.w, meg4.screen.h, 640 * sizeof(uint32_t));
     } else {
         for(i = 0; i < 640 * 400; i++)
 #if MEG4_BYTEORDER == 1234
@@ -600,7 +597,7 @@ RETRO_API void retro_run(void)
 #else
             scrbuf16[i] = ((scrbuf32[i] >> 3) & 0x1f) | ((scrbuf32[i] & 0xf80000) >> 8) | ((scrbuf32[i] & 0xfc00) >> 5);
 #endif
-        video_cb((void*)(scrbuf16 + offs), meg4.screen.w, meg4.screen.h, 640 * sizeof(uint16_t));
+        video_cb((void*)scrbuf16, meg4.screen.w, meg4.screen.h, 640 * sizeof(uint16_t));
     }
     /* play audio in the main thread... could this be any more inefficient? */
     if(!use_audio_cb) audio_callback();

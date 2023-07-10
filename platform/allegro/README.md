@@ -6,7 +6,8 @@ This directory contains the main executable for the [allegro](https://liballeg.o
 Compilation options
 -------------------
 
-To compile statically, just add `allegro5` directory with the repository. The allegro's dependencies will still be linked dynamically.
+To compile statically, just add `allegro5` directory with the repository. Note that allegro has a significant number of
+dependencies of its own, those still linked dynamically.
 
 | Command               | Description                                                |
 |-----------------------|------------------------------------------------------------|

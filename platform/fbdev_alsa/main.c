@@ -378,7 +378,7 @@ void main_fix_scaler(void)
     uint32_t *src, *dst;
     int i, j, k, l, m, p;
 
-    src = scrbuf + (le16toh(meg4.mmio.scrx) > 320 || le16toh(meg4.mmio.scry) > 200 ? 0 : le16toh(meg4.mmio.scry) * 640 + le16toh(meg4.mmio.scrx));
+    src = scrbuf;
     dst = (uint32_t*)foffs;
     /* optimized upscaler for 1x, 2x, 3x, 4x, 6x and 8x */
     p = win_h / meg4.screen.h;
@@ -537,7 +537,7 @@ void main_arb_scaler(void)
     int o = 0, x, y, sx, sy, *csax, *csay, csx, csy, ex, ey, t1, t2, sstep, lx, ly, l;
     int sw = meg4.screen.w, sh = meg4.screen.h, sp = 640, w = win_fw, h = win_fh, p = fb_fix.line_length;
 
-    src = scrbuf + (le16toh(meg4.mmio.scrx) > 320 || le16toh(meg4.mmio.scry) > 200 ? 0 : le16toh(meg4.mmio.scry) * 640 + le16toh(meg4.mmio.scrx));
+    src = scrbuf;
     dst = (uint32_t*)ffull;
     sx = (int) (65536.0 * (float)sw / (float)w); sy = (int) (65536.0 * (float)sh / (float)h);
     csp = src; ep = src + sp * sh - 1; dp = (uint32_t*)((uint8_t*)dst + o);

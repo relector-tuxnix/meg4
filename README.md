@@ -10,7 +10,7 @@ To get the feeling: if those other consoles were the NES, then MEG-4 would be th
 Installation
 ------------
 
-This is not all, just the ones I provide binary release too. Check out the [platform](platform) directory for more!
+This is not all, just the ones I provide as binary release too. Check out the [platform](platform) directory for more!
 
 | Platform   | Link                                                                                                           |
 |------------|----------------------------------------------------------------------------------------------------------------|

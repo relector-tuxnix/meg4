@@ -9,7 +9,7 @@ as hooks. These always start with `main_`. The second group are functions provid
 Hereafter these will be referenced from the platform application's perspective, eg. exported functions are the ones that the
 platform application provides, and imported ones are the functions provided by the libmeg4.a library.
 
-NOTE: Most of the `main_` functions are OS dependent, and already implemented in `platform/common.h`.
+NOTE: Most of the `main_` functions are OS dependent (and not library), and already implemented in `platform/common.h`.
 
 Exported Functions
 ------------------
@@ -130,7 +130,8 @@ Resets the MEG-4 emulator to its default state.
 void meg4_insert(char *name, uint8_t *buf, int len);
 ```
 
-Insert a floppy disk (or a file in any other supported formats) into the MEG-4 Floppy Drive.
+Insert a floppy disk (or a file in any other supported formats) into the MEG-4 Floppy Drive. Note that `name` is just a filename,
+without path.
 
 ```c
 int meg4_load(uint8_t *buf, int len);
@@ -208,23 +209,27 @@ you don't have to worry about these. Your platform probably returns normal keys 
 a few keys like <kbd>F1</kbd>-<kbd>F12</kbd>, <kbd>Backspace</kbd>, <kbd>Enter</kbd> etc. to be handled manually.)
 
 ```c
-void meg4_audiofeed(int8_t *buf, int len);
+void meg4_audiofeed(float *buf, int len);
 ```
 
-Call when your audio playback needs to fill the audio buffer with data.
+Call when your audio playback needs to fill the audio buffer with data. You'll need only one audio stream, mixing is already
+done for you.
 
 ```c
 void meg4_redraw(uint32_t *dst, int dw, int dh, int dp);
 ```
 
-Update your platform's framebuffer with the MEG-4 screen.
+Update your platform's framebuffer with the MEG-4 screen. `dp` is the display pitch, one scanline's length in bytes. It is
+possible that not the entire buffer has to be displayed; only render `meg4.screen.w` x `meg4.screen.h` pixels from the top
+left corner. Normally you call this right after `meg4_run()`, but there could be platforms where you want to handle these
+independently.
 
 Platform Main Loop
 ------------------
 
 A typical platform application's main loop looks like this:
 ```c
-    meg4_poweron();
+    meg4_poweron("en");
     while(platform_running) {
         loopstart = platform_current_time();
         /* parse events, call meg4_setpad, meg4_setbtn, meg4_pushkey, etc. accordingly */

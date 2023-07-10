@@ -453,13 +453,7 @@ int main(int argc, char **argv)
         meg4_run();
         meg4_redraw(image.data, 640, 400, 640 * 4);
         UpdateTexture(screen, image.data);
-        if(le16toh(meg4.mmio.scrx) > 320 || le16toh(meg4.mmio.scry) > 200) {
-            src.x = src.y = 0.0f;
-        } else {
-            src.x = (float)le16toh(meg4.mmio.scrx);
-            src.y = (float)le16toh(meg4.mmio.scry);
-        }
-        src.width = (float)meg4.screen.w; src.height = (float)meg4.screen.h;
+        src.x = src.y = 0.0f; src.width = (float)meg4.screen.w; src.height = (float)meg4.screen.h;
         ww = GetRenderWidth(); wh = GetRenderHeight();
         w = ww; h = (int)meg4.screen.h * ww / (int)meg4.screen.w;
         if(h > wh) { h = wh; w = (int)meg4.screen.w * wh / (int)meg4.screen.h; }

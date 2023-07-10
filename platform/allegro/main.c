@@ -171,7 +171,7 @@ int main(int argc, char **argv)
     ALLEGRO_MOUSE_STATE state;
     ALLEGRO_MONITOR_INFO info;
     ALLEGRO_EVENT event;
-    float x, y, *abuf;
+    float *abuf;
     int i, w, h, ww, wh, redraw, running = 1;
     char *infile = NULL, *fn;
     char s[5];
@@ -498,16 +498,10 @@ int main(int argc, char **argv)
             /* display screen */
             meg4_redraw((uint32_t*)screen->memory, 640, 400, screen->pitch);
             al_clear_to_color(al_map_rgba_f(0, 0, 0, 1));
-            if(le16toh(meg4.mmio.scrx) > 320 || le16toh(meg4.mmio.scry) > 200) {
-                x = y = 0.0f;
-            } else {
-                x = (float)le16toh(meg4.mmio.scrx);
-                y = (float)le16toh(meg4.mmio.scry);
-            }
             ww = al_get_display_width(disp); wh = al_get_display_height(disp);
             w = ww; h = (int)meg4.screen.h * ww / (int)meg4.screen.w;
             if(h > wh) { h = wh; w = (int)meg4.screen.w * wh / (int)meg4.screen.h; }
-            al_draw_scaled_bitmap(screen, x, y, (float)meg4.screen.w, (float)meg4.screen.h,
+            al_draw_scaled_bitmap(screen, 0, 0, (float)meg4.screen.w, (float)meg4.screen.h,
                 (float)((ww - w) >> 1), (float)((wh - h) >> 1), (float)ww, (float)wh, 0);
             al_flip_display();
         }
