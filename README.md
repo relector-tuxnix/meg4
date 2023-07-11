@@ -29,8 +29,8 @@ This is a portable executable, no installation required. Alternatively if you've
 sudo dpkg -i meg4_*.deb
 ```
 
-As for MEG-4 OS, that's a bare metal solution, which does not need any Operating System. You can flash that .iso to a storage and boot it,
-or you can try it out in qemu with
+The [MEG-4 OS](platform/baremetal) is a bare metal solution, which does not need any Operating System. You can flash that .iso to a
+storage and boot it, or you can try it out in a virtual machine with
 
 ```
 qemu-system-x86_64 -m 256 -drive file=meg4.iso,format=raw -device virtio-mouse -serial stdio
