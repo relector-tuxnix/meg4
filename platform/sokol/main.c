@@ -372,7 +372,7 @@ static void event(const sapp_event* ev)
 sapp_desc sokol_main(int argc, char* argv[])
 {
     int i;
-    char *infile = NULL, *fn;
+    char **infile = NULL, *fn;
     uint8_t *ptr;
 #ifdef __WIN32__
     char *lng = main_lng;
@@ -498,9 +498,9 @@ sapp_desc sokol_main(int argc, char* argv[])
     /* turn on the emulator */
     meg4_poweron(lng);
 #ifndef NOEDITORS
-    if(infile) {
-        if((ptr = main_readfile(infile, &i))) {
-            fn = strrchr(infile, SEP[0]); if(!fn) fn = infile; else fn++;
+    for(; infile && *infile; infile++) {
+        if((ptr = main_readfile(*infile, &i))) {
+            fn = strrchr(*infile, SEP[0]); if(!fn) fn = *infile; else fn++;
             meg4_insert(fn, ptr, i);
             free(ptr);
         }

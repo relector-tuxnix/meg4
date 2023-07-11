@@ -541,7 +541,7 @@ void main_hdr(void)
 int main(int argc, char **argv)
 {
     int i, j, w;
-    char *infile = NULL, *ptr2;
+    char **infile = NULL, *ptr2;
     uint8_t *ptr;
     SDL_RWops *ops = NULL;
     SDL_AudioSpec want;
@@ -746,9 +746,9 @@ int main(int argc, char **argv)
     /* turn on the emulator */
     meg4_poweron(lng);
 #if !defined(NOEDITORS) && !defined(__EMSCRIPTEN__)
-    if(infile) {
-        if((ptr = main_readfile(infile, &i))) {
-            fn = strrchr(infile, SEP[0]); if(!fn) fn = infile; else fn++;
+    for(; infile && *infile; infile++) {
+        if((ptr = main_readfile(*infile, &i))) {
+            fn = strrchr(*infile, SEP[0]); if(!fn) fn = *infile; else fn++;
             meg4_insert(fn, ptr, i);
             free(ptr);
         }

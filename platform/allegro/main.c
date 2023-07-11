@@ -173,7 +173,7 @@ int main(int argc, char **argv)
     ALLEGRO_EVENT event;
     float *abuf;
     int i, w, h, ww, wh, redraw, running = 1;
-    char *infile = NULL, *fn;
+    char **infile = NULL, *fn;
     char s[5];
     uint8_t *ptr;
 #ifdef __WIN32__
@@ -316,9 +316,9 @@ int main(int argc, char **argv)
     /* turn on the emulator */
     meg4_poweron(lng);
 #ifndef NOEDITORS
-    if(infile) {
-        if((ptr = main_readfile(infile, &i))) {
-            fn = strrchr(infile, SEP[0]); if(!fn) fn = infile; else fn++;
+    for(; infile && *infile; infile++) {
+        if((ptr = main_readfile(*infile, &i))) {
+            fn = strrchr(*infile, SEP[0]); if(!fn) fn = *infile; else fn++;
             meg4_insert(fn, ptr, i);
             free(ptr);
         }

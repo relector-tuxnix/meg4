@@ -590,7 +590,7 @@ int main(int argc, char **argv)
     struct input_event ev[64];
     struct timespec ts;
     int i, j, k, n, mx = 160, my = 100, emptyalt = 0;
-    char *infile = NULL, *fn;
+    char **infile = NULL, *fn;
     char s[5];
     uint32_t rrate = 44100;
     uint8_t *ptr;
@@ -800,9 +800,9 @@ noaudio:
     /* turn on the emulator */
     meg4_poweron(lng);
 #ifndef NOEDITORS
-    if(infile) {
-        if((ptr = main_readfile(infile, &i))) {
-            fn = strrchr(infile, SEP[0]); if(!fn) fn = infile; else fn++;
+    for(; infile && *infile; infile++) {
+        if((ptr = main_readfile(*infile, &i))) {
+            fn = strrchr(*infile, SEP[0]); if(!fn) fn = *infile; else fn++;
             meg4_insert(fn, ptr, i);
             free(ptr);
         }

@@ -382,7 +382,7 @@ int main(int argc, char **argv)
     const GLFWvidmode *vidmode;
     GLFWgamepadstate state;
     int i, j, w, h, ww, wh, lx, ly, rx, ry;
-    char *infile = NULL, *fn;
+    char **infile = NULL, *fn;
     int32_t tickdiff;
     uint32_t ticks;
     uint8_t *ptr;
@@ -574,9 +574,9 @@ int main(int argc, char **argv)
     /* turn on the emulator */
     meg4_poweron(lng);
 #ifndef NOEDITORS
-    if(infile) {
-        if((ptr = main_readfile(infile, &i))) {
-            fn = strrchr(infile, SEP[0]); if(!fn) fn = infile; else fn++;
+    for(; infile && *infile; infile++) {
+        if((ptr = main_readfile(*infile, &i))) {
+            fn = strrchr(*infile, SEP[0]); if(!fn) fn = *infile; else fn++;
             meg4_insert(fn, ptr, i);
             free(ptr);
         }

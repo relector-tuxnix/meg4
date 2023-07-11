@@ -934,7 +934,7 @@ void main_log(int lvl, const char* fmt, ...)
 /**
  * Parse the command line
  */
-void main_parsecommandline(int argc, char **argv, char **lng, char **infile)
+void main_parsecommandline(int argc, char **argv, char **lng, char ***infile)
 {
     int i, j;
 
@@ -985,7 +985,7 @@ usage:                  main_hdr();
                     break;
                 }
         } else
-        if(!*infile) *infile = argv[i];
+        if(!*infile) *infile = &argv[i];
     }
 #ifdef EMBED
     if(!main_floppydir) goto usage;
