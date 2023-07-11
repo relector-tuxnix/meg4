@@ -248,14 +248,14 @@ void main_win(void)
     if(ioctl(fb, FBIOGET_VSCREENINFO, &fb_var) != 0 || fb_var.xres < 640 || fb_var.yres < 400) {
         /* try to set resolution */
         close(fb);
-        l = open("/sys/class/graphics/fb0/mode", O_WRONLY); if(l > 0) { write(l, "U:1280x800p-0\n", 14); close(l); }
+        l = open("/sys/class/graphics/fb0/mode", O_WRONLY); if(l > 0) { x = write(l, "U:1280x800p-0\n", 14); close(l); }
         fb = open(fbd, O_RDWR); if(fb < 0) return;
         if(ioctl(fb, FBIOGET_VSCREENINFO, &fb_var) != 0 || fb_var.xres < 640 || fb_var.yres < 400) { close(fb); fb = -1; return; }
     }
     memcpy(&fb_orig, &fb_var, sizeof(struct fb_var_screeninfo));
     /* clear screen and hide cursor */
     fprintf(stdout, "\x1b[H\x1b[2J\x1b[?12l\x1b[?17c\x1b[?2q\x1b[?25l"); fflush(stdout);
-    l = open("/sys/class/graphics/fbcon/cursor_blink", O_WRONLY); if(l > 0) { write(l, "0\n", 2); close(l); }
+    l = open("/sys/class/graphics/fbcon/cursor_blink", O_WRONLY); if(l > 0) { x = write(l, "0\n", 2); close(l); }
     if(fb_var.bits_per_pixel != 32) {
         fb_var.bits_per_pixel = 32;
         if(ioctl(fb, FBIOPUT_VSCREENINFO, &fb_var) != 0 ||
