@@ -19,6 +19,7 @@ This is not all, just the ones I provide as binary release too. Check out the [p
 | Ubuntu     | [meg4_0.0.1-amd64.deb](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4_0.0.1-amd64.deb)                       |
 | RaspiOS    | [meg4_0.0.1-armhf.deb](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4_0.0.1-armhf.deb)                       |
 | Web        | [meg4-wasm-emscripten.zip](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-wasm-emscripten.zip)               |
+| MEG-4 OS   | [meg4-x86_64.iso.tgz](https://gitlab.com/bztsrc/meg4/raw/binaries/meg4-x86_64.iso.tgz)                         |
 
 Extract to: `/usr` (Linux, BSDs), `C:\Program Files` (Windows); or in a webserver's public folder (Emscripten).
 
@@ -26,6 +27,13 @@ This is a portable executable, no installation required. Alternatively if you've
 
 ```
 sudo dpkg -i meg4_*.deb
+```
+
+As for MEG-4 OS, that's a bare metal solution, which does not need any Operating System. You can flash that .iso to a storage and boot it,
+or you can try it out in qemu with
+
+```
+qemu-system-x86_64 -m 256 -drive file=meg4.iso,format=raw -device virtio-mouse -serial stdio
 ```
 
 Compilation
