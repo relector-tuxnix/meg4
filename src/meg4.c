@@ -113,6 +113,7 @@ const char *copyright[3] = {
     "along with this program; if not, write to the Free Software",
     "Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA."
 };
+char meg4plat[64] = { 0 };
 meg4_pixbuf_t meg4_icons, meg4_screen;
 meg4_t meg4;
 uint8_t *meg4_font = NULL, *meg4_defwaves = NULL, *meg4_init = NULL;

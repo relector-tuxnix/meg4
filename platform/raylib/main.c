@@ -26,6 +26,7 @@
 #include "meg4.h"
 #include <raylib.h>
 
+extern const char *raylib_version;
 Image image;
 Texture2D screen;
 AudioStream stream;
@@ -192,6 +193,9 @@ int main(int argc, char **argv)
     for(i = 0; i < 3; i++) printf("  %s\r\n", copyright[i]);
     printf("\r\n");
     fflush(stdout);
+
+    sprintf(meg4plat, "raylib %s", raylib_version);
+
     /* set up keymap */
     memset(main_keymap, 0, sizeof(main_keymap));
     main_keymap[KEY_SPACE] = MEG4_KEY_SPACE;

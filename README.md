@@ -88,7 +88,7 @@ the other hand contributions for Lua workarounds are always welcome.
 Contributors
 ------------
 
-I would like to say thanks to [Mátyás Jani](https://gitlab.com/jzombi) for through testing and making suggestions on useful
+I would like to say thanks to [Mátyás Jani](https://gitlab.com/jzombi) for thorough testing and making suggestions on useful
 features.
 
 To Do

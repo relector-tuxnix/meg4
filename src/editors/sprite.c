@@ -356,12 +356,12 @@ void sprite_view(void)
                 meg4_box(meg4.valt, 640, 388, 2560, 11 + i * 9, 321 + j * 9, 10, 10, theme[THEME_SEL_FG], 0, theme[THEME_SEL_FG],
                     0, 0, 0, 0, 0);
             h = meg4.mmio.palette[k];
-            if(k) meg4_blitd(meg4.valt, 12 + i * 9, 322 + j * 9, 2560, 8, 8, 8, &h, 0, 0, 1, 1, 4);
+            if(k) meg4_blitd(meg4.valt, 12 + i * 9, 322 + j * 9, 2560, 8, 8, 8, &h, 0, 0, 1, 1, 4, 0);
             else meg4_blit(meg4.valt, 12 + i * 9, 322 + j * 9, 2560, 8, 8, meg4_edicons.buf, 144, 48, meg4_edicons.w * 4, 1);
         }
     meg4_box(meg4.valt, 640, 388, 2560, 10, 366, 13, 13, theme[THEME_D], theme[THEME_BG], theme[THEME_L], 0, 0, 0, 3, 3);
     h = meg4.mmio.palette[palidx];
-    meg4_blitd(meg4.valt, 11, 367, 2560, 11, 11, 11, &h, 0, 0, 1, 1, 4);
+    meg4_blitd(meg4.valt, 11, 367, 2560, 11, 11, 11, &h, 0, 0, 1, 1, 4, 0);
     /* no palette modification for index 0, that's the "clear" color */
     if(!palidx) {
         meg4_box(meg4.valt, 640, 388, 2560, 26, 366, 13, 13, theme[THEME_D], theme[THEME_L], theme[THEME_D], 0, 0, 0, 0, 0);

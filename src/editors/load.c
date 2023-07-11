@@ -139,9 +139,12 @@ int load_ctrl(void)
         lkey = i;
     }
     if(!load_list) {
+        /* set mouse cursor */
+        x = px >= 80 && px < 240 && py >= 80 && py < 120; y = px >= 2 && py >= 2 && px < 21 && py < 12;
+        meg4.mmio.ptrspr = x || y ? MEG4_PTR_HAND : MEG4_PTR_NORM;
         /* look for mouse button release. GTK open file modal doesn't work with SDL if button press was used... */
-        if(j || (last && !clk && px >= 80 && px < 240 && py >= 80 && py < 120) ||
-          meg4_api_popkey() == htole32('\n')) {
+        if(last && !clk && y) meg4_switchmode(MEG4_MODE_HELP); else
+        if(j || (last && !clk && x) || meg4_api_popkey() == htole32('\n')) {
             /* let's see if we have a floppy list. If not, then open the open file modal */
             files = main_getfloppies();
             if(!files) main_openfile();
@@ -193,12 +196,26 @@ int load_ctrl(void)
                     goto dosearch;
                 } else
                 if(key == htole32('\n')) goto doload; else
-                if(!memcmp(&key, "Up", 3) && curfloppy > 0) {
+                if(!memcmp(&key, "Left", 3) && curfloppy > 0) {
                     do { curfloppy--; } while(curfloppy > 0 && floppy[curfloppy].d == -1);
+                    if(!curfloppy && floppy[curfloppy].d == -1) while(curfloppy + 1 < numfloppy && floppy[curfloppy].d == -1) curfloppy++;
                     x = 1;
                 } else
-                if(!memcmp(&key, "Down", 4) && curfloppy + 1 < numfloppy) {
+                if(!memcmp(&key, "Rght", 4) && curfloppy + 1 < numfloppy) {
                     do { curfloppy++; } while(curfloppy + 1 < numfloppy && floppy[curfloppy].d == -1);
+                    if(curfloppy + 1 == numfloppy && floppy[curfloppy].d == -1) while(curfloppy > 0 && floppy[curfloppy].d == -1) curfloppy--;
+                    x = 1;
+                } else
+                if(!memcmp(&key, "Up", 3)) {
+                    for(i = 0; i < 3 && curfloppy > 0; i++)
+                        do { curfloppy--; } while(curfloppy > 0 && floppy[curfloppy].d == -1);
+                    if(!curfloppy && floppy[curfloppy].d == -1) while(curfloppy + 1 < numfloppy && floppy[curfloppy].d == -1) curfloppy++;
+                    x = 1;
+                } else
+                if(!memcmp(&key, "Down", 4)) {
+                    for(i = 0; i < 3 && curfloppy + 1 < numfloppy; i++)
+                        do { curfloppy++; } while(curfloppy + 1 < numfloppy && floppy[curfloppy].d == -1);
+                    if(curfloppy + 1 == numfloppy && floppy[curfloppy].d == -1) while(curfloppy > 0 && floppy[curfloppy].d == -1) curfloppy--;
                     x = 1;
                 }
                 if(x) {
@@ -274,6 +291,13 @@ void load_view(void)
     if(!load_list) {
         /* the MEG-4 Floppy Drive screen */
         load_bg();
+        /* display F1 and help */
+        x = 2; meg4_blit(meg4.valt, x, 2, 2560, 3, 8, meg4_edicons.buf, 128, 40, meg4_edicons.w * 4, 1);
+        for(i = 0, y = meg4_width(meg4_font, 1, "F1", NULL); i <= y; i++)
+            meg4_blit(meg4.valt, x + 3 + i, 2, 2560, 1, 8, meg4_edicons.buf, 131, 40, meg4_edicons.w * 4, 1);
+        meg4_blit(meg4.valt, x + 3 + i, 2, 2560, 3, 8, meg4_edicons.buf, 132, 40, meg4_edicons.w * 4, 1);
+        meg4_text(meg4.valt, x + 4, 2, 2560, theme[THEME_HELP_KEY], 0, 1, meg4_font, "F1");
+        meg4_text(meg4.valt, x + 9 + i, 2, 2560, theme[THEME_FG], 0, 1, meg4_font, lang[MENU_HELP]);
         /* do the loading animation. this takes exactly 2 secs, always, not like real floppies... :-) */
         if(floppyimg.buf) {
             anim++;
@@ -283,7 +307,7 @@ void load_view(void)
                 y1 = (i * 108) / 30; y2 = 0;
             } else { w = 132; h = 48; y1 = 108; y2 = anim < 60 ? ((anim - 40) * floppyimg.h) / 20 : floppyimg.h; }
             meg4_blitd(meg4.valt, (320-floppyimg.w)/2, (186-floppyimg.h)/2 + y1, 640 * 4,
-                w, floppyimg.w, h, floppyimg.buf, 0, y2, floppyimg.w, floppyimg.h, floppyimg.w * 4);
+                w, floppyimg.w, h, floppyimg.buf, 0, y2, floppyimg.w, floppyimg.h, floppyimg.w * 4, 0);
             if((anim > 60 && anim < 70) || (anim > 70 && anim < 110 && !(anim & 4)))
                 meg4_blit(meg4.valt, 100, 107, 640 * 4, 16, 8, meg4_edicons.buf, 32, 40, meg4_edicons.w * 4, 1);
             if(anim > 120) {
@@ -315,7 +339,7 @@ void load_view(void)
                     meg4_box(meg4.valt, 640, 400, 2560, x, y, 210, 224, 0, theme[THEME_SEL_BG], 0, 0, 0, 0, 0, 0);
                     meg4_blit(meg4.valt, x, y + 2, 640 * 4, 210, 220, floppy[i].img, 0, 0, 840, 1);
                 } else
-                    meg4_blitd(meg4.valt, x + 5, y + 7, 640 * 4, 200, 200, 210, floppy[i].img, 0, 0, 210, 220, 840);
+                    meg4_blitd(meg4.valt, x + 5, y + 7, 640 * 4, 200, 200, 210, floppy[i].img, 0, 0, 210, 220, 840, 1);
                 x += 210; if(x >= 630) { x = 0; y += 224; }
             }
         }

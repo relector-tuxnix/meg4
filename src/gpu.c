@@ -1066,7 +1066,7 @@ void meg4_blit(uint32_t *dst, int x, int y, int dp, int w, int h, uint32_t *src,
 /**
  * Blit distorted to screen
  */
-void meg4_blitd(uint32_t *dst, int x, int y, int dp, int w1, int w2, int h, uint32_t *src, int sx, int sy, int sw, int sh, int sp)
+void meg4_blitd(uint32_t *dst, int x, int y, int dp, int w1, int w2, int h, uint32_t *src, int sx, int sy, int sw, int sh, int sp, int a)
 {
     int i, j, w, D, m = w2 > w1 ? w2 : w1;
     uint8_t *s, *d, *b;
@@ -1081,8 +1081,13 @@ void meg4_blitd(uint32_t *dst, int x, int y, int dp, int w1, int w2, int h, uint
             for(i = 0; i < w; i++, d += 4) {
                 b = s + (i * sw / w) * 4;
                 if(!b[3] || x + i < 0 || x + i >= 630) continue;
-                D = 255 - b[3];
-                d[2] = (b[2]*b[3] + D*d[2]) >> 8; d[1] = (b[1]*b[3] + D*d[1]) >> 8; d[0] = (b[0]*b[3] + D*d[0]) >> 8;
+                if(a) {
+                    D = ((b[2] + b[1] + b[0]) / 3) << 7;
+                    d[2] = ((d[2]<<7) + D) >> 8; d[1] = ((d[1]<<7) + D) >> 8; d[0] = ((d[0]<<7) + D) >> 8;
+                } else {
+                    D = 255 - b[3];
+                    d[2] = (b[2]*b[3] + D*d[2]) >> 8; d[1] = (b[1]*b[3] + D*d[1]) >> 8; d[0] = (b[0]*b[3] + D*d[0]) >> 8;
+                }
             }
         }
     }

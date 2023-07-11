@@ -4,8 +4,8 @@ Interface
 Game Screen
 -----------
 
-By default, you'll see the game screen, with your game running. If you press <kbd>Esc</kbd> here, then you'll switch to
-editor mode.
+By default, you'll see the game screen, with your game running (or the MEG-4 Floppy Drive if there's no game loaded). When you
+press <kbd>Esc</kbd> on this screen, then you'll switch to editor mode.
 
 Editor Screens
 --------------

@@ -133,7 +133,7 @@ void save_view(void)
                 w = (anim * 132 + (30 - anim) * floppyimg.w) / 30; h = (anim * 48 + (30 - anim) * floppyimg.h) / 30;
                 y1 = (anim * 108) / 30; y2 = 0;
             } else { w = 132; h = 48; y1 = 108; y2 = anim < 50 ? ((anim - 30) * floppyimg.h) / 20 : floppyimg.h; }
-            meg4_blitd(meg4.valt, x, y + y1, 640 * 4, w, floppyimg.w, h, floppyimg.buf, 0, y2, floppyimg.w, floppyimg.h, floppyimg.w * 4);
+            meg4_blitd(meg4.valt, x, y + y1, 640 * 4, w, floppyimg.w, h, floppyimg.buf, 0, y2, floppyimg.w, floppyimg.h, floppyimg.w * 4, 0);
             if(anim > 60)
                 meg4_switchmode(-1);
         }

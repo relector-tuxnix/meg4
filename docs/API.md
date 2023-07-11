@@ -219,10 +219,9 @@ done for you.
 void meg4_redraw(uint32_t *dst, int dw, int dh, int dp);
 ```
 
-Update your platform's framebuffer with the MEG-4 screen. `dp` is the display pitch, one scanline's length in bytes. It is
-possible that not the entire buffer has to be displayed; only render `meg4.screen.w` x `meg4.screen.h` pixels from the top
-left corner. Normally you call this right after `meg4_run()`, but there could be platforms where you want to handle these
-independently.
+Update your platform's framebuffer with the MEG-4 screen. `dp` is the display pitch, one scanline's length in bytes. Normally you
+call this right after `meg4_run()`, but there could be platforms where you want to handle these independently. It is possible that
+not the entire buffer has to be displayed; only render `meg4.screen.w` x `meg4.screen.h` pixels from the top left corner.
 
 Platform Main Loop
 ------------------
@@ -233,7 +232,7 @@ A typical platform application's main loop looks like this:
     while(platform_running) {
         loopstart = platform_current_time();
         /* parse events, call meg4_setpad, meg4_setbtn, meg4_pushkey, etc. accordingly */
-        while(platform_hasevents) { ... }
+        while(platform_hasevents) switch(platform_event) { ... }
         /* run the emulator */
         meg4_run();
         /* update your 32 bit RGBA framebuffer with the emulator's screen */

@@ -7,19 +7,22 @@ side to ease creation of content, and make the use of MEG-4 actual fun.
 Floppies
 --------
 
-MEG-4 stores programs in "floppies". You can save in this format by pressing <kbd>Ctrl</kbd>+<kbd>S</kbd>, or by selecting
-`MEG-4` > `Save` from the menu (see [interface]). You'll be prompted to give a label to the floppy, which will be your program's
-title as well. To load such floppies, press <kbd>Ctrl</kbd>+<kbd>L</kbd>, or just simply drag'n'drop these image files onto the
-MEG-4 Floppy Drive.
+MEG-4 stores programs in "floppies". These are image files that look like a real floppy disk. You can save in this format by
+pressing <kbd>Ctrl</kbd>+<kbd>S</kbd>, or by selecting <imgt ../img/menu.png> > `Save` from the menu (see [interface]). You'll be
+prompted to give a label to the floppy, which will be your program's title as well. To load such floppies, press
+<kbd>Ctrl</kbd>+<kbd>L</kbd>, or just simply drag'n'drop these image files onto the MEG-4 Floppy Drive.
 
 The low level specification for this format can be found [here](https://gitlab.com/bztsrc/meg4/blob/main/docs/floppy.md).
 
 Project Format
 --------------
 
-For convenience, there's also a project format, which is a zip archive containing the console's data in only common and
-well-known formats so that you can use your favourite editor or tool to modify them. You can save in this format by selecting
-the `MEG-4` > `Export ZIP` menu option. To load, you can simply drag'n'drop such zip files into the MEG-4 Floppy Drive.
+For convenience, there's also a project format, which is a zip archive containing the console's data in only common and well-known
+formats so that you can use your favourite editor or tool to modify them. You can save in this format by selecting the
+<imgt ../img/menu.png> > `Export ZIP` menu option. To load, you can simply drag'n'drop such zip files into the MEG-4 Floppy Drive.
+
+HINT: One of the test tools, the [converter](https://gitlab.com/bztsrc/meg4/blob/main/tests/converter) can be used to convert
+floppies into zip archives.
 
 Files in the archive:
 

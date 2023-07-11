@@ -397,6 +397,9 @@ int main(int argc, char **argv)
     for(i = 0; i < 3; i++) printf("  %s\r\n", copyright[i]);
     printf("\r\n");
     fflush(stdout);
+    glfwGetVersion(&i, &j, &w); h = Pa_GetVersion();
+    sprintf(meg4plat, "glfw %u.%u.%u, portaudio %u.%u.%u", i, j, w, (h >> 16) & 0xff, (h >> 8) & 0xff, h & 0xff);
+
     /* set up keymap */
     memset(main_keymap, 0, sizeof(main_keymap));
     main_keymap[GLFW_KEY_SPACE] = MEG4_KEY_SPACE;

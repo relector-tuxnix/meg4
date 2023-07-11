@@ -23,6 +23,10 @@
 
 #include <stdio.h>
 #include "editors.h"
+/* only needed to get the version */
+#if LUA
+#include "../lua/lua.h"
+#endif
 
 extern const char *copyright[3];
 static int menu_width = 0, menu_subwidth = 0, menu_active = 0, menu_sel = - 1, menu_pro = 0, menu_last = 0, subw = 0;
@@ -299,19 +303,28 @@ void menu_view(uint32_t *dst, int dw, int dh, int dp)
         i = meg4_width(meg4_font, 2, tmp, NULL);
         meg4_box(dst, dw, dh, dp, 160, 120, i > 320 ? i + 20 : 320, 160,
             theme[THEME_MENU_L], theme[THEME_MENU_BG], theme[THEME_MENU_D], htole32(0x3f000000), 0, 0, 0, 0);
-        meg4_blit(dst, 268, 130, dp, 104, 64, meg4_icons.buf, 0, 0, meg4_icons.w * 4, 1);
-        y = 200;
+        meg4_blit(dst, 268, 128, dp, 104, 64, meg4_icons.buf, 0, 0, meg4_icons.w * 4, 1);
+        y = 192;
         meg4_text(dst, (640 - i) / 2, y, dp, theme[THEME_SEL_FG], htole32(0x3f000000), 2, meg4_font, tmp);
         y += 20;
         sprintf(tmp, "%s v%u.%u.%u", lang[LOAD_FW], meg4.mmio.fwver[0], meg4.mmio.fwver[1], meg4.mmio.fwver[2]);
         meg4_text(dst, (640 - meg4_width(meg4_font, 2, tmp, NULL)) / 2, y, dp, theme[THEME_SEL_FG], htole32(0x3f000000), 2, meg4_font, tmp);
+#if LUA
+        if(meg4plat[0]) sprintf(tmp, "(%s, " LUA_RELEASE ")", meg4plat); else sprintf(tmp, "(" LUA_RELEASE ")");
+        {
+#else
+        if(meg4plat[0]) {
+            sprintf(tmp, "(%s)", meg4plat);
+#endif
+            meg4_text(dst, (640 - meg4_width(meg4_font, 1, tmp, NULL)) / 2, y + 16, dp, theme[THEME_SEL_FG], 0, 1, meg4_font, tmp);
+        }
+        y += 36;
         if(meg4_pro && meg4_author[0]) {
-            meg4_text(dst, (640 - meg4_width(meg4_font, 1, lang[MENU_REGTO], NULL)) / 2, y + 32, dp, theme[THEME_ACTIVE_BG], 0,
+            meg4_text(dst, (640 - meg4_width(meg4_font, 1, lang[MENU_REGTO], NULL)) / 2, y + 8, dp, theme[THEME_ACTIVE_BG], 0,
                 1, meg4_font, lang[MENU_REGTO]);
-            meg4_text(dst, (640 - meg4_width(meg4_font, 1, meg4_author, NULL)) / 2, y + 40, dp, theme[THEME_MENU_FG], htole32(0x3f000000),
+            meg4_text(dst, (640 - meg4_width(meg4_font, 1, meg4_author, NULL)) / 2, y + 16, dp, theme[THEME_MENU_FG], htole32(0x3f000000),
                 1, meg4_font, meg4_author);
         } else {
-            y += 28;
             for(i = 0; i < 3; i++, y += 10)
                 meg4_text(dst, 164, y, dp, theme[THEME_ACTIVE_BG], 0, 1, meg4_font, (char*)copyright[i]);
         }

@@ -616,6 +616,7 @@ int main(int argc, char **argv)
     printf("\r\n");
     fflush(stdout);
 #endif
+    strcpy(meg4plat, "fbdev_alsa");
 
     /* set up keymap */
     memset(main_keymap, 0, sizeof(main_keymap));

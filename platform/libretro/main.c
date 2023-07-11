@@ -184,6 +184,8 @@ RETRO_API void retro_init(void)
     char *lng;
     unsigned int l = 0;
 
+    sprintf(meg4plat, "libretro %u", RETRO_API_VERSION);
+
     memset(main_keymap, 0, sizeof(main_keymap));
     main_keymap[RETROK_SPACE] = MEG4_KEY_SPACE;
     main_keymap[RETROK_CARET] = MEG4_KEY_APOSTROPHE;

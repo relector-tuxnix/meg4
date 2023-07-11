@@ -545,6 +545,7 @@ int main(int argc, char **argv)
     uint8_t *ptr;
     SDL_RWops *ops = NULL;
     SDL_AudioSpec want;
+    SDL_version ver;
 #ifdef __EMSCRIPTEN__
     char detlng[3] = { 0 }, *lng = detlng;
 
@@ -575,6 +576,10 @@ int main(int argc, char **argv)
     for(i = 0; i < 3; i++) printf("  %s\r\n", copyright[i]);
     printf("\r\n");
     fflush(stdout);
+
+    SDL_GetVersion(&ver);
+    sprintf(meg4plat, "SDL %u.%u.%u", ver.major, ver.minor, ver.patch);
+
     /* set up keymap */
     memset(main_keymap, 0, sizeof(main_keymap));
     main_keymap[SDL_SCANCODE_A] = MEG4_KEY_A;

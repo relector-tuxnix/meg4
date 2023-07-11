@@ -176,6 +176,7 @@ int main(int argc, char **argv)
     char **infile = NULL, *fn;
     char s[5];
     uint8_t *ptr;
+    uint32_t ver;
 #ifdef __WIN32__
     char *lng = main_lng;
 #else
@@ -191,6 +192,8 @@ int main(int argc, char **argv)
         main_log(0, "unable to initialize allegro");
         return 1;
     }
+    ver = al_get_allegro_version();
+    sprintf(meg4plat, "allegro %u.%u.%u", (ver >> 24) & 0xff, (ver >> 16) & 0xff, (ver >> 8) & 0xff);
     al_install_keyboard();
     al_install_mouse();
     al_install_joystick();

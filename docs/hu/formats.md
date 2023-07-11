@@ -7,10 +7,10 @@ hogy segítse a tartalomkészítést, és ténylegesen szórakoztatóvá tegye a
 Flopik
 ------
 
-A MEG-4 a programokat "flopi" lemezeken tárolja. Ilyen formátumban menthetsz a <kbd>Ctrl</kbd>+<kbd>S</kbd> leütésével, vagy
-a `MEG-4` > `Elment` menüpont kiválasztásával (lásd [interfész]). Be fogja kérni a lemez feliratát, ami egyben a programod neve
-is lesz. Ilyen flopilemezek betöltéséhez üsd le a <kbd>Ctrl</kbd>+<kbd>L</kbd>-t, vagy csak simán húzd rá ezeket a képfájlokat a
-MEG-4 Flopi Meghajtóra.
+A MEG-4 a programokat "flopi"-kon tárolja. Ezek olyan képfájlok, amik egy igazi flopi lemezt ábrázolnak. Ilyen formátumban menthetsz
+a <kbd>Ctrl</kbd>+<kbd>S</kbd> leütésével, vagy a <imgt ../img/menu.png> > `Elment` menüpont kiválasztásával (lásd [interfész]). Be
+fogja kérni a lemez feliratát, ami egyben a programod neve is lesz. Ilyen flopilemezek betöltéséhez üsd le a
+<kbd>Ctrl</kbd>+<kbd>L</kbd>-t, vagy csak simán húzd rá ezeket a képfájlokat a MEG-4 Flopi Meghajtóra.
 
 Az alacsonyszintű specifikáció [itt](https://gitlab.com/bztsrc/meg4/blob/main/docs/floppy.md) érhető el (angol nyelvű).
 
@@ -19,8 +19,11 @@ Projektformátum
 
 Kényelmed érdekében van egy projektformátum is, ami egy tömörített zip a konzol adataival, benne kizárólag jólismert és
 általánosan támogatott formátumú fájlokkal, hogy a kedvenc programoddal vagy eszközöddel is módosíthasd őket. Ebben a formátumban
-való mentéshez válaszd a `MEG-4` > `ZIP Export` menüpontot. A betöltéshez csak simán húzd rá az ilyen zip fájlt a MEG-4 Flopi
-Meghajtóra.
+való mentéshez válaszd a <imgt ../img/menu.png> > `ZIP Export` menüpontot. A betöltéshez csak simán húzd rá az ilyen zip fájlt a
+MEG-4 Flopi Meghajtóra.
+
+HINT: Az egyik teszt eszköz, a [converter](https://gitlab.com/bztsrc/meg4/blob/main/tests/converter) használható flopilemezek
+zip-é konvertálására.
 
 A benne lévő fájlok:
 

@@ -384,6 +384,9 @@ sapp_desc sokol_main(int argc, char* argv[])
     for(i = 0; i < 3; i++) printf("  %s\r\n", copyright[i]);
     printf("\r\n");
     fflush(stdout);
+
+    strcpy(meg4plat, "sokol");
+
     /* set up keymap */
     memset(main_keymap, 0, sizeof(main_keymap));
     main_keymap[SAPP_KEYCODE_SPACE] = MEG4_KEY_SPACE;

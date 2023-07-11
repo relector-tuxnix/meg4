@@ -4,7 +4,8 @@ Interfész
 Játékképernyő
 -------------
 
-Alapból ez a játékképernyő fogad, ahol a programod fut. Ha itt leütöd az <kbd>Esc</kbd> gombot, akkor átvált szerkesztő módba.
+Alapból a játékképernyő fogad, ahol a programod fut (illetve a MEG-4 Flopi Meghajtó, ha nincs betöltve program). Ha ezen a
+képernyőn leütöd az <kbd>Esc</kbd> gombot, akkor átvált szerkesztő módba.
 
 Szerkesztő képernyők
 --------------------

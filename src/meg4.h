@@ -369,7 +369,7 @@ typedef uint32_t str_t;
 
 /* global variables */
 extern const char meg4ver[], *copyright[3];
-extern char meg4_title[64], meg4_author[64], meg4_pro, meg4_takescreenshot;
+extern char meg4plat[64], meg4_title[64], meg4_author[64], meg4_pro, meg4_takescreenshot;
 extern uint8_t *meg4_font, *meg4_defwaves;
 extern meg4_pixbuf_t meg4_icons, meg4_edicons;
 extern meg4_t meg4;
@@ -604,7 +604,7 @@ uint8_t meg4_palidx(uint8_t *rgba);
 void meg4_spr(uint32_t *dst, int dp, int x, int y, int sprite, int scale, int type);
 void meg4_blit(uint32_t *dst, int x, int y, int dp, int w, int h, uint32_t *src, int sx, int sy, int sp, int t);
 #ifndef NOEDITORS
-void meg4_blitd(uint32_t *dst, int x, int y, int dp, int w1, int w2, int h, uint32_t *src, int sx, int sy, int sw, int sh, int sp);
+void meg4_blitd(uint32_t *dst, int x, int y, int dp, int w1, int w2, int h, uint32_t *src, int sx, int sy, int sw, int sh, int sp, int a);
 void meg4_box(uint32_t *dst, int dw, int dh, int dp, int x, int y, int w, int h, uint32_t l, uint32_t b, uint32_t d,
     uint32_t s, int t, int o, int r, int c);
 void meg4_chk(uint32_t *dst, int dw, int dh, int dp, int x, int y, uint32_t l, uint32_t d, int c);
