@@ -105,7 +105,7 @@ endif
 package:
 ifeq ("$(TARGET)","meg4.js")
 	@rm ../meg4-wasm-emscripten.zip 2>/dev/null || true
-	@printf "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">\n    <title>MEG-4</title>\n    <style>\nbody { text-align:center; vertical-align:middle; }\na { text-decoration:none; }\n#canvas { width:320px; height:200px; background:#444; }\n@media (min-width:768px){#canvas { width:640px; height:400px; }}\n@media (min-width:1024px){#canvas { width:960px; height:600px; }}\n@media (min-width:1500px){#canvas { width:1280px; height:800px; }}\n    </style>\n  </head>\n  <body>\n    <canvas id=\"canvas\"></canvas>\n    <script src="meg4.js"></script>\n    <br><a href=\"https://bztsrc.gitlab.io/meg4\" target=\"new\">Visit MEG-4 website</a>\n  </body>\n</html>\n" >index.html
+	@printf "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">\n    <title>MEG-4</title>\n    <style>\nbody { text-align:center; vertical-align:middle; }\na { text-decoration:none; }\n#canvas { width:320px; height:200px; background:#444; }\n@media (min-width:768px){#canvas { width:640px; height:400px; }}\n@media (min-width:1024px){#canvas { width:960px; height:600px; }}\n@media (min-width:1500px){#canvas { width:1280px; height:800px; }}\n    </style>\n  </head>\n  <body>\n    <canvas id=\"canvas\"></canvas>\n    <script src=\"meg4.js\"></script>\n    <br><a href=\"https://bztsrc.gitlab.io/meg4\" target=\"new\">Visit MEG-4 website</a>\n  </body>\n</html>\n" >index.html
 	zip -r ../../meg4-wasm-emscripten.zip index.html meg4.js meg4.wasm
 	@rm index.html
 else
