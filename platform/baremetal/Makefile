@@ -26,7 +26,6 @@ KBDMAP?=us
 LANG?=en
 FLOPPYDEV?=/dev/sda1
 KERNEL?=6.4.2
-SYSLINUX?=6.03
 # ----- end of configuration -----
 
 qemu=qemu-system-$(shell uname -m) -m 256 -drive file=meg4.iso,format=raw -device virtio-mouse -serial stdio
@@ -90,38 +89,16 @@ boot/initrd: rootfs/init
 	cd rootfs && find . | cpio -R root:root -H newc -o | gzip > ../boot/initrd
 
 ### get boot loader
-syslinux.tar.xz:
-	wget -c http://kernel.org/pub/linux/utils/boot/syslinux/syslinux-$(SYSLINUX).tar.xz -O syslinux.tar.xz
+simpleboot/simpleboot:
+	git clone https://gitlab.com/bztsrc/simpleboot
 
 ### construct disk image ###
-meg4.iso: boot/vmlinuz boot/initrd syslinux.tar.xz
+meg4.iso: boot/vmlinuz boot/initrd simpleboot/simpleboot
 	@mkdir -p boot/MEG-4 2>/dev/null || true
 	@cp -r ../../public/floppies/* boot/MEG-4
-	@printf "default vmlinuz initrd=/initrd $(FBSET) console=ttyS0,115200 quiet\n" >boot/syslinux.cfg
-	dd if=/dev/zero of=meg4.iso count=$(IMGSIZE) bs=1048576
-	printf "n\np\n1\n2048\n\nt 1\nc\na\nw\nq\n" | fdisk meg4.iso
-	mkfs.vfat -F 32 -n "MEG-4 OS" --offset 2048 meg4.iso
-	tar --strip-components=3 -xvf syslinux.tar.xz syslinux-$(SYSLINUX)/bios/mbr/mbr.bin && dd bs=440 count=1 conv=notrunc if=mbr.bin of=meg4.iso && rm mbr.bin
-ifneq ($(wildcard /usr/bin/mcopy),)
-	@# if mtools is installed, use that (available to all users)
-	tar --strip-components=3 -xvf syslinux.tar.xz syslinux-$(SYSLINUX)/bios/mtools/syslinux && ./syslinux -t 1048576 -i meg4.iso && rm syslinux
-	cd boot && mcopy -i ../meg4.iso@@1M -s * ::
-else
-	@# use standard Linux tools otherwise (unfortunately requires root priviledge...)
-	tar --strip-components=3 -xvf syslinux.tar.xz syslinux-$(SYSLINUX)/bios/linux/syslinux-nomtools && ./syslinux-nomtools -t 1048576 -i meg4.iso && rm syslinux-nomtools
-	@mkdir mnt 2>/dev/null
-	sudo mount -o loop,offset=1048576,user,umask=000 meg4.iso mnt
-	cd boot && cp -r * ../mnt
-	sudo umount mnt
-	rm -rf mnt
-endif
-
-## Ok, I got fed up with this buggy shitparade called grub, switching to syslinux
-#	@printf "set default=0\nset timeout=1\nroot (hd0,0)\nmenuentry \"MEG-4 OS\" {\n linux /vmlinuz\n initrd /initrd\n}\n" >boot/grub/grub.cfg
-#	grub-mkrescue --compress=xz -o meg4.iso boot
-## AHHHHHH such a bloated epic failure... it reads my host (!) system's configs, even though I explicitly told it NOT to!
-#	@printf "insmod part_gpt\ninsmod part_msdos\ninsmod fat\ninsmod all_video\nset default=0\nset timeout=1\nset root='hd0,0'\nmenuentry \"MEG-4 OS\" {\n linux /vmlinuz\n initrd /initrd\n}\n" >boot/grub/grub.cfg
-#	grub-install --compress=xz --boot-directory=./boot --target=i386-pc meg4.iso
+	@cp ../../src/misc/logo.tga boot/meg4.tga
+	@printf "kernel vmlinuz $(FBSET) console=ttyS0,115200 quiet\nmodule initrd\nbootsplash #444444 meg4.tga" >boot/simpleboot.cfg
+	simpleboot/simpleboot -p $(IMGSIZE) boot meg4.iso
 
 package: meg4.iso
 	@printf "#/bin/sh\n\nmkdir -p mnt\nsudo mount -o loop,offset=1048576,user,umask=000 meg4.iso mnt\n" > mount.sh && chmod +x mount.sh
@@ -130,7 +107,7 @@ package: meg4.iso
 	@rm mount.sh run.sh
 
 clean:
-	rm -rf rootfs boot linux-* kernel.tar.xz syslinux.tar.xz meg4.iso 2>/dev/null || true
+	rm -rf rootfs boot linux-* kernel.tar.xz simpleboot meg4.iso 2>/dev/null || true
 
 run: meg4.iso
 	$(qemu)

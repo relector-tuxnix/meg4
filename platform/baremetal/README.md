@@ -25,7 +25,4 @@ Compilation options
 You can write the resulting `meg4.iso` with `dd` or [USBImager](https://bztsrc.gitlab.io/usbimager/) to a storage and
 boot that on a real machine. Or alternatively `make run` will start in a virtual machine, provided you have qemu installed.
 
-NOTE: for simplicity, the boot loader is configured for BIOS. On a real hardware with EFI, you'll have to enable EFI CSM,
-or modify the Makefile to use the EFI version of syslinux. Alternatively you could try to use grub (I gave up on that,
-because no matter what I did, grub read the host (!) system's configuration files, which of course will never work for the
-image. And modifying the host computer's boot config just to install grub on an image is an insane risk I refuse to take).
+NOTE: the image uses [Simpleboot](https://gitlab.com/bztsrc/simpleboot), which can boot on UEFI as well as on BIOS machines.

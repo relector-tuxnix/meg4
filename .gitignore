@@ -26,6 +26,7 @@ platform/raspberrypi/firmware.zip
 platform/baremetal/rootfs
 platform/baremetal/boot
 platform/baremetal/linux-*
+platform/baremetal/simpleboot
 platform/baremetal/*.tar.xz
 platform/allegro/allegro*
 src/editors/pro.*
