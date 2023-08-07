@@ -387,15 +387,17 @@ void code_getfunc(void)
 
     hlp = lhlp = -1;
     if(!meg4.src || meg4.src_len < 1) return;
-    for(i = 0; i + 1 < numtok && (uint32_t)(tok[i] >> 4) <= cursor; i++);
+    for(i = 0; i + 1 < numtok && (uint32_t)(tok[i] >> 4) < cursor; i++);
     /* with Assembly there's no conventional function call, instead name prefixed by an SCALL keyword */
     if(meg4.src_len > 5 && !memcmp(meg4.src, "#!asm", 5)) {
+        if((tok[i] & 15) == HL_V) i++;
         if(i > 3 && (tok[i - 1] & 15) == HL_V && (tok[i - 2] & 15) == HL_D && (tok[i - 3] & 15) == HL_K &&
           !casecmp(meg4.src + (tok[i - 3] >> 4), "scall", 5))
             hlp = help_find(meg4.src + (tok[i - 1] >> 4), (tok[i] >> 4) - (tok[i - 1] >> 4), 1);
         return;
     }
     if(i > 0 && i < numtok) {
+        if(meg4.src[tok[i] >> 4] == ')') i--;
         for(p = 1; i > 0 && p > 0; i--) {
             if(meg4.src[tok[i] >> 4] == '(') p--; else
             if(meg4.src[tok[i] >> 4] == ')') p++;
