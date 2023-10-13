@@ -162,7 +162,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             case 0x07: lng = "de"; break;   case 0x08: lng = "el"; break;   case 0x0A: lng = "es"; break;
             case 0x0B: lng = "fi"; break;   case 0x0C: lng = "fr"; break;   case 0x0D: lng = "he"; break;
             case 0x0E: lng = "hu"; break;   case 0x0F: lng = "is"; break;   case 0x10: lng = "it"; break;
-            case 0x11: lng = "jp"; break;   case 0x12: lng = "ko"; break;   case 0x13: lng = "nl"; break;
+            case 0x11: lng = "ja"; break;   case 0x12: lng = "ko"; break;   case 0x13: lng = "nl"; break;
             case 0x14: lng = "no"; break;   case 0x15: lng = "pl"; break;   case 0x16: lng = "pt"; break;
             case 0x17: lng = "rm"; break;   case 0x18: lng = "ro"; break;   case 0x19: lng = "ru"; break;
             case 0x1A: lng = "hr"; break;   case 0x1B: lng = "sk"; break;   case 0x1C: lng = "sq"; break;
