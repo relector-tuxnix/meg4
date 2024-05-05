@@ -22,9 +22,10 @@ Compilation options
 
 You must run this `meg4` with the `-d` flag and specify a directory where the floppies are stored. With `USE_INIT=1`,
 there's no command line, so this has to be hardcoded, use the `FLOPPYDEV` environment variable to change the default.
-This should contain a partition device with a file system that the Linux kernel supports, and with a directory named
-`MEG-4` on it where the floppy images are kept. Because for init there are no environment variables either, the interface's
-language (specified in the `LANG` environment variable) is also taken at compilation time and hardcoded into the binary.
+This is not an actual floppy device file (like /dev/fd0), rather it should point to a partition device with a file system that the
+Linux kernel supports, and with a directory named `MEG-4` on that file system where the floppy images are kept. Because for init
+there are no environment variables either, the interface's language (specified in the `LANG` environment variable) is also taken
+and hardcoded into the binary at compilation time.
 
 The Linux kernel's event interface does not and cannot support switchable X11 keyboard layouts, so you must compile in
 a keyboard mapping manually. You can choose any of the existing header files, for example `KBDMAP=gb make`. To create a

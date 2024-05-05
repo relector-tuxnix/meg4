@@ -8,8 +8,8 @@ Step 1: compile `meg4` as an init process
 -----------------------------------------
 
 Go to the [fbdev_alsa](../platform/fbdev_alsa) directory, and compile MEG-4 with the `USE_INIT=1` flag. Specify the
-other parameters as well, like the keyboard layout or the floppy device (which must point to the boot partition you're
-about to create in step 4, see below).
+other parameters as well, like the keyboard layout or the floppy device (which is not an actual floppy device file,
+instead it must point to the boot partition you're about to create in step 4, see below).
 
 Step 2: compile the Linux kernel
 --------------------------------
@@ -64,28 +64,35 @@ sees this boot partition *when it runs* (you can also use the `UUID=` variant wi
 Step 5: install boot loader
 ---------------------------
 
-You'll also have to install a target platform specific boot loader into the image (GRUB, syslinux, isolinux, LILO, whatever). The
-required steps vary from loader to loader, but they usually have a simple text config file to specify what OS to boot. Tell this
-boot loader to load your Linux kernel along with the initial ramdisk from the boot partition, and pass a command line to the kernel
-to set up the framebuffer.
+You'll also have to install a target platform specific boot loader into the image (GRUB, syslinux, isolinux, LILO, Simpleboot,
+whatever). The required steps vary from loader to loader, but they usually have a simple text config file to specify what OS to
+boot. Tell this boot loader to load your Linux kernel along with the initial ramdisk from the boot partition, and pass a command
+line to the kernel to set up the framebuffer.
 
 For example, if your hardware uses UEFI, then you'll probably need the loader in "EFI/BOOT/BOOTX86.EFI" (this could be the kernel
-itself, if compiled with EFI-stub). On legacy BIOS machines, you'll need "ldlinux.sys" and "ldlinux.c32", and in "syslinux.cfg"
-something like:
+itself, if compiled with EFI-stub). On legacy BIOS machines with syslinux, you'll need "ldlinux.sys" and "ldlinux.c32", and in
+"syslinux.cfg" something like:
 ```
 default vmlinuz initrd=/initrd vga=0x37a quiet
 ```
-On Raspberry Pi, the loader has multiple files too, "bootcode.bin" and "start.elf", you have to specify the initrd in "config.txt",
-and you also have to rename your kernel file to "kernel8.img", otherwise it won't work. For GRUB, you'll need a directory named
-"grub", with lots and lots of files, among which "grub/grub.cfg" being the configuration file, containing something like:
+For GRUB, you'll need a directory named "grub", with lots and lots of files, among which "grub/grub.cfg" being the configuration
+file, containing something like:
 ```
 menuentry "MEG-4 OS" {
     linux  /vmlinuz vga=0x37a quiet
     initrd /initrd
 }
 ```
+Because I couldn't get syslinux to work on UEFI, and GRUB is way too bloated to my taste, I've also written a boot loader,
+this needs a "simpleboot.cfg" file on the boot partition like:
+```
+kernel /vmlinuz vga=0x37a quiet
+module /initrd
+```
+On Raspberry Pi, the loader has multiple files too, "bootcode.bin" and "start.elf", you have to specify the initrd in "config.txt",
+and you also have to rename your "vmlinuz" kernel file to "kernel8.img", otherwise it won't work.
 
-This step is very platform and loader specific, but the end of the day it just loads the kernel and the initrd.
+This step is very platform and loader specific, but the end of the day it just loads the kernel and the initrd on boot.
 
 Step 6: burn the image file to a real disk
 ------------------------------------------

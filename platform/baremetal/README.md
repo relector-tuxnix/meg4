@@ -22,7 +22,7 @@ Compilation options
 | `LANG=xx make`        | Select interface's language (default `en`, English)                   |
 | `KBDMAP=xx make`      | Select keyboard layout map (default `us`, International)              |
 
-You can write the resulting `meg4.iso` with `dd` or [USBImager](https://bztsrc.gitlab.io/usbimager/) to a storage and
-boot that on a real machine. Or alternatively `make run` will start in a virtual machine, provided you have qemu installed.
+You can write the resulting `meg4.iso` with `dd` or [USBImager](https://bztsrc.gitlab.io/usbimager/) to a storage and boot
+that on a real machine. Or alternatively `make run` will start it in a virtual machine, provided you have qemu installed.
 
 NOTE: the image uses [Simpleboot](https://gitlab.com/bztsrc/simpleboot), which can boot on UEFI as well as on BIOS machines.
