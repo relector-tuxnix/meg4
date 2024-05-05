@@ -80,6 +80,7 @@ boot/vmlinuz: linux-$(KERNEL)/.config
 	@mkdir -p boot rootfs/lib/modules 2>/dev/null || true
 	make -C linux-$(KERNEL) -j4 bzImage modules
 	make INSTALL_PATH=../boot INSTALL_MOD_PATH=../rootfs -C linux-$(KERNEL) install modules_install
+	@mv boot/vmlinuz-$(KERNEL) boot/vmlinuz 2>/dev/null || mv boot/bzImage-$(KERNEL) boot/vmlinuz 2>/dev/null || true
 	@rm rootfs/lib/modules/$(KERNEL)/build rootfs/lib/modules/$(KERNEL)/source 2>/dev/null || true
 
 ### create initial ramdisk ###
