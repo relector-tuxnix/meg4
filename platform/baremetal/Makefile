@@ -98,7 +98,7 @@ meg4.iso: boot/vmlinuz boot/initrd simpleboot/simpleboot
 	@cp -r ../../public/floppies/* boot/MEG-4
 	@cp ../../src/misc/logo.tga boot/meg4.tga
 	@printf "kernel vmlinuz $(FBSET) console=ttyS0,115200 quiet\nmodule initrd\nbootsplash #444444 meg4.tga" >boot/simpleboot.cfg
-	simpleboot/simpleboot -p $(IMGSIZE) boot meg4.iso
+	simpleboot/distrib/simpleboot -p $(IMGSIZE) boot meg4.iso
 
 package: meg4.iso
 	@printf "#/bin/sh\n\nmkdir -p mnt\nsudo mount -o loop,offset=1048576,user,umask=000 meg4.iso mnt\n" > mount.sh && chmod +x mount.sh
