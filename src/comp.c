@@ -1160,7 +1160,7 @@ int cpu_compile(void)
 #if LUA
     if(meg4.code_type == 0x10) return comp_lua(meg4.src + 6, meg4.src_len - 7); else
 #endif
-    if(meg4.code_type > 1) { code_error(2, lang[ERR_UNKLNG]); return 0; }
+    if(meg4.code_type > 1 && meg4.code_type != 15) { code_error(2, lang[ERR_UNKLNG]); return 0; }
 
     /* make sure code ends with a newline */
     if(meg4.src && meg4.src_len > 1 && meg4.src[meg4.src_len - 2] != '\n')
