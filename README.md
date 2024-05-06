@@ -97,7 +97,8 @@ Contributors
 ------------
 
 I would like to say thanks to [Mátyás Jani](https://gitlab.com/jzombi) for thorough testing and making suggestions on useful
-features, and [Tony Wang](https://github.com/paladin-t) for the Chinese translation fixes!
+features, and [Tony Wang](https://github.com/paladin-t) for the Chinese, and [nic_le](https://gitlab.com/nics_le) for the German
+translation fixes!
 
 To Do
 -----
